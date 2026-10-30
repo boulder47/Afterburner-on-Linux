@@ -1,0 +1,70 @@
+[151711.458391] afterburner_flash2 0000:0f:00.0: Apple Afterburner [106b:0205] Phase 2b fine-grained Flash locator + READ
+[151711.458481] afterburner_flash2 0000:0f:00.0: ID block +0x4 = 0x10020014 (reference)
+[151711.458488] afterburner_flash2 0000:0f:00.0: --- step 1: read-only sweep +0x8000..+0xf000 (non-zero only) ---
+[151711.458492] afterburner_flash2 0000:0f:00.0:   +0x8000: 0x000b0101
+[151711.458525] afterburner_flash2 0000:0f:00.0:   +0x8008: 0x3e0fd000
+[151711.458531] afterburner_flash2 0000:0f:00.0:   +0x8014: 0x00000004
+[151711.458536] afterburner_flash2 0000:0f:00.0:   +0x8024: 0x00001000
+[151711.458540] afterburner_flash2 0000:0f:00.0:   +0x8028: 0x0000002a
+[151711.459423] afterburner_flash2 0000:0f:00.0:   +0x9000: 0x000b0101
+[151711.459427] afterburner_flash2 0000:0f:00.0:   +0x9008: 0x3e0fd000
+[151711.459432] afterburner_flash2 0000:0f:00.0:   +0x9014: 0x00000004
+[151711.459437] afterburner_flash2 0000:0f:00.0:   +0x9024: 0x00001000
+[151711.459440] afterburner_flash2 0000:0f:00.0:   +0x9028: 0x0000002a
+[151711.460323] afterburner_flash2 0000:0f:00.0:   +0xa000: 0x000b0101
+[151711.460327] afterburner_flash2 0000:0f:00.0:   +0xa008: 0x3e0fd000
+[151711.460331] afterburner_flash2 0000:0f:00.0:   +0xa014: 0x00000004
+[151711.460337] afterburner_flash2 0000:0f:00.0:   +0xa024: 0x00001000
+[151711.460340] afterburner_flash2 0000:0f:00.0:   +0xa028: 0x0000002a
+[151711.461225] afterburner_flash2 0000:0f:00.0:   +0xb000: 0x000b0101
+[151711.461229] afterburner_flash2 0000:0f:00.0:   +0xb008: 0x3e0fd000
+[151711.461234] afterburner_flash2 0000:0f:00.0:   +0xb014: 0x00000004
+[151711.461239] afterburner_flash2 0000:0f:00.0:   +0xb024: 0x00001000
+[151711.461242] afterburner_flash2 0000:0f:00.0:   +0xb028: 0x0000002a
+[151711.462124] afterburner_flash2 0000:0f:00.0:   +0xc000: 0x000b0101
+[151711.462128] afterburner_flash2 0000:0f:00.0:   +0xc008: 0x3e0fd000
+[151711.462132] afterburner_flash2 0000:0f:00.0:   +0xc014: 0x00000004
+[151711.462138] afterburner_flash2 0000:0f:00.0:   +0xc024: 0x00001000
+[151711.462141] afterburner_flash2 0000:0f:00.0:   +0xc028: 0x0000002a
+[151711.463023] afterburner_flash2 0000:0f:00.0:   +0xd000: 0x000b0101
+[151711.463027] afterburner_flash2 0000:0f:00.0:   +0xd008: 0x3e0fd000
+[151711.463032] afterburner_flash2 0000:0f:00.0:   +0xd014: 0x00000004
+[151711.463037] afterburner_flash2 0000:0f:00.0:   +0xd024: 0x00001000
+[151711.463040] afterburner_flash2 0000:0f:00.0:   +0xd028: 0x0000002a
+[151711.463923] afterburner_flash2 0000:0f:00.0:   +0xe000: 0x000b0101
+[151711.463927] afterburner_flash2 0000:0f:00.0:   +0xe008: 0x3e0fd000
+[151711.463931] afterburner_flash2 0000:0f:00.0:   +0xe014: 0x00000004
+[151711.463937] afterburner_flash2 0000:0f:00.0:   +0xe024: 0x00001000
+[151711.463940] afterburner_flash2 0000:0f:00.0:   +0xe028: 0x0000002a
+[151711.464848] afterburner_flash2 0000:0f:00.0: --- step 2: issue READ at each candidate base (non-destructive) ---
+[151711.467134] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x8fb0: 0x01010b00
+[151711.467142] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x8fb8: 0x00d00f3e
+[151711.467151] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x8fc4: 0x0c000000
+[151711.467163] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x8fd4: 0x00100000
+[151711.467167] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x8fd8: 0x20000000
+[151711.469481] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x9fb0: 0x01010b00
+[151711.469487] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x9fb8: 0x00d00f3e
+[151711.469495] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x9fc4: 0x0c000000
+[151711.469508] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x9fd4: 0x00100000
+[151711.469512] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0x9fd8: 0x20000000
+[151711.471782] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xafb0: 0x01010b00
+[151711.471788] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xafb8: 0x00d00f3e
+[151711.471797] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xafc4: 0x0c000000
+[151711.471807] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xafd4: 0x00100000
+[151711.471811] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xafd8: 0x20000000
+[151711.474081] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xbfb0: 0x01010b00
+[151711.474087] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xbfb8: 0x00d00f3e
+[151711.474095] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xbfc4: 0x0c000000
+[151711.474105] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xbfd4: 0x00100000
+[151711.474108] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xbfd8: 0x20000000
+[151711.476384] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xcfb0: 0x01010b00
+[151711.476390] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xcfb8: 0x00d00f3e
+[151711.476398] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xcfc4: 0x0c000000
+[151711.476408] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xcfd4: 0x00100000
+[151711.476412] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xcfd8: 0x20000000
+[151711.478685] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xdfb0: 0x01010b00
+[151711.478692] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xdfb8: 0x00d00f3e
+[151711.478700] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xdfc4: 0x0c000000
+[151711.478710] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xdfd4: 0x00100000
+[151711.478714] afterburner_flash2 0000:0f:00.0:     ^ READBACK at base +0xdfd8: 0x20000000
+[151711.480976] afterburner_flash2 0000:0f:00.0: --- flash2 scan done ---

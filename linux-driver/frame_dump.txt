@@ -1,0 +1,36 @@
+[155163.049770] afterburner_frame 0000:0f:00.0: Apple Afterburner [106b:0205] Phase 3c REAL FRAME + desc-reg pin
+[155163.049844] afterburner_frame 0000:0f:00.0: --- sweeping candidate desc-PA register offsets ---
+[155163.049850] afterburner_frame 0000:0f:00.0:     bar0+0x5080 ignored (readback=0xffffffff)
+[155163.049857] afterburner_frame 0000:0f:00.0:     bar0+0x6080 ignored (readback=0xffffffff)
+[155163.049862] afterburner_frame 0000:0f:00.0:     bar0+0x5084 ignored (readback=0xffffffff)
+[155163.049867] afterburner_frame 0000:0f:00.0:     bar0+0x6084 ignored (readback=0xffffffff)
+[155163.049872] afterburner_frame 0000:0f:00.0:     bar0+0x5088 ignored (readback=0xffffffff)
+[155163.049877] afterburner_frame 0000:0f:00.0:     bar0+0x6088 ignored (readback=0xffffffff)
+[155163.049881] afterburner_frame 0000:0f:00.0:     bar0+0x4080 ignored (readback=0x10000106)
+[155163.049886] afterburner_frame 0000:0f:00.0:     bar0+0x5080 ignored (readback=0xffffffff)
+[155163.049890] afterburner_frame 0000:0f:00.0:     bar0+0x4084 ignored (readback=0x10000106)
+[155163.049895] afterburner_frame 0000:0f:00.0:     bar0+0x5084 ignored (readback=0xffffffff)
+[155163.049900] afterburner_frame 0000:0f:00.0:     bar0+0x4088 ignored (readback=0x10000106)
+[155163.049904] afterburner_frame 0000:0f:00.0:     bar0+0x5088 ignored (readback=0xffffffff)
+[155163.049909] afterburner_frame 0000:0f:00.0:     bar0+0x5000 ignored (readback=0xffffffff)
+[155163.049913] afterburner_frame 0000:0f:00.0:     bar0+0x6000 ignored (readback=0xffffffff)
+[155163.049918] afterburner_frame 0000:0f:00.0:     bar0+0x5078 ignored (readback=0xffffffff)
+[155163.049922] afterburner_frame 0000:0f:00.0:     bar0+0x507c ignored (readback=0xffffffff)
+[155163.049927] afterburner_frame 0000:0f:00.0:     bar0+0x6078 ignored (readback=0xffffffff)
+[155163.049932] afterburner_frame 0000:0f:00.0:     bar0+0x607c ignored (readback=0xffffffff)
+[155163.049936] afterburner_frame 0000:0f:00.0:     bar0+0x2000 ignored (readback=0x04000104)
+[155163.049941] afterburner_frame 0000:0f:00.0:     bar0+0x2004 ignored (readback=0x00005000)
+[155163.049946] afterburner_frame 0000:0f:00.0:     bar0+0x2008 ignored (readback=0x00000000)
+[155163.049951] afterburner_frame 0000:0f:00.0:     bar0+0x200c ignored (readback=0xffffff9b)
+[155163.049956] afterburner_frame 0000:0f:00.0:     bar0+0x2010 ignored (readback=0x00000000)
+[155163.049960] afterburner_frame 0000:0f:00.0:     bar0+0x8000 ignored (readback=0x000b0101)
+[155163.049965] afterburner_frame 0000:0f:00.0:     bar0+0x8004 ignored (readback=0x00000000)
+[155163.049970] afterburner_frame 0000:0f:00.0:     bar0+0x8008 ignored (readback=0x3e0fd000)
+[155163.049975] afterburner_frame 0000:0f:00.0:     bar0+0x800c ignored (readback=0x00000000)
+[155163.049979] afterburner_frame 0000:0f:00.0:     bar0+0x8010 ignored (readback=0x00000000)
+[155163.049982] afterburner_frame 0000:0f:00.0:   -> 0 candidate registers accepted the PA write
+[155163.049985] afterburner_frame 0000:0f:00.0: --- loading real frame: /home/archuser/afterburner-re/frame0.yuv (8294400 bytes) ---
+[155163.050023] Modules linked in: afterburner_frame(OE+) uas usb_storage rfcomm snd_seq_dummy snd_hrtimer snd_seq joydev mousedev hid_magicmouse nft_masq nft_ct nft_reject_ipv4 nf_reject_ipv4 nft_reject act_csum cls_u32 sch_htb nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables bridge stp llc uhid algif_hash algif_skcipher af_alg bnep vfat fat intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common skx_edac skx_edac_common nfit libnvdimm brcmfmac_wcc snd_hda_codec_atihdmi encrypted_keys trusted snd_hda_codec_hdmi asn1_encoder tee snd_hda_intel x86_pkg_temp_thermal intel_powerclamp snd_hda_codec coretemp snd_hda_core kvm_intel snd_usb_audio snd_intel_dspcfg snd_usbmidi_lib snd_intel_sdw_acpi kvm r8153_ecm snd_ump snd_rawmidi t2bce_audio(C) snd_seq_device irqbypass snd_hwdep snd_pcm snd_timer btusb aesni_intel brcmfmac btmtk gf128mul rapl cdc_mbim snd cdc_wdm soundcore intel_cstate atlantic brcmutil cdc_ncm btrtl cdc_ether hid_sensor_als btbcm usbnet btintel
+[155163.050372]  ab_probe+0x29c/0x6e0 [afterburner_frame 4f22bbd927eae152befd37217fa1f569c4020412]
+[155163.050474]  ? __pfx_init_module+0x10/0x10 [afterburner_frame 4f22bbd927eae152befd37217fa1f569c4020412]
+[155163.050761] afterburner_frame 0000:0f:00.0: dma_alloc_coherent (frame 8MB) failed

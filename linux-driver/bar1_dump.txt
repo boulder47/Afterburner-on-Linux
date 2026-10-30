@@ -1,0 +1,4 @@
+[148789.790468] afterburner_map 0000:0f:00.0: BAR0 size=131072 BAR1 size=65536
+[148789.822358] afterburner_map 0000:0f:00.0: === SLICE BAR1 full map (4096 bytes / 1024 words) ===
+[148789.822360] afterburner_map 0000:0f:00.0:   BAR1+0x00000: 0x1fc08006
+[148789.822378] afterburner_map 0000:0f:00.0:   BAR1+0x0004c: 0x00010140

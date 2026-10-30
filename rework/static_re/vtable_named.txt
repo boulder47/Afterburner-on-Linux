@@ -1,0 +1,310 @@
+vf# -2: BASE=NULL                                                        | DERIVED=NULL
+vf# -1: BASE=NULL                                                        | DERIVED=NULL
+vf#  0: BASE=LOCAL fn@0x40b8                                             | DERIVED=LOCAL fn@0xcbe0
+vf#  1: BASE=LOCAL fn@0x40bc                                             | DERIVED=LOCAL fn@0xcbe4
+vf#  2: BASE=IMP[313] __ZN9IOService13matchLocationEPS_                  | DERIVED=IMP[313] __ZN9IOService13matchLocationEPS_
+vf#  3: BASE=IMP[312] __ZN9IOService13askChangeDownEm                    | DERIVED=IMP[312] __ZN9IOService13askChangeDownEm
+vf#  4: BASE=IMP[311] __ZN9IOService13addPowerChildEPS_                  | DERIVED=IMP[311] __ZN9IOService13addPowerChildEPS_
+vf#  5: BASE=IMP[310] __ZN9IOService12updateReportEP19IOReportChannelListjPvS2_| DERIVED=IMP[310] __ZN9IOService12updateReportEP19IOReportChannelListjPvS2_
+vf#  6: BASE=IMP[309] __ZN9IOService12tellChangeUpEm                     | DERIVED=IMP[309] __ZN9IOService12tellChangeUpEm
+vf#  7: BASE=LOCAL fn@0x40ec                                             | DERIVED=LOCAL fn@0xcc14
+vf#  8: BASE=IMP[308] __ZN9IOService12requestProbeEj                     | DERIVED=IMP[308] __ZN9IOService12requestProbeEj
+vf#  9: BASE=IMP[307] __ZN9IOService12getResourcesEv                     | DERIVED=IMP[307] __ZN9IOService12getResourcesEv
+vf# 10: BASE=IMP[306] __ZN9IOService12getBusyStateEv                     | DERIVED=IMP[306] __ZN9IOService12getBusyStateEv
+vf# 11: BASE=IMP[305] __ZN9IOService11handleCloseEPS_j                   | DERIVED=IMP[305] __ZN9IOService11handleCloseEPS_j
+vf# 12: BASE=IMP[304] __ZN9IOService10joinPMtreeEPS_                     | DERIVED=IMP[367] __ZN9IOService20_RESERVEDIOService10Ev
+vf# 13: BASE=IMP[303] __ZN9IOService10handleOpenEPS_jPv                  | DERIVED=IMP[303] __ZN9IOService10handleOpenEPS_jPv
+vf# 14: BASE=IMP[302] __ZN9IOService10gMetaClassE                        | DERIVED=IMP[302] __ZN9IOService10gMetaClassE
+vf# 15: BASE=IMP[301] __ZN9IOService10adjustBusyEi                       | DERIVED=IMP[301] __ZN9IOService10adjustBusyEi
+vf# 16: BASE=IMP[300] __ZN8OSObjectnwEm                                  | DERIVED=IMP[300] __ZN8OSObjectnwEm
+vf# 17: BASE=IMP[299] __ZN8OSObjectdlEPvm                                | DERIVED=IMP[299] __ZN8OSObjectdlEPvm
+vf# 18: BASE=IMP[298] __ZN8OSObject4initEv                               | DERIVED=IMP[298] __ZN8OSObject4initEv
+vf# 19: BASE=IMP[297] __ZN8OSObject19_RESERVEDOSObject15Ev               | DERIVED=IMP[297] __ZN8OSObject19_RESERVEDOSObject15Ev
+vf# 20: BASE=IMP[296] __ZN8OSObject19_RESERVEDOSObject14Ev               | DERIVED=IMP[296] __ZN8OSObject19_RESERVEDOSObject14Ev
+vf# 21: BASE=IMP[295] __ZN8OSObject19_RESERVEDOSObject13Ev               | DERIVED=IMP[366] __ZN9IOService19unregisterInterruptEi
+vf# 22: BASE=LOCAL fn@0xc984                                             | DERIVED=IMP[365] __ZN9IOService19registerPowerDriverEPS_P14IOPMPowerStatem
+vf# 23: BASE=IMP[294] __ZN8OSObject19_RESERVEDOSObject12Ev               | DERIVED=IMP[294] __ZN8OSObject19_RESERVEDOSObject12Ev
+vf# 24: BASE=IMP[293] __ZN8OSObject19_RESERVEDOSObject11Ev               | DERIVED=IMP[293] __ZN8OSObject19_RESERVEDOSObject11Ev
+vf# 25: BASE=IMP[292] __ZN8OSObject19_RESERVEDOSObject10Ev               | DERIVED=IMP[292] __ZN8OSObject19_RESERVEDOSObject10Ev
+vf# 26: BASE=IMP[291] __ZN8OSObject18_RESERVEDOSObject9Ev                | DERIVED=IMP[291] __ZN8OSObject18_RESERVEDOSObject9Ev
+vf# 27: BASE=IMP[290] __ZN8OSObject18_RESERVEDOSObject8Ev                | DERIVED=IMP[290] __ZN8OSObject18_RESERVEDOSObject8Ev
+vf# 28: BASE=IMP[289] __ZN8OSObject18_RESERVEDOSObject7Ev                | DERIVED=IMP[289] __ZN8OSObject18_RESERVEDOSObject7Ev
+vf# 29: BASE=IMP[288] __ZN8OSObject18_RESERVEDOSObject6Ev                | DERIVED=IMP[288] __ZN8OSObject18_RESERVEDOSObject6Ev
+vf# 30: BASE=IMP[287] __ZN8OSObject18_RESERVEDOSObject5Ev                | DERIVED=IMP[287] __ZN8OSObject18_RESERVEDOSObject5Ev
+vf# 31: BASE=IMP[286] __ZN8OSObject18_RESERVEDOSObject4Ev                | DERIVED=IMP[286] __ZN8OSObject18_RESERVEDOSObject4Ev
+vf# 32: BASE=IMP[285] __ZN8OSObject18_RESERVEDOSObject3Ev                | DERIVED=IMP[285] __ZN8OSObject18_RESERVEDOSObject3Ev
+vf# 33: BASE=IMP[284] __ZN8OSObject18_RESERVEDOSObject2Ev                | DERIVED=IMP[284] __ZN8OSObject18_RESERVEDOSObject2Ev
+vf# 34: BASE=IMP[283] __ZN8OSObject18_RESERVEDOSObject1Ev                | DERIVED=IMP[283] __ZN8OSObject18_RESERVEDOSObject1Ev
+vf# 35: BASE=IMP[282] __ZN8OSObject18_RESERVEDOSObject0Ev                | DERIVED=IMP[282] __ZN8OSObject18_RESERVEDOSObject0Ev
+vf# 36: BASE=IMP[281] __ZN8IOMapper7gSystemE                             | DERIVED=IMP[281] __ZN8IOMapper7gSystemE
+vf# 37: BASE=IMP[280] __ZN8IOMapper19copyMapperForDeviceEP9IOService     | DERIVED=IMP[280] __ZN8IOMapper19copyMapperForDeviceEP9IOService
+vf# 38: BASE=IMP[279] __ZN6OSData9withBytesEPKvj                         | DERIVED=IMP[279] __ZN6OSData9withBytesEPKvj
+vf# 39: BASE=IMP[278] __ZN24IOBufferMemoryDescriptor9withBytesEPKvmjb    | DERIVED=IMP[278] __ZN24IOBufferMemoryDescriptor9withBytesEPKvmjb
+vf# 40: BASE=IMP[277] __ZN24IOBufferMemoryDescriptor11withOptionsEjmm    | DERIVED=IMP[277] __ZN24IOBufferMemoryDescriptor11withOptionsEjmm
+vf# 41: BASE=IMP[276] __ZN22IOInterruptEventSource20interruptEventSourceEP8OSObjectPFvS1_PS_iEP9IOServicei| DERIVED=IMP[276] __ZN22IOInterruptEventSource20interruptEventSourceEP8OSObjectPFvS1_PS_iEP9IOServicei
+vf# 42: BASE=IMP[275] __ZN18IOTimerEventSource16timerEventSourceEP8OSObjectPFvS1_PS_E| DERIVED=IMP[275] __ZN18IOTimerEventSource16timerEventSourceEP8OSObjectPFvS1_PS_E
+vf# 43: BASE=IMP[274] __ZN18IOMemoryDescriptor16withAddressRangeEyyjP4task| DERIVED=IMP[274] __ZN18IOMemoryDescriptor16withAddressRangeEyyjP4task
+vf# 44: BASE=IMP[273] __ZN15OSMetaClassBase8DispatchE5IORPC              | DERIVED=IMP[273] __ZN15OSMetaClassBase8DispatchE5IORPC
+vf# 45: BASE=IMP[272] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase7Ev | DERIVED=IMP[272] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase7Ev
+vf# 46: BASE=IMP[271] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase6Ev | DERIVED=IMP[271] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase6Ev
+vf# 47: BASE=IMP[270] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase5Ev | DERIVED=IMP[270] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase5Ev
+vf# 48: BASE=IMP[269] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase4Ev | DERIVED=IMP[269] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase4Ev
+vf# 49: BASE=IMP[268] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase3Ev | DERIVED=IMP[268] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase3Ev
+vf# 50: BASE=IMP[267] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase2Ev | DERIVED=IMP[267] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase2Ev
+vf# 51: BASE=IMP[266] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase1Ev | DERIVED=IMP[266] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase1Ev
+vf# 52: BASE=IMP[265] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase0Ev | DERIVED=IMP[265] __ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase0Ev
+vf# 53: BASE=IMP[264] __ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass| DERIVED=IMP[264] __ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass
+vf# 54: BASE=IMP[263] __ZN15IORegistryEntry9detachAllEPK15IORegistryPlane| DERIVED=IMP[263] __ZN15IORegistryEntry9detachAllEPK15IORegistryPlane
+vf# 55: BASE=IMP[262] __ZN15IORegistryEntry7setNameEPKcPK15IORegistryPlane| DERIVED=IMP[262] __ZN15IORegistryEntry7setNameEPKcPK15IORegistryPlane
+vf# 56: BASE=IMP[261] __ZN15IORegistryEntry7setNameEPK8OSSymbolPK15IORegistryPlane| DERIVED=IMP[261] __ZN15IORegistryEntry7setNameEPK8OSSymbolPK15IORegistryPlane
+vf# 57: BASE=IMP[260] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry31Ev| DERIVED=IMP[260] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry31Ev
+vf# 58: BASE=IMP[259] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry30Ev| DERIVED=IMP[259] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry30Ev
+vf# 59: BASE=IMP[258] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry29Ev| DERIVED=IMP[258] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry29Ev
+vf# 60: BASE=IMP[257] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry28Ev| DERIVED=IMP[257] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry28Ev
+vf# 61: BASE=IMP[256] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry27Ev| DERIVED=IMP[256] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry27Ev
+vf# 62: BASE=IMP[255] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry26Ev| DERIVED=IMP[255] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry26Ev
+vf# 63: BASE=IMP[254] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry25Ev| DERIVED=IMP[254] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry25Ev
+vf# 64: BASE=IMP[253] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry24Ev| DERIVED=IMP[253] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry24Ev
+vf# 65: BASE=IMP[252] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry23Ev| DERIVED=IMP[252] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry23Ev
+vf# 66: BASE=IMP[251] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry22Ev| DERIVED=IMP[251] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry22Ev
+vf# 67: BASE=IMP[250] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry21Ev| DERIVED=IMP[250] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry21Ev
+vf# 68: BASE=IMP[249] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry20Ev| DERIVED=IMP[249] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry20Ev
+vf# 69: BASE=IMP[248] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry19Ev| DERIVED=IMP[248] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry19Ev
+vf# 70: BASE=IMP[247] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry18Ev| DERIVED=IMP[247] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry18Ev
+vf# 71: BASE=IMP[246] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry17Ev| DERIVED=IMP[246] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry17Ev
+vf# 72: BASE=IMP[245] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry16Ev| DERIVED=IMP[245] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry16Ev
+vf# 73: BASE=IMP[244] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry15Ev| DERIVED=IMP[244] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry15Ev
+vf# 74: BASE=IMP[243] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry14Ev| DERIVED=IMP[243] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry14Ev
+vf# 75: BASE=IMP[242] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry13Ev| DERIVED=IMP[242] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry13Ev
+vf# 76: BASE=IMP[241] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry12Ev| DERIVED=IMP[241] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry12Ev
+vf# 77: BASE=LOCAL fn@0xc8c0                                             | DERIVED=IMP[364] __ZN9IOService19_RESERVEDIOService9Ev
+vf# 78: BASE=IMP[240] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry11Ev| DERIVED=IMP[240] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry11Ev
+vf# 79: BASE=IMP[239] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry10Ev| DERIVED=IMP[239] __ZN15IORegistryEntry26_RESERVEDIORegistryEntry10Ev
+vf# 80: BASE=IMP[238] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry9Ev | DERIVED=IMP[238] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry9Ev
+vf# 81: BASE=IMP[237] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry8Ev | DERIVED=IMP[237] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry8Ev
+vf# 82: BASE=IMP[236] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry7Ev | DERIVED=IMP[236] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry7Ev
+vf# 83: BASE=IMP[235] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry6Ev | DERIVED=IMP[235] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry6Ev
+vf# 84: BASE=IMP[234] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry5Ev | DERIVED=IMP[234] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry5Ev
+vf# 85: BASE=IMP[233] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry4Ev | DERIVED=IMP[233] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry4Ev
+vf# 86: BASE=IMP[232] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry3Ev | DERIVED=IMP[232] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry3Ev
+vf# 87: BASE=IMP[231] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry2Ev | DERIVED=IMP[231] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry2Ev
+vf# 88: BASE=IMP[230] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry1Ev | DERIVED=IMP[230] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry1Ev
+vf# 89: BASE=IMP[229] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry0Ev | DERIVED=IMP[229] __ZN15IORegistryEntry25_RESERVEDIORegistryEntry0Ev
+vf# 90: BASE=IMP[228] __ZN15IORegistryEntry17runPropertyActionEPFiP8OSObjectPvS2_S2_S2_ES1_S2_S2_S2_S2_| DERIVED=IMP[228] __ZN15IORegistryEntry17runPropertyActionEPFiP8OSObjectPvS2_S2_S2_ES1_S2_S2_S2_S2_
+vf# 91: BASE=IMP[227] __ZN15IORegistryEntry16setPropertyTableEP12OSDictionary| DERIVED=IMP[227] __ZN15IORegistryEntry16setPropertyTableEP12OSDictionary
+vf# 92: BASE=IMP[226] __ZN15IORegistryEntry16detachFromParentEPS_PK15IORegistryPlane| DERIVED=IMP[226] __ZN15IORegistryEntry16detachFromParentEPS_PK15IORegistryPlane
+vf# 93: BASE=IMP[225] __ZN15IORegistryEntry15detachFromChildEPS_PK15IORegistryPlane| DERIVED=IMP[225] __ZN15IORegistryEntry15detachFromChildEPS_PK15IORegistryPlane
+vf# 94: BASE=IMP[224] __ZN15IORegistryEntry14removePropertyEPKc          | DERIVED=IMP[224] __ZN15IORegistryEntry14removePropertyEPKc
+vf# 95: BASE=IMP[223] __ZN15IORegistryEntry14removePropertyEPK8OSSymbol  | DERIVED=IMP[223] __ZN15IORegistryEntry14removePropertyEPK8OSSymbol
+vf# 96: BASE=IMP[222] __ZN15IORegistryEntry14removePropertyEPK8OSString  | DERIVED=IMP[222] __ZN15IORegistryEntry14removePropertyEPK8OSString
+vf# 97: BASE=IMP[221] __ZN15IORegistryEntry14attachToParentEPS_PK15IORegistryPlane| DERIVED=IMP[221] __ZN15IORegistryEntry14attachToParentEPS_PK15IORegistryPlane
+vf# 98: BASE=IMP[220] __ZN15IORegistryEntry13setPropertiesEP8OSObject    | DERIVED=IMP[220] __ZN15IORegistryEntry13setPropertiesEP8OSObject
+vf# 99: BASE=IMP[219] __ZN15IORegistryEntry13childFromPathEPKcPK15IORegistryPlanePcPi| DERIVED=IMP[219] __ZN15IORegistryEntry13childFromPathEPKcPK15IORegistryPlanePcPi
+vf#100: BASE=IMP[218] __ZN15IORegistryEntry13attachToChildEPS_PK15IORegistryPlane| DERIVED=IMP[218] __ZN15IORegistryEntry13attachToChildEPS_PK15IORegistryPlane
+vf#101: BASE=IMP[217] __ZN15IORegistryEntry11setPropertyEPKcyj           | DERIVED=IMP[217] __ZN15IORegistryEntry11setPropertyEPKcyj
+vf#102: BASE=IMP[216] __ZN15IORegistryEntry11setPropertyEPKcb            | DERIVED=IMP[216] __ZN15IORegistryEntry11setPropertyEPKcb
+vf#103: BASE=IMP[215] __ZN15IORegistryEntry11setPropertyEPKcS1_          | DERIVED=IMP[215] __ZN15IORegistryEntry11setPropertyEPKcS1_
+vf#104: BASE=IMP[214] __ZN15IORegistryEntry11setPropertyEPKcPvj          | DERIVED=IMP[214] __ZN15IORegistryEntry11setPropertyEPKcPvj
+vf#105: BASE=IMP[213] __ZN15IORegistryEntry11setPropertyEPKcP8OSObject   | DERIVED=IMP[213] __ZN15IORegistryEntry11setPropertyEPKcP8OSObject
+vf#106: BASE=IMP[212] __ZN15IORegistryEntry11setPropertyEPK8OSSymbolP8OSObject| DERIVED=IMP[212] __ZN15IORegistryEntry11setPropertyEPK8OSSymbolP8OSObject
+vf#107: BASE=IMP[211] __ZN15IORegistryEntry11setPropertyEPK8OSStringP8OSObject| DERIVED=IMP[211] __ZN15IORegistryEntry11setPropertyEPK8OSStringP8OSObject
+vf#108: BASE=IMP[210] __ZN15IORegistryEntry11setLocationEPKcPK15IORegistryPlane| DERIVED=IMP[210] __ZN15IORegistryEntry11setLocationEPKcPK15IORegistryPlane
+vf#109: BASE=IMP[209] __ZN15IORegistryEntry11setLocationEPK8OSSymbolPK15IORegistryPlane| DERIVED=IMP[209] __ZN15IORegistryEntry11setLocationEPK8OSSymbolPK15IORegistryPlane
+vf#110: BASE=IMP[208] __ZN15IORegistryEntry11detachAboveEPK15IORegistryPlane| DERIVED=IMP[208] __ZN15IORegistryEntry11detachAboveEPK15IORegistryPlane
+vf#111: BASE=IMP[207] __ZN13IOCommandPool12withWorkLoopEP10IOWorkLoop    | DERIVED=IMP[207] __ZN13IOCommandPool12withWorkLoopEP10IOWorkLoop
+vf#112: BASE=IMP[206] __ZN13IOCommandGate11commandGateEP8OSObjectPFiS1_PvS2_S2_S2_E| DERIVED=IMP[206] __ZN13IOCommandGate11commandGateEP8OSObjectPFiS1_PvS2_S2_S2_E
+vf#113: BASE=IMP[205] __ZN12IOUserClientD2Ev                             | DERIVED=IMP[205] __ZN12IOUserClientD2Ev
+vf#114: BASE=IMP[204] __ZN12IOUserClientC2EPK11OSMetaClass               | DERIVED=IMP[204] __ZN12IOUserClientC2EPK11OSMetaClass
+vf#115: BASE=IMP[203] __ZN12IOUserClient8DispatchE5IORPC                 | DERIVED=IMP[203] __ZN12IOUserClient8DispatchE5IORPC
+vf#116: BASE=IMP[202] __ZN12IOUserClient4initEv                          | DERIVED=IMP[202] __ZN12IOUserClient4initEv
+vf#117: BASE=IMP[201] __ZN12IOUserClient4initEP12OSDictionary            | DERIVED=IMP[201] __ZN12IOUserClient4initEP12OSDictionary
+vf#118: BASE=IMP[200] __ZN12IOUserClient4freeEv                          | DERIVED=IMP[200] __ZN12IOUserClient4freeEv
+vf#119: BASE=IMP[199] __ZN12IOUserClient31getAsyncTargetAndMethodForIndexEPP9IOServicej| DERIVED=IMP[199] __ZN12IOUserClient31getAsyncTargetAndMethodForIndexEPP9IOServicej
+vf#120: BASE=IMP[198] __ZN12IOUserClient30getExternalAsyncMethodForIndexEj| DERIVED=IMP[198] __ZN12IOUserClient30getExternalAsyncMethodForIndexEj
+vf#121: BASE=IMP[197] __ZN12IOUserClient26getTargetAndMethodForIndexEPP9IOServicej| DERIVED=IMP[197] __ZN12IOUserClient26getTargetAndMethodForIndexEPP9IOServicej
+vf#122: BASE=IMP[196] __ZN12IOUserClient25getExternalMethodForIndexEj    | DERIVED=IMP[196] __ZN12IOUserClient25getExternalMethodForIndexEj
+vf#123: BASE=IMP[195] __ZN12IOUserClient24registerNotificationPortEP8ipc_portjy| DERIVED=IMP[195] __ZN12IOUserClient24registerNotificationPortEP8ipc_portjy
+vf#124: BASE=IMP[194] __ZN12IOUserClient24registerNotificationPortEP8ipc_portjj| DERIVED=IMP[194] __ZN12IOUserClient24registerNotificationPortEP8ipc_portjj
+vf#125: BASE=IMP[193] __ZN12IOUserClient24getTargetAndTrapForIndexEPP9IOServicej| DERIVED=IMP[193] __ZN12IOUserClient24getTargetAndTrapForIndexEPP9IOServicej
+vf#126: BASE=IMP[192] __ZN12IOUserClient24getNotificationSemaphoreEjPP9semaphore| DERIVED=IMP[192] __ZN12IOUserClient24getNotificationSemaphoreEjPP9semaphore
+vf#127: BASE=IMP[191] __ZN12IOUserClient23getExternalTrapForIndexEj      | DERIVED=IMP[191] __ZN12IOUserClient23getExternalTrapForIndexEj
+vf#128: BASE=IMP[190] __ZN12IOUserClient23_RESERVEDIOUserClient15Ev      | DERIVED=IMP[190] __ZN12IOUserClient23_RESERVEDIOUserClient15Ev
+vf#129: BASE=IMP[189] __ZN12IOUserClient23_RESERVEDIOUserClient14Ev      | DERIVED=IMP[189] __ZN12IOUserClient23_RESERVEDIOUserClient14Ev
+vf#130: BASE=IMP[188] __ZN12IOUserClient23_RESERVEDIOUserClient13Ev      | DERIVED=IMP[188] __ZN12IOUserClient23_RESERVEDIOUserClient13Ev
+vf#131: BASE=IMP[187] __ZN12IOUserClient23_RESERVEDIOUserClient12Ev      | DERIVED=IMP[187] __ZN12IOUserClient23_RESERVEDIOUserClient12Ev
+vf#132: BASE=LOCAL fn@0xca68                                             | DERIVED=LOCAL fn@0xd54c
+vf#133: BASE=LOCAL fn@0xca80                                             | DERIVED=LOCAL fn@0xd60c
+vf#134: BASE=IMP[186] __ZN12IOUserClient23_RESERVEDIOUserClient11Ev      | DERIVED=IMP[186] __ZN12IOUserClient23_RESERVEDIOUserClient11Ev
+vf#135: BASE=IMP[185] __ZN12IOUserClient23_RESERVEDIOUserClient10Ev      | DERIVED=IMP[185] __ZN12IOUserClient23_RESERVEDIOUserClient10Ev
+vf#136: BASE=IMP[184] __ZN12IOUserClient22_RESERVEDIOUserClient9Ev       | DERIVED=IMP[184] __ZN12IOUserClient22_RESERVEDIOUserClient9Ev
+vf#137: BASE=IMP[183] __ZN12IOUserClient22_RESERVEDIOUserClient8Ev       | DERIVED=IMP[183] __ZN12IOUserClient22_RESERVEDIOUserClient8Ev
+vf#138: BASE=IMP[182] __ZN12IOUserClient22_RESERVEDIOUserClient7Ev       | DERIVED=IMP[182] __ZN12IOUserClient22_RESERVEDIOUserClient7Ev
+vf#139: BASE=IMP[181] __ZN12IOUserClient22_RESERVEDIOUserClient6Ev       | DERIVED=IMP[181] __ZN12IOUserClient22_RESERVEDIOUserClient6Ev
+vf#140: BASE=IMP[180] __ZN12IOUserClient22_RESERVEDIOUserClient5Ev       | DERIVED=IMP[180] __ZN12IOUserClient22_RESERVEDIOUserClient5Ev
+vf#141: BASE=IMP[179] __ZN12IOUserClient22_RESERVEDIOUserClient4Ev       | DERIVED=IMP[179] __ZN12IOUserClient22_RESERVEDIOUserClient4Ev
+vf#142: BASE=IMP[178] __ZN12IOUserClient22_RESERVEDIOUserClient3Ev       | DERIVED=IMP[178] __ZN12IOUserClient22_RESERVEDIOUserClient3Ev
+vf#143: BASE=IMP[177] __ZN12IOUserClient22_RESERVEDIOUserClient2Ev       | DERIVED=IMP[177] __ZN12IOUserClient22_RESERVEDIOUserClient2Ev
+vf#144: BASE=IMP[176] __ZN12IOUserClient22_RESERVEDIOUserClient1Ev       | DERIVED=IMP[176] __ZN12IOUserClient22_RESERVEDIOUserClient1Ev
+vf#145: BASE=IMP[175] __ZN12IOUserClient22_RESERVEDIOUserClient0Ev       | DERIVED=IMP[175] __ZN12IOUserClient22_RESERVEDIOUserClient0Ev
+vf#146: BASE=IMP[174] __ZN12IOUserClient20exportObjectToClientEP4taskP8OSObjectPS3_| DERIVED=IMP[174] __ZN12IOUserClient20exportObjectToClientEP4taskP8OSObjectPS3_
+vf#147: BASE=IMP[173] __ZN12IOUserClient19clientMemoryForTypeEjPjPP18IOMemoryDescriptor| DERIVED=IMP[173] __ZN12IOUserClient19clientMemoryForTypeEjPjPP18IOMemoryDescriptor
+vf#148: BASE=IMP[172] __ZN12IOUserClient13connectClientEPS_              | DERIVED=IMP[172] __ZN12IOUserClient13connectClientEPS_
+vf#149: BASE=IMP[171] __ZN12IOUserClient12initWithTaskEP4taskPvj         | DERIVED=IMP[171] __ZN12IOUserClient12initWithTaskEP4taskPvj
+vf#150: BASE=IMP[170] __ZN12IOUserClient10getServiceEv                   | DERIVED=IMP[170] __ZN12IOUserClient10getServiceEv
+vf#151: BASE=IMP[169] __ZN12IOUserClient10gMetaClassE                    | DERIVED=IMP[169] __ZN12IOUserClient10gMetaClassE
+vf#152: BASE=IMP[168] __ZN12IODMACommand17withSpecificationEPFbPS_NS_9Segment64EPvjEhyNS_14MappingOptionsEyjP8IOMapperS2_| DERIVED=IMP[168] __ZN12IODMACommand17withSpecificationEPFbPS_NS_9Segment64EPvjEhyNS_14MappingOptionsEyjP8IOMapperS2_
+vf#153: BASE=IMP[167] __ZN12IODMACommand14OutputLittle64EPS_NS_9Segment64EPvj| DERIVED=IMP[167] __ZN12IODMACommand14OutputLittle64EPS_NS_9Segment64EPvj
+vf#154: BASE=IMP[166] __ZN11OSMetaClassD2Ev                              | DERIVED=IMP[166] __ZN11OSMetaClassD2Ev
+vf#155: BASE=IMP[165] __ZN11OSMetaClassC2EPKcPKS_j                       | DERIVED=IMP[165] __ZN11OSMetaClassC2EPKcPKS_j
+vf#156: BASE=IMP[164] __ZN11OSMetaClass21_RESERVEDOSMetaClass7Ev         | DERIVED=IMP[164] __ZN11OSMetaClass21_RESERVEDOSMetaClass7Ev
+vf#157: BASE=IMP[163] __ZN11OSMetaClass21_RESERVEDOSMetaClass6Ev         | DERIVED=IMP[163] __ZN11OSMetaClass21_RESERVEDOSMetaClass6Ev
+vf#158: BASE=IMP[162] __ZN11OSMetaClass21_RESERVEDOSMetaClass5Ev         | DERIVED=IMP[162] __ZN11OSMetaClass21_RESERVEDOSMetaClass5Ev
+vf#159: BASE=IMP[161] __ZN11OSMetaClass21_RESERVEDOSMetaClass4Ev         | DERIVED=IMP[161] __ZN11OSMetaClass21_RESERVEDOSMetaClass4Ev
+vf#160: BASE=IMP[160] __ZN11OSMetaClass21_RESERVEDOSMetaClass3Ev         | DERIVED=IMP[160] __ZN11OSMetaClass21_RESERVEDOSMetaClass3Ev
+vf#161: BASE=IMP[159] __ZN11OSMetaClass21_RESERVEDOSMetaClass2Ev         | DERIVED=IMP[159] __ZN11OSMetaClass21_RESERVEDOSMetaClass2Ev
+vf#162: BASE=IMP[158] __ZN11OSMetaClass21_RESERVEDOSMetaClass1Ev         | DERIVED=IMP[158] __ZN11OSMetaClass21_RESERVEDOSMetaClass1Ev
+vf#163: BASE=IMP[157] __ZN11OSMetaClass21_RESERVEDOSMetaClass0Ev         | DERIVED=IMP[157] __ZN11OSMetaClass21_RESERVEDOSMetaClass0Ev
+vf#164: BASE=IMP[156] __ZN11IOPCIDevice9metaClassE                       | DERIVED=IMP[156] __ZN11IOPCIDevice9metaClassE
+vf#165: BASE=IMP[155] __ZN11IOPCIDevice21extendedConfigWrite32Eyj        | DERIVED=IMP[155] __ZN11IOPCIDevice21extendedConfigWrite32Eyj
+vf#166: BASE=IMP[154] __ZN11IOPCIDevice20extendedConfigRead32Ey          | DERIVED=IMP[154] __ZN11IOPCIDevice20extendedConfigRead32Ey
+vf#167: BASE=IMP[153] __ZN10IOWorkLoop8workLoopEv                        | DERIVED=IMP[153] __ZN10IOWorkLoop8workLoopEv
+vf#168: BASE=IMP[152] _PAGE_SHIFT_CONST                                  | DERIVED=IMP[152] _PAGE_SHIFT_CONST
+vf#169: BASE=IMP[151] _OSKextRequestResource                             | DERIVED=IMP[151] _OSKextRequestResource
+vf#170: BASE=IMP[150] _IOSleep                                           | DERIVED=IMP[150] _IOSleep
+vf#171: BASE=IMP[149] _IOMalloc                                          | DERIVED=IMP[149] _IOMalloc
+vf#172: BASE=IMP[148] _IOLog                                             | DERIVED=IMP[148] _IOLog
+vf#173: BASE=IMP[147] _IOLockUnlock                                      | DERIVED=IMP[147] _IOLockUnlock
+vf#174: BASE=IMP[146] _IOLockLock                                        | DERIVED=IMP[146] _IOLockLock
+vf#175: BASE=IMP[145] _IOLockFree                                        | DERIVED=IMP[145] _IOLockFree
+vf#176: BASE=IMP[144] _IOLockAlloc                                       | DERIVED=IMP[144] _IOLockAlloc
+vf#177: BASE=IMP[143] _IOFree                                            | DERIVED=IMP[143] _IOFree
+vf#178: BASE=IMP[142] _IODelay                                           | DERIVED=IMP[142] _IODelay
+vf#179: BASE=IMP[141] _kmod_info                                         | DERIVED=IMP[141] _kmod_info
+vf#180: BASE=IMP[140] __ZTVN26AppleAfterburnerUserClient9MetaClassE      | DERIVED=IMP[140] __ZTVN26AppleAfterburnerUserClient9MetaClassE
+vf#181: BASE=IMP[139] __ZTVN16AppleAfterburner9MetaClassE                | DERIVED=IMP[139] __ZTVN16AppleAfterburner9MetaClassE
+vf#182: BASE=IMP[138] __ZTV26AppleAfterburnerUserClient                  | DERIVED=IMP[138] __ZTV26AppleAfterburnerUserClient
+vf#183: BASE=IMP[137] __ZTV16AppleAfterburner                            | DERIVED=IMP[137] __ZTV16AppleAfterburner
+vf#184: BASE=IMP[136] __ZNK26AppleAfterburnerUserClient9MetaClass5allocEv| DERIVED=IMP[136] __ZNK26AppleAfterburnerUserClient9MetaClass5allocEv
+vf#185: BASE=IMP[135] __ZNK26AppleAfterburnerUserClient12getMetaClassEv  | DERIVED=IMP[135] __ZNK26AppleAfterburnerUserClient12getMetaClassEv
+vf#186: BASE=IMP[134] __ZNK16AppleAfterburner9MetaClass5allocEv          | DERIVED=IMP[134] __ZNK16AppleAfterburner9MetaClass5allocEv
+vf#187: BASE=IMP[133] __ZNK16AppleAfterburner12getMetaClassEv            | DERIVED=IMP[133] __ZNK16AppleAfterburner12getMetaClassEv
+vf#188: BASE=IMP[132] __ZN26AppleAfterburnerUserClientnwEm               | DERIVED=IMP[132] __ZN26AppleAfterburnerUserClientnwEm
+vf#189: BASE=LOCAL fn@0xc998                                             | DERIVED=IMP[363] __ZN9IOService19_RESERVEDIOService8Ev
+vf#190: BASE=LOCAL fn@0x4254                                             | DERIVED=LOCAL fn@0xd1e4
+vf#191: BASE=LOCAL fn@0xc0a4                                             | DERIVED=LOCAL fn@0xd25c
+vf#192: BASE=IMP[131] __ZN26AppleAfterburnerUserClientdlEPvm             | DERIVED=IMP[131] __ZN26AppleAfterburnerUserClientdlEPvm
+vf#193: BASE=IMP[130] __ZN26AppleAfterburnerUserClientD2Ev               | DERIVED=IMP[130] __ZN26AppleAfterburnerUserClientD2Ev
+vf#194: BASE=IMP[129] __ZN26AppleAfterburnerUserClientD1Ev               | DERIVED=IMP[129] __ZN26AppleAfterburnerUserClientD1Ev
+vf#195: BASE=IMP[128] __ZN26AppleAfterburnerUserClientD0Ev               | DERIVED=IMP[128] __ZN26AppleAfterburnerUserClientD0Ev
+vf#196: BASE=IMP[127] __ZN26AppleAfterburnerUserClientC2Ev               | DERIVED=IMP[127] __ZN26AppleAfterburnerUserClientC2Ev
+vf#197: BASE=IMP[126] __ZN26AppleAfterburnerUserClientC2EPK11OSMetaClass | DERIVED=IMP[126] __ZN26AppleAfterburnerUserClientC2EPK11OSMetaClass
+vf#198: BASE=LOCAL fn@0xca98                                             | DERIVED=LOCAL fn@0xd6d8
+vf#199: BASE=LOCAL fn@0xcab0                                             | DERIVED=LOCAL fn@0xd6f0
+vf#200: BASE=IMP[125] __ZN26AppleAfterburnerUserClientC1Ev               | DERIVED=IMP[125] __ZN26AppleAfterburnerUserClientC1Ev
+vf#201: BASE=IMP[124] __ZN26AppleAfterburnerUserClientC1EPK11OSMetaClass | DERIVED=IMP[124] __ZN26AppleAfterburnerUserClientC1EPK11OSMetaClass
+vf#202: BASE=IMP[123] __ZN26AppleAfterburnerUserClient9unbindAllEv       | DERIVED=IMP[123] __ZN26AppleAfterburnerUserClient9unbindAllEv
+vf#203: BASE=IMP[122] __ZN26AppleAfterburnerUserClient9terminateEj       | DERIVED=IMP[122] __ZN26AppleAfterburnerUserClient9terminateEj
+vf#204: BASE=IMP[121] __ZN26AppleAfterburnerUserClient9metaClassE        | DERIVED=IMP[121] __ZN26AppleAfterburnerUserClient9metaClassE
+vf#205: BASE=IMP[120] __ZN26AppleAfterburnerUserClient9bindFrameEP16s_bindDataStructPy| DERIVED=IMP[120] __ZN26AppleAfterburnerUserClient9bindFrameEP16s_bindDataStructPy
+vf#206: BASE=IMP[119] __ZN26AppleAfterburnerUserClient9MetaClassC2Ev     | DERIVED=IMP[119] __ZN26AppleAfterburnerUserClient9MetaClassC2Ev
+vf#207: BASE=IMP[118] __ZN26AppleAfterburnerUserClient9MetaClassC1Ev     | DERIVED=IMP[118] __ZN26AppleAfterburnerUserClient9MetaClassC1Ev
+vf#208: BASE=IMP[117] __ZN26AppleAfterburnerUserClient8sMethodsE         | DERIVED=IMP[117] __ZN26AppleAfterburnerUserClient8sMethodsE
+vf#209: BASE=IMP[116] __ZN26AppleAfterburnerUserClient8finalizeEj        | DERIVED=IMP[116] __ZN26AppleAfterburnerUserClient8finalizeEj
+vf#210: BASE=IMP[115] __ZN26AppleAfterburnerUserClient5startEP9IOService | DERIVED=IMP[115] __ZN26AppleAfterburnerUserClient5startEP9IOService
+vf#211: BASE=IMP[114] __ZN26AppleAfterburnerUserClient4stopEP9IOService  | DERIVED=IMP[114] __ZN26AppleAfterburnerUserClient4stopEP9IOService
+vf#212: BASE=IMP[113] __ZN26AppleAfterburnerUserClient16sQueryCompletionEPS_PvP25IOExternalMethodArguments| DERIVED=IMP[113] __ZN26AppleAfterburnerUserClient16sQueryCompletionEPS_PvP25IOExternalMethodArguments
+vf#213: BASE=IMP[112] __ZN26AppleAfterburnerUserClient15queryCompletionEPyS0_| DERIVED=IMP[112] __ZN26AppleAfterburnerUserClient15queryCompletionEPyS0_
+vf#214: BASE=IMP[111] __ZN26AppleAfterburnerUserClient14sCheckForSpaceEPS_PvP25IOExternalMethodArguments| DERIVED=IMP[111] __ZN26AppleAfterburnerUserClient14sCheckForSpaceEPS_PvP25IOExternalMethodArguments
+vf#215: BASE=IMP[110] __ZN26AppleAfterburnerUserClient14externalMethodEjP25IOExternalMethodArgumentsP24IOExternalMethodDispatchP8OSObjectPv| DERIVED=IMP[110] __ZN26AppleAfterburnerUserClient14externalMethodEjP25IOExternalMethodArgumentsP24IOExternalMethodDispatchP8OSObjectPv
+vf#216: BASE=IMP[109] __ZN26AppleAfterburnerUserClient13willTerminateEP9IOServicej| DERIVED=IMP[109] __ZN26AppleAfterburnerUserClient13willTerminateEP9IOServicej
+vf#217: BASE=IMP[108] __ZN26AppleAfterburnerUserClient13checkForSpaceEP15s_bufDataStruct| DERIVED=IMP[108] __ZN26AppleAfterburnerUserClient13checkForSpaceEP15s_bufDataStruct
+vf#218: BASE=IMP[107] __ZN26AppleAfterburnerUserClient12sSubmitFrameEPS_PvP25IOExternalMethodArguments| DERIVED=IMP[107] __ZN26AppleAfterburnerUserClient12sSubmitFrameEPS_PvP25IOExternalMethodArguments
+vf#219: BASE=IMP[106] __ZN26AppleAfterburnerUserClient12initWithTaskEP4taskPvjP12OSDictionary| DERIVED=IMP[106] __ZN26AppleAfterburnerUserClient12initWithTaskEP4taskPvjP12OSDictionary
+vf#220: BASE=IMP[105] __ZN26AppleAfterburnerUserClient12didTerminateEP9IOServicejPb| DERIVED=IMP[105] __ZN26AppleAfterburnerUserClient12didTerminateEP9IOServicejPb
+vf#221: BASE=IMP[104] __ZN26AppleAfterburnerUserClient11submitFrameEP17s_inputDataStructPy| DERIVED=IMP[104] __ZN26AppleAfterburnerUserClient11submitFrameEP17s_inputDataStructPy
+vf#222: BASE=IMP[103] __ZN26AppleAfterburnerUserClient11sGetPercentEPS_PvP25IOExternalMethodArguments| DERIVED=IMP[103] __ZN26AppleAfterburnerUserClient11sGetPercentEPS_PvP25IOExternalMethodArguments
+vf#223: BASE=IMP[102] __ZN26AppleAfterburnerUserClient11sCardStatusEPS_PvP25IOExternalMethodArguments| DERIVED=IMP[102] __ZN26AppleAfterburnerUserClient11sCardStatusEPS_PvP25IOExternalMethodArguments
+vf#224: BASE=IMP[101] __ZN26AppleAfterburnerUserClient11clientCloseEv    | DERIVED=IMP[101] __ZN26AppleAfterburnerUserClient11clientCloseEv
+vf#225: BASE=IMP[100] __ZN26AppleAfterburnerUserClient10superClassE      | DERIVED=IMP[100] __ZN26AppleAfterburnerUserClient10superClassE
+vf#226: BASE=IMP[99] __ZN26AppleAfterburnerUserClient10sUnbindAllEPS_PvP25IOExternalMethodArguments| DERIVED=IMP[99] __ZN26AppleAfterburnerUserClient10sUnbindAllEPS_PvP25IOExternalMethodArguments
+vf#227: BASE=IMP[98] __ZN26AppleAfterburnerUserClient10sBindFrameEPS_PvP25IOExternalMethodArguments| DERIVED=IMP[98] __ZN26AppleAfterburnerUserClient10sBindFrameEPS_PvP25IOExternalMethodArguments
+vf#228: BASE=IMP[97] __ZN26AppleAfterburnerUserClient10getPercentEPy     | DERIVED=IMP[97] __ZN26AppleAfterburnerUserClient10getPercentEPy
+vf#229: BASE=IMP[96] __ZN26AppleAfterburnerUserClient10gMetaClassE       | DERIVED=IMP[96] __ZN26AppleAfterburnerUserClient10gMetaClassE
+vf#230: BASE=IMP[95] __ZN26AppleAfterburnerUserClient10clientDiedEv      | DERIVED=IMP[95] __ZN26AppleAfterburnerUserClient10clientDiedEv
+vf#231: BASE=IMP[94] __ZN26AppleAfterburnerUserClient10cardStatusEPy     | DERIVED=IMP[94] __ZN26AppleAfterburnerUserClient10cardStatusEPy
+vf#232: BASE=IMP[93] __ZN16AppleAfterburnernwEm                          | DERIVED=IMP[93] __ZN16AppleAfterburnernwEm
+vf#233: BASE=IMP[92] __ZN16AppleAfterburnerdlEPvm                        | DERIVED=IMP[92] __ZN16AppleAfterburnerdlEPvm
+vf#234: BASE=IMP[91] __ZN16AppleAfterburnerD2Ev                          | DERIVED=IMP[91] __ZN16AppleAfterburnerD2Ev
+vf#235: BASE=IMP[90] __ZN16AppleAfterburnerD1Ev                          | DERIVED=IMP[90] __ZN16AppleAfterburnerD1Ev
+vf#236: BASE=IMP[89] __ZN16AppleAfterburnerD0Ev                          | DERIVED=IMP[89] __ZN16AppleAfterburnerD0Ev
+vf#237: BASE=IMP[88] __ZN16AppleAfterburnerC2Ev                          | DERIVED=IMP[88] __ZN16AppleAfterburnerC2Ev
+vf#238: BASE=IMP[87] __ZN16AppleAfterburnerC2EPK11OSMetaClass            | DERIVED=IMP[87] __ZN16AppleAfterburnerC2EPK11OSMetaClass
+vf#239: BASE=IMP[86] __ZN16AppleAfterburnerC1Ev                          | DERIVED=IMP[86] __ZN16AppleAfterburnerC1Ev
+vf#240: BASE=IMP[85] __ZN16AppleAfterburnerC1EPK11OSMetaClass            | DERIVED=IMP[85] __ZN16AppleAfterburnerC1EPK11OSMetaClass
+vf#241: BASE=IMP[84] __ZN16AppleAfterburner9terminateEj                  | DERIVED=IMP[84] __ZN16AppleAfterburner9terminateEj
+vf#242: BASE=IMP[83] __ZN16AppleAfterburner9metaClassE                   | DERIVED=IMP[83] __ZN16AppleAfterburner9metaClassE
+vf#243: BASE=IMP[82] __ZN16AppleAfterburner9freeSpaceEPy                 | DERIVED=IMP[82] __ZN16AppleAfterburner9freeSpaceEPy
+vf#244: BASE=IMP[81] __ZN16AppleAfterburner9bindFrameEP18IOMemoryDescriptor| DERIVED=IMP[81] __ZN16AppleAfterburner9bindFrameEP18IOMemoryDescriptor
+vf#245: BASE=IMP[80] __ZN16AppleAfterburner9MetaClassC2Ev                | DERIVED=IMP[80] __ZN16AppleAfterburner9MetaClassC2Ev
+vf#246: BASE=IMP[79] __ZN16AppleAfterburner9MetaClassC1Ev                | DERIVED=IMP[79] __ZN16AppleAfterburner9MetaClassC1Ev
+vf#247: BASE=IMP[78] __ZN16AppleAfterburner8spieraseEj                   | DERIVED=IMP[78] __ZN16AppleAfterburner8spieraseEj
+vf#248: BASE=IMP[77] __ZN16AppleAfterburner8finalizeEj                   | DERIVED=IMP[77] __ZN16AppleAfterburner8finalizeEj
+vf#249: BASE=IMP[76] __ZN16AppleAfterburner7cleanUpEP8sContext           | DERIVED=IMP[76] __ZN16AppleAfterburner7cleanUpEP8sContext
+vf#250: BASE=IMP[75] __ZN16AppleAfterburner5startEP9IOService            | DERIVED=IMP[75] __ZN16AppleAfterburner5startEP9IOService
+vf#251: BASE=IMP[74] __ZN16AppleAfterburner5resetEv                      | DERIVED=IMP[74] __ZN16AppleAfterburner5resetEv
+vf#252: BASE=IMP[73] __ZN16AppleAfterburner5probeEP9IOServicePi          | DERIVED=IMP[73] __ZN16AppleAfterburner5probeEP9IOServicePi
+vf#253: BASE=IMP[72] __ZN16AppleAfterburner4stopEP9IOService             | DERIVED=IMP[72] __ZN16AppleAfterburner4stopEP9IOService
+vf#254: BASE=IMP[71] __ZN16AppleAfterburner4initEP12OSDictionary         | DERIVED=IMP[71] __ZN16AppleAfterburner4initEP12OSDictionary
+vf#255: BASE=IMP[70] __ZN16AppleAfterburner4freeEv                       | DERIVED=IMP[70] __ZN16AppleAfterburner4freeEv
+vf#256: BASE=IMP[69] __ZN16AppleAfterburner27resourceLoadCallbackHandlerEjiPKvj| DERIVED=IMP[69] __ZN16AppleAfterburner27resourceLoadCallbackHandlerEjiPKvj
+vf#257: BASE=IMP[68] __ZN16AppleAfterburner26updateIORegistryPropertiesEv| DERIVED=IMP[68] __ZN16AppleAfterburner26updateIORegistryPropertiesEv
+vf#258: BASE=IMP[67] __ZN16AppleAfterburner25getResourceDescriptorListEPN12IODMACommand9Segment64EjjPyPjy| DERIVED=IMP[67] __ZN16AppleAfterburner25getResourceDescriptorListEPN12IODMACommand9Segment64EjjPyPjy
+vf#259: BASE=LOCAL fn@0x7c60                                             | DERIVED=IMP[362] __ZN9IOService19_RESERVEDIOService7Ev
+vf#260: BASE=IMP[66] __ZN16AppleAfterburner23pointer_restore_handlerEP22IOInterruptEventSourcei| DERIVED=IMP[66] __ZN16AppleAfterburner23pointer_restore_handlerEP22IOInterruptEventSourcei
+vf#261: BASE=IMP[65] __ZN16AppleAfterburner21pointer_restore_timerEP18IOTimerEventSource| DERIVED=IMP[65] __ZN16AppleAfterburner21pointer_restore_timerEP18IOTimerEventSource
+vf#262: BASE=IMP[64] __ZN16AppleAfterburner20writeVersionRegisterEjj     | DERIVED=IMP[64] __ZN16AppleAfterburner20writeVersionRegisterEjj
+vf#263: BASE=IMP[63] __ZN16AppleAfterburner20writeThermalRegisterEjj     | DERIVED=IMP[63] __ZN16AppleAfterburner20writeThermalRegisterEjj
+vf#264: BASE=IMP[62] __ZN16AppleAfterburner20writeBitfileRegisterEjj     | DERIVED=IMP[62] __ZN16AppleAfterburner20writeBitfileRegisterEjj
+vf#265: BASE=IMP[61] __ZN16AppleAfterburner20resourceLoadCallbackEjiPKvjPv| DERIVED=IMP[61] __ZN16AppleAfterburner20resourceLoadCallbackEjiPKvjPv
+vf#266: BASE=IMP[60] __ZN16AppleAfterburner20queryCompletionGatedEPyPi   | DERIVED=IMP[60] __ZN16AppleAfterburner20queryCompletionGatedEPyPi
+vf#267: BASE=IMP[59] __ZN16AppleAfterburner19writeDecodeRegisterEjj      | DERIVED=IMP[59] __ZN16AppleAfterburner19writeDecodeRegisterEjj
+vf#268: BASE=IMP[58] __ZN16AppleAfterburner19submitResourceGatedEP10sDmaConfig| DERIVED=IMP[58] __ZN16AppleAfterburner19submitResourceGatedEP10sDmaConfig
+vf#269: BASE=IMP[57] __ZN16AppleAfterburner19readVersionRegisterEj       | DERIVED=IMP[57] __ZN16AppleAfterburner19readVersionRegisterEj
+vf#270: BASE=IMP[56] __ZN16AppleAfterburner19readThermalRegisterEj       | DERIVED=IMP[56] __ZN16AppleAfterburner19readThermalRegisterEj
+vf#271: BASE=IMP[55] __ZN16AppleAfterburner19readBitfileRegisterEj       | DERIVED=IMP[55] __ZN16AppleAfterburner19readBitfileRegisterEj
+vf#272: BASE=NULL                                                        | DERIVED=LOCAL fn@0xcfc8
+vf#273: BASE=NULL                                                        | DERIVED=IMP[361] __ZN9IOService19_RESERVEDIOService6Ev
+vf#274: BASE=NULL                                                        | DERIVED=IMP[360] __ZN9IOService19_RESERVEDIOService5Ev
+vf#275: BASE=LOCAL fn@0x4048                                             | DERIVED=IMP[359] __ZN9IOService19_RESERVEDIOService4Ev
+vf#276: BASE=LOCAL fn@0xcac8                                             | DERIVED=IMP[358] __ZN9IOService19_RESERVEDIOService3Ev
+vf#277: BASE=IMP[331] __ZN9IOService15registerServiceEj                  | DERIVED=IMP[357] __ZN9IOService19_RESERVEDIOService2Ev
+vf#278: BASE=IMP[330] __ZN9IOService15powerChangeDoneEm                  | DERIVED=IMP[356] __ZN9IOService19_RESERVEDIOService1Ev
+vf#279: BASE=IMP[329] __ZN9IOService15nextIdleTimeoutEyyj                | DERIVED=IMP[355] __ZN9IOService19_RESERVEDIOService0Ev
+vf#280: BASE=IMP[328] __ZN9IOService15getDeviceMemoryEv                  | DERIVED=IMP[354] __ZN9IOService18systemWillShutdownEj
+vf#281: BASE=IMP[327] __ZN9IOService15errnoFromReturnEi                  | DERIVED=IMP[353] __ZN9IOService18setIdleTimerPeriodEm
+vf#282: BASE=IMP[326] __ZN9IOService15enableInterruptEi                  | DERIVED=IMP[352] __ZN9IOService18matchPropertyTableEP12OSDictionaryPi
+vf#283: BASE=IMP[308] __ZN9IOService12requestProbeEj                     | DERIVED=IMP[351] __ZN9IOService18matchPropertyTableEP12OSDictionary
+vf#284: BASE=IMP[325] __ZN9IOService15configureReportEP19IOReportChannelListjPvS2_| DERIVED=IMP[350] __ZN9IOService18lockForArbitrationEb
+vf#285: BASE=IMP[324] __ZN9IOService15comparePropertyEP12OSDictionaryPKc | DERIVED=IMP[349] __ZN9IOService17setAggressivenessEmm
+vf#286: BASE=IMP[323] __ZN9IOService15comparePropertyEP12OSDictionaryPK8OSString| DERIVED=IMP[348] __ZN9IOService17registerInterruptEiP8OSObjectPFvS1_PvPS_iES2_
+vf#287: BASE=IMP[322] __ZN9IOService14tellChangeDownEm                   | DERIVED=IMP[347] __ZN9IOService17getAggressivenessEmPm
+vf#288: BASE=IMP[303] __ZN9IOService10handleOpenEPS_jPv                  | DERIVED=IMP[346] __ZN9IOService17comparePropertiesEP12OSDictionaryP12OSCollection
+vf#289: BASE=IMP[302] __ZN9IOService10gMetaClassE                        | DERIVED=IMP[345] __ZN9IOService17cancelPowerChangeEm
+vf#290: BASE=IMP[301] __ZN9IOService10adjustBusyEi                       | DERIVED=LOCAL fn@0xd004
+vf#291: BASE=IMP[300] __ZN8OSObjectnwEm                                  | DERIVED=IMP[344] __ZN9IOService17applyToInterestedEPK8OSSymbolPFvP8OSObjectPvES5_
+vf#292: BASE=IMP[299] __ZN8OSObjectdlEPvm                                | DERIVED=LOCAL fn@0xd3f8
+vf#293: BASE=IMP[298] __ZN8OSObject4initEv                               | DERIVED=LOCAL fn@0xd534
+vf#294: BASE=IMP[297] __ZN8OSObject19_RESERVEDOSObject15Ev               | DERIVED=IMP[343] __ZN9IOService17addNeededResourceEPKc
+vf#295: BASE=IMP[296] __ZN8OSObject19_RESERVEDOSObject14Ev               | DERIVED=IMP[342] __ZN9IOService16tellNoChangeDownEm
+vf#296: BASE=LOCAL fn@0x4140                                             | DERIVED=IMP[341] __ZN9IOService16stringFromReturnEi
+vf#297: BASE=IMP[321] __ZN9IOService14messageClientsEjPvm                | DERIVED=IMP[340] __ZN9IOService16requestTerminateEPS_j
+vf#298: BASE=IMP[320] __ZN9IOService14causeInterruptEi                   | DERIVED=IMP[339] __ZN9IOService16removePowerChildEP17IOPowerConnection
+vf#299: BASE=IMP[319] __ZN9IOService14applyToClientsEPFvPS_PvES1_        | DERIVED=IMP[338] __ZN9IOService16registerInterestEPK8OSSymbolPFiPvS3_jPS_S3_mES3_S3_
+vf#300: BASE=IMP[318] __ZN9IOService14activityTickleEmm                  | DERIVED=IMP[337] __ZN9IOService16getInterruptTypeEiPi
+vf#301: BASE=IMP[317] __ZN9IOService13setPowerStateEmPS_                 | DERIVED=IMP[336] __ZN9IOService16disableInterruptEi
+vf#302: BASE=IMP[316] __ZN9IOService13newUserClientEP4taskPvjPP12IOUserClient| DERIVED=IMP[335] __ZN9IOService16applyToProvidersEPFvPS_PvES1_
+vf#303: BASE=IMP[315] __ZN9IOService13newUserClientEP4taskPvjP12OSDictionaryPP12IOUserClient| DERIVED=IMP[334] __ZN9IOService16allowPowerChangeEm
+vf#304: BASE=IMP[314] __ZN9IOService13messageClientEjP8OSObjectPvm       | DERIVED=IMP[333] __ZN9IOService15terminateClientEPS_j
+vf#305: BASE=NULL                                                        | DERIVED=IMP[332] __ZN9IOService15setDeviceMemoryEP7OSArray
+vf#306: BASE=?top=0x0 lo=0x101c0                                         | DERIVED=LOCAL fn@0xd708
+vf#307: BASE=?top=0x40 lo=0x12                                           | DERIVED=LOCAL fn@0xdcc4

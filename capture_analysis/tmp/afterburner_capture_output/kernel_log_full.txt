@@ -1,0 +1,1000 @@
+2026-10-23 18:45:34.567010-0500 0x44ef     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) iokit-open RootDomainUserClient
+2026-10-23 18:45:34.582775-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users/boulder/Library
+2026-10-23 18:45:34.590611-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 4 duplicate reports for studentd deny(1) file-read-metadata /Users/boulder/Library
+2026-10-23 18:45:34.590613-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-data /usr/libexec
+2026-10-23 18:45:34.598205-0500 0x44ef     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for studentd deny(1) file-read-data /usr/libexec
+2026-10-23 18:45:34.598209-0500 0x44ef     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:34.599493-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users/boulder/Library
+2026-10-23 18:45:34.628280-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for studentd deny(1) file-read-metadata /Users/boulder/Library
+2026-10-23 18:45:34.628282-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:34.650879-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for studentd deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:34.650881-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-data /usr/libexec
+2026-10-23 18:45:34.650888-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /usr/libexec
+2026-10-23 18:45:34.650905-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:34.667832-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785781 tx stats: # 500 finish 505 enter 312 wait 22 581us close 217us flush 690us
+2026-10-23 18:45:34.672270-0500 0x44fc     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 4 duplicate reports for studentd deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:34.672273-0500 0x44fc     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: progressd(1156) deny(1) process-info-pidinfo others [ClassKitPreferen(1149)]
+2026-10-23 18:45:34.672323-0500 0x44c3     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: suggestd(542) deny(1) mach-lookup com.apple.progressd
+2026-10-23 18:45:34.675596-0500 0x44ee     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:34.686486-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 2 duplicate reports for studentd deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:34.686488-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /usr/libexec
+2026-10-23 18:45:34.695962-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.697691-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 9 duplicate reports for studentd deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.697693-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /private
+2026-10-23 18:45:34.702876-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 119 duplicate reports for studentd deny(1) file-read-metadata /private
+2026-10-23 18:45:34.702878-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.702927-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for studentd deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.702928-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.703135-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 34 duplicate reports for studentd deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.703136-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.703268-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 17 duplicate reports for studentd deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.703269-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.709083-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 89 duplicate reports for studentd deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.709084-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.712340-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 26 duplicate reports for studentd deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.712342-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.712406-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 9 duplicate reports for studentd deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.712407-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.712448-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for studentd deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.712449-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.712546-0500 0x44d4     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 9 duplicate reports for studentd deny(1) file-read-metadata /Users
+2026-10-23 18:45:34.712547-0500 0x44d4     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.722027-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: assertionsUser 0x50->0x51
+2026-10-23 18:45:34.722066-0500 0x3037     Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:45:34.724260-0500 0x44ef     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 2 duplicate reports for studentd deny(1) file-read-metadata /Library
+2026-10-23 18:45:34.724263-0500 0x44ef     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:38.764426-0500 0x45bc     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for studentd deny(1) file-read-metadata /usr/libexec/studentd
+2026-10-23 18:45:38.764429-0500 0x45bc     Error       0x0                  0      0    kernel: (Sandbox) System Policy: mdwrite(696) deny(1) file-write-xattr /System/Library/PreferencePanes/Network.prefPane
+2026-10-23 18:45:39.712634-0500 0x44fd     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Users
+2026-10-23 18:45:39.724806-0500 0x42fd     Default     0x0                  0      0    kernel: PMRD: assertionsUser 0x51->0x50
+2026-10-23 18:45:39.724864-0500 0x42fd     Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:45:39.770077-0500 0x44ef     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 9 duplicate reports for studentd deny(1) file-read-metadata /Users
+2026-10-23 18:45:39.770078-0500 0x44ef     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: studentd(1154) deny(1) file-read-metadata /Library
+2026-10-23 18:45:44.637920-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: setAggressiveness(0) kPMMinutesToSleep = 0
+2026-10-23 18:45:45.560599-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: setAggressiveness(0) kPMMinutesToSleep = 0
+2026-10-23 18:45:54.003348-0500 0x44c3     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for studentd deny(1) file-read-metadata /Library
+2026-10-23 18:45:54.003351-0500 0x44c3     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: proactiveeventtr(1190) deny(1) mach-lookup com.apple.mobileassetd.v2
+2026-10-23 18:45:54.019097-0500 0x2420     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for proactiveeventtr deny(1) mach-lookup com.apple.mobileassetd.v2
+2026-10-23 18:45:54.019099-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/.IMG_9419.MOV.icloud
+2026-10-23 18:45:54.019584-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/.IMG_9485.MOV.icloud
+2026-10-23 18:45:54.020227-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Ma’s Heart .pages.icloud
+2026-10-23 18:45:54.021150-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/.IMG_9418.MOV.icloud
+2026-10-23 18:45:54.021534-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.quote-160921.pages-tef.icloud
+2026-10-23 18:45:54.021919-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Fire.pages.icloud
+2026-10-23 18:45:54.022283-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Shimmer .pages.icloud
+2026-10-23 18:45:54.022897-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.New treehouse .pages.icloud
+2026-10-23 18:45:54.023508-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Blank.pages.icloud
+2026-10-23 18:45:54.023865-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Blank 4.pages.icloud
+2026-10-23 18:45:54.024246-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Untitled.pages.icloud
+2026-10-23 18:45:54.024752-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Blank 3.pages.icloud
+2026-10-23 18:45:54.025152-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Treehouse book 1.pages.icloud
+2026-10-23 18:45:54.025605-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Story outlines .pages.icloud
+2026-10-23 18:45:54.026079-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.switcher quick reference.pages.icloud
+2026-10-23 18:45:54.026480-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.keys Topaz copy.pages.icloud
+2026-10-23 18:45:54.026867-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Blank 2.pages.icloud
+2026-10-23 18:45:54.027243-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Date night.pages.icloud
+2026-10-23 18:45:54.027621-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.Birthday Card.pages.icloud
+2026-10-23 18:45:54.028121-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Pages/Documents/.what_is_bf47.pages.icloud
+2026-10-23 18:45:54.028593-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/.IMG_9668.MOV.icloud
+2026-10-23 18:45:54.029000-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.BP255-N.EUSALLG_ENG.pdf.icloud
+2026-10-23 18:45:54.029835-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.MFL70301502_1.2+MFL70320422_1.1+RS+QSGsmartWebOS4.0.pdf.icloud
+2026-10-23 18:45:54.030238-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/.IMG_9329.MOV.icloud
+2026-10-23 18:45:54.030628-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.FF-C-450D.pdf.icloud
+2026-10-23 18:45:54.031207-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.Icu.pdf.icloud
+2026-10-23 18:45:54.031544-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.BP255-N.EUSALLG(BP175)_SM_MFL71685947.pdf.icloud
+2026-10-23 18:45:54.031896-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/.IMG_0027.MOV.icloud
+2026-10-23 18:45:54.032220-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.JPEG image 2.jpeg.icloud
+2026-10-23 18:45:54.032556-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.ARC-8050T3U_specification.pdf.icloud
+2026-10-23 18:45:54.032900-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.NWS - National Mosaic Enhanced Radar Image Full Resolution Loop.pdf.icloud
+2026-10-23 18:45:54.033257-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.JPEG image.jpeg.icloud
+2026-10-23 18:45:54.033754-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.Treehouse book 1.pages.icloud
+2026-10-23 18:45:54.034089-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/.IMG_9794.MOV.icloud
+2026-10-23 18:45:54.034414-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.backhaul_b24.pdf.icloud
+2026-10-23 18:45:54.034779-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.terminator_series.pdf.icloud
+2026-10-23 18:45:54.035140-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/iCloud~com~linearity~vn/Documents/.Untitled.vectornator.icloud
+2026-10-23 18:45:54.035920-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~CloudDocs/Downloads/.BTS Building and Using the Largest Film Camera in the World.pdf.icloud
+2026-10-23 18:45:54.036387-0500 0x2420     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) file-read-data /Users/boulder/Library/Mobile Documents/com~apple~Keynote/Documents/Bethrothed Slides.key
+2026-10-23 18:45:54.037967-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:45:54.037978-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:45:54.037981-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:46:05.400005-0500 0x42fd     Default     0x0                  0      0    kernel: PMRD: assertionsUser 0x50->0x51
+2026-10-23 18:46:05.400039-0500 0x42fd     Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:46:08.519971-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:46:08.519984-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:46:08.519986-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:46:09.146055-0500 0x4271     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: mapspushd(885) deny(1) mach-lookup com.apple.syncdefaultsd
+2026-10-23 18:46:09.429827-0500 0x4814     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: assistantd(430) deny(1) mach-lookup com.apple.corespeech.voicetriggerservice
+2026-10-23 18:46:09.468105-0500 0x4814     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: assistantd(430) deny(1) mach-lookup com.apple.ak.anisette.xpc
+2026-10-23 18:46:09.950014-0500 0x4866     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: bird(431) deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:46:10.402012-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: assertionsUser 0x51->0x50
+2026-10-23 18:46:10.402039-0500 0x3037     Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:46:18.289439-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:46:18.289449-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:46:18.289450-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:46:19.483267-0500 0x4814     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: assistantd(430) deny(1) mach-lookup com.apple.ak.anisette.xpc
+2026-10-23 18:46:42.118357-0500 0x322      Default     0x0                  0      0    kernel: (AppleEthernetAquantiaAqtion) setPTPOffsetsForMedium speed 1000000000 ingress offset -1250 egress offset 1350 result true
+2026-10-23 18:46:42.133620-0500 0x75       Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:46:47.285929-0500 0x322      Default     0x0                  0      0    kernel: (AppleEthernetAquantiaAqtion) setPTPOffsetsForMedium speed 1000000000 ingress offset -1250 egress offset 1350 result true
+2026-10-23 18:46:47.286024-0500 0x75       Default     0x0                  0      0    kernel: [  570.016147]: fq_getq_flow: high delay idx: 0, 4046641286, flow: 0x0, iface: en
+2026-10-23 18:46:47.286028-0500 0x75       Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:46:48.604140-0500 0x4af4     Default     0x0                  0      0    kernel: PMRD: setAggressiveness(0) kPMMinutesToSleep = 0
+2026-10-23 18:46:53.774736-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: setAggressiveness(0) kPMMinutesToSleep = 0
+2026-10-23 18:46:53.775141-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: setAggressiveness(0) kPMMinutesToSleep = 0
+2026-10-23 18:46:53.780891-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: setAggressiveness(0) kPMMinutesToSleep = 0
+2026-10-23 18:46:54.042834-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:46:54.042842-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:46:54.042844-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:46:54.317921-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49194 > 443 in state 4, reset timer to 462
+2026-10-23 18:46:54.317931-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49190 > 443 in state 4, reset timer to 480
+2026-10-23 18:46:54.318483-0500 0x4c00     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 2 duplicate reports for assistantd deny(1) mach-lookup com.apple.ak.anisette.xpc
+2026-10-23 18:46:54.318485-0500 0x4c00     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: itunescloudd(434) deny(1) user-preference-write com.apple.mobileipod
+2026-10-23 18:46:54.404151-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: setUTCTimeOfDay
+2026-10-23 18:46:54.425267-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) setUTCTimeOfDay setting PMU offset
+2026-10-23 18:46:54.425269-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: setting PMU offset to 53841745940733
+2026-10-23 18:46:54.425770-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC)  SMCRTC: set PMU offset to 53841745940733
+2026-10-23 18:46:54.947059-0500 0x3037     Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: [PowerByCalendarDate] 0/0/0 0:0:0 (0)
+2026-10-23 18:46:54.947061-0500 0x3037     Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: [PowerByCalendarDate] 0/0/0 0:0:0 (0)
+2026-10-23 18:46:54.952307-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: SYSCTL setting PMU offset
+2026-10-23 18:46:54.952309-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: setting PMU offset to 53841745940739
+2026-10-23 18:46:54.952719-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC)  SMCRTC: set PMU offset to 53841745940739
+2026-10-23 18:46:54.972541-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: write to clock async key returned in progress, retrying the write
+2026-10-23 18:46:54.977074-0500 0x4cb0     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: cloudd(425) deny(1) system-fsctl _IO('h', 47)
+2026-10-23 18:46:54.992075-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: write to clock async key returned in progress, retrying the write
+2026-10-23 18:46:55.033154-0500 0x4bfd     Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: write to clock async key returned in progress, retrying the write
+2026-10-23 18:46:55.052535-0500 0x4bfd     Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: write to clock async key returned in progress, retrying the write
+2026-10-23 18:46:55.074772-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: SYSCTL setting PMU offset
+2026-10-23 18:46:55.182675-0500 0x4c69     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 3 duplicate reports for cloudd deny(1) system-fsctl _IO('h', 47)
+2026-10-23 18:46:55.182678-0500 0x4c69     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:46:55.298620-0500 0x3037     Default     0x0                  0      0    kernel: PMRD: assertionsUser 0x50->0x51
+2026-10-23 18:46:55.298647-0500 0x3037     Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:46:55.300443-0500 0x4c69     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:46:55.300445-0500 0x4c69     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: mapspushd(885) deny(1) mach-lookup com.apple.syncdefaultsd
+2026-10-23 18:46:55.303352-0500 0x4c69     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:46:55.305965-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: SYSCTL setting PMU offset
+2026-10-23 18:46:55.305967-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: setting PMU offset to 53841745940738
+2026-10-23 18:46:55.306370-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC)  SMCRTC: set PMU offset to 53841745940738
+2026-10-23 18:46:55.323376-0500 0x4bfe     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:46:55.323378-0500 0x4bfe     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: AssetCacheLocato(1262) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:46:55.369441-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: write to clock async key returned in progress, retrying the write
+2026-10-23 18:46:55.389437-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: write to clock async key returned in progress, retrying the write
+2026-10-23 18:46:55.455927-0500 0x619      Default     0x0                  0      0    kernel: (AppleSMCRTC) SMCRTC: SYSCTL setting PMU offset
+2026-10-23 18:46:55.954764-0500 0x4c95     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target CalendarWidgetExtension:532
+2026-10-23 18:46:55.955777-0500 0x4836     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target WeatherWidget:533
+2026-10-23 18:46:55.955894-0500 0x1760     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.955962-0500 0x1760     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.955995-0500 0x1760     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.956025-0500 0x1760     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.956058-0500 0x1760     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.956084-0500 0x1760     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.956588-0500 0x4c95     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target WorldClockWidget:531
+2026-10-23 18:46:55.957095-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.957251-0500 0x4c95     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target NewsToday2:534
+2026-10-23 18:46:55.957356-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.957402-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.957452-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.957495-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.957635-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.958078-0500 0x4c96     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target StocksWidget:535
+2026-10-23 18:46:55.958105-0500 0x171a     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.958159-0500 0x3570     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.958204-0500 0x3570     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.958251-0500 0x3570     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.958278-0500 0x3570     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.958518-0500 0x1700     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.958945-0500 0x4c97     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target ScreenTimeWidgetExtension:530
+2026-10-23 18:46:55.959684-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.959869-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.960047-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.960634-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:55.962706-0500 0x177b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.962927-0500 0x177b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.963097-0500 0x177b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.963613-0500 0x4e18     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:55.964080-0500 0x4e1b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WorldClockWidget:531
+2026-10-23 18:46:55.964336-0500 0x4e1b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WorldClockWidget:531
+2026-10-23 18:46:55.964406-0500 0x17ab     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.964511-0500 0x4e1b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WorldClockWidget:531
+2026-10-23 18:46:55.964637-0500 0x17ab     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.964831-0500 0x17ab     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.965073-0500 0x4e1a     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WorldClockWidget:531
+2026-10-23 18:46:55.965320-0500 0x17ab     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:55.965873-0500 0x1762     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.966096-0500 0x1762     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.966305-0500 0x1762     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.966805-0500 0x1762     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:55.969017-0500 0x4e1f     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for ScreenTimeWidgetExtension:530
+2026-10-23 18:46:55.969285-0500 0x4e1f     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for ScreenTimeWidgetExtension:530
+2026-10-23 18:46:55.969456-0500 0x4e1f     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for ScreenTimeWidgetExtension:530
+2026-10-23 18:46:55.969997-0500 0x4e1f     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for ScreenTimeWidgetExtension:530
+2026-10-23 18:46:56.009590-0500 0x4e1f     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for ScreenTimeWidgetExtension:530
+2026-10-23 18:46:56.009773-0500 0x175f     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for ScreenTimeWidgetExtension:530
+2026-10-23 18:46:56.068032-0500 0x4c96     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target ScreenTimeWidgetExtension:530
+2026-10-23 18:46:56.234177-0500 0x16e8     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:56.234300-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:46:56.334705-0500 0x4c95     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target CalendarWidgetExtension:532
+2026-10-23 18:46:56.641912-0500 0x4e1a     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WorldClockWidget:531
+2026-10-23 18:46:56.642132-0500 0x4e1c     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WorldClockWidget:531
+2026-10-23 18:46:56.742237-0500 0x4c96     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target WorldClockWidget:531
+2026-10-23 18:46:56.821875-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:46:56.821884-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:46:56.821885-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:46:56.833018-0500 0x1781     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:56.833259-0500 0x4e17     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for WeatherWidget:533
+2026-10-23 18:46:56.845972-0500 0x4c95     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target WeatherWidget:533
+2026-10-23 18:46:56.873466-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49250 > 443 in state 4, reset timer to 425
+2026-10-23 18:46:56.935937-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49251 > 443 in state 4, reset timer to 477
+2026-10-23 18:46:56.963342-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49252 > 443 in state 4, reset timer to 493
+2026-10-23 18:46:57.208514-0500 0x4ae9     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 23 duplicate reports for AssetCacheLocato deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:46:57.208516-0500 0x4ae9     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.quickl(464) deny(1) mach-lookup com.apple.bird.token
+2026-10-23 18:46:57.309127-0500 0x4b0b     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: bird(431) deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:46:57.313726-0500 0x1762     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:57.313892-0500 0x179e     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for StocksWidget:535
+2026-10-23 18:46:57.650720-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785801 tx stats: # 520 finish 525 enter 355 wait 22 581us close 209us flush 719us
+2026-10-23 18:46:58.096008-0500 0x4e70     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for Dropbox deny(1) file-read-data /Users/boulder/.Trash
+2026-10-23 18:46:58.096013-0500 0x4e70     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: bird(431) deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:46:58.156765-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49265 > 443 in state 4, reset timer to 789
+2026-10-23 18:46:58.177922-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49241 > 443 in state 4, reset timer to 2144
+2026-10-23 18:46:58.190648-0500 0x4c97     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target StocksWidget:535
+2026-10-23 18:46:58.239634-0500 0x17ab     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:58.239788-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:46:58.362795-0500 0x4836     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target NewsToday2:534
+2026-10-23 18:46:58.567365-0500 0x4c07     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for bird deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:46:58.567377-0500 0x4c07     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/ActiveTileGroup.pbd
+2026-10-23 18:46:59.048840-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785821 tx stats: # 540 finish 545 enter 349 wait 28 1201us close 204us flush 729us
+2026-10-23 18:46:59.268520-0500 0x4c69     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: suggestd(542) deny(1) mach-lookup com.apple.coreservices.launchservicesd
+2026-10-23 18:46:59.786214-0500 0x4b50     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: taskgated-helper(1304) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:46:59.870442-0500 0x4ae9     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: DataDetectorsSou(1314) deny(1) mach-lookup com.apple.distributed_notifications@1v3
+2026-10-23 18:46:59.977219-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49277 > 443 in state 4, reset timer to 569
+2026-10-23 18:47:00.299302-0500 0x4b68     Default     0x0                  0      0    kernel: PMRD: assertionsUser 0x51->0x50
+2026-10-23 18:47:00.299335-0500 0x4b68     Default     0x0                  0      0    kernel: (IOgPTPPlugin) IOTimeSyncLocalClockPort::handleGeneralNotification <private>
+2026-10-23 18:47:00.304120-0500 0x4ae9     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:47:01.717020-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49228 > 443 in state 4, reset timer to 5814
+2026-10-23 18:47:02.892722-0500 0x4836     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target CalendarWidgetExtension:532
+2026-10-23 18:47:02.892886-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.892977-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893044-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893103-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893139-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893445-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893492-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893621-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893675-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893717-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.893763-0500 0x1718     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.896259-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.896459-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.896622-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:02.897062-0500 0x171b     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:03.144073-0500 0x16e8     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:03.144167-0500 0x4e10     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for CalendarWidgetExtension:532
+2026-10-23 18:47:03.244706-0500 0x4c95     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target CalendarWidgetExtension:532
+2026-10-23 18:47:07.246116-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49286 > 443 in state 4, reset timer to 388
+2026-10-23 18:47:08.618500-0500 0x396f     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:47:08.618503-0500 0x396f     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/ActiveTileGroup.pbd
+2026-10-23 18:47:10.984957-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:47:10.984968-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:47:10.984970-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:47:14.266871-0500 0x4967     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: adprivacyd(1336) deny(1) mach-lookup com.apple.ManagedClient.agent
+2026-10-23 18:47:14.275043-0500 0x4967     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: adprivacyd(1336) deny(1) mach-lookup com.apple.windowserver.active
+2026-10-23 18:47:14.365929-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785841 tx stats: # 560 finish 565 enter 361 wait 29 1168us close 197us flush 740us
+2026-10-23 18:47:14.965727-0500 0x5255     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for adprivacyd deny(1) mach-lookup com.apple.windowserver.active
+2026-10-23 18:47:14.965729-0500 0x5255     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: coreaudiod(203) deny(1) file-read-metadata /Library/Keychains
+2026-10-23 18:47:15.298931-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49306 > 443 in state 4, reset timer to 441
+2026-10-23 18:47:19.107138-0500 0x251      Default     0x0                  0      0    kernel: (IONVMeFamily) void IONVMeController::HandleCompletionErrors(AppleNVMeRequest *, uint32_t)::5594:DWORD0=0x001020c5 DWORD10=0x00000000 NVMeStatus=0xc0
+2026-10-23 18:47:19.107148-0500 0x251      Default     0x0                  0      0    kernel: (IONVMeFamily) void IONVMeController::HandleCompletionErrors(AppleNVMeRequest *, uint32_t)::5594:DWORD0=0x001020c5 DWORD10=0x00000000 NVMeStatus=0xc0
+2026-10-23 18:47:19.223342-0500 0x50f2     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 15 duplicate reports for coreaudiod deny(1) file-read-metadata /Library/Keychains
+2026-10-23 18:47:19.223344-0500 0x50f2     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:47:19.966205-0500 0x5255     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:47:19.966209-0500 0x5255     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: coreaudiod(203) deny(1) file-read-metadata /Library/Keychains
+2026-10-23 18:47:22.562055-0500 0x251      Default     0x0                  0      0    kernel: (IONVMeFamily) void IONVMeController::HandleCompletionErrors(AppleNVMeRequest *, uint32_t)::5594:DWORD0=0x004820c5 DWORD10=0x00000000 NVMeStatus=0xc0
+2026-10-23 18:47:22.562060-0500 0x251      Default     0x0                  0      0    kernel: (IONVMeFamily) void IONVMeController::HandleCompletionErrors(AppleNVMeRequest *, uint32_t)::5594:DWORD0=0x004820c5 DWORD10=0x00000000 NVMeStatus=0xc0
+2026-10-23 18:47:22.578575-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:47:22.578584-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:47:22.578587-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:47:28.460957-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785861 tx stats: # 580 finish 584 enter 716 wait 31 1165us close 190us flush 736us
+2026-10-23 18:47:34.217092-0500 0x50f2     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 3 duplicate reports for coreaudiod deny(1) file-read-metadata /Library/Keychains
+2026-10-23 18:47:34.217094-0500 0x50f2     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: networkservicepr(426) deny(1) mach-lookup com.apple.distributed_notifications@Uv3
+2026-10-23 18:47:34.226301-0500 0x53e5     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: mobileactivation(329) deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:47:34.228302-0500 0x4b50     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for mobileactivation deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:47:34.228306-0500 0x4b50     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: mobileactivation(329) deny(1) user-preference-read com.apple.SubmitDiagInfo
+2026-10-23 18:47:34.860348-0500 0x4491     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49316 > 443 in state 4, reset timer to 736
+2026-10-23 18:47:34.995190-0500 0x542d     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:47:34.996767-0500 0x521b     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: adprivacyd(1336) deny(1) file-read-data /Users/boulder/Library/Preferences/com.apple.security.plist
+2026-10-23 18:47:35.007734-0500 0x542d     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:47:36.063855-0500 0x50f2     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 12 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:47:36.063862-0500 0x50f2     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: mdworker_shared(1357) deny(1) mach-lookup com.apple.security.syspolicy (import fstype:apfs fsflag:4909000 flags:250000025E diag:0 isXCode:0 uti:com.apple.application-bundle plugin:/Library/Spotlight/Application.mdimporter - find suspect file using: sudo mdutil -t 549261)
+2026-10-23 18:47:36.172098-0500 0x542f     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) user-preference-read com.apple.GEO
+2026-10-23 18:47:36.172862-0500 0x5555     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/Experiments.pbd
+2026-10-23 18:47:36.172922-0500 0x555a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices
+2026-10-23 18:47:36.173004-0500 0x5555     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/networkDefaults.plist
+2026-10-23 18:47:36.173336-0500 0x5557     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/Resources
+2026-10-23 18:47:36.177645-0500 0x5557     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/RegionalResources
+2026-10-23 18:47:36.222636-0500 0x5555     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-issue-extension target:/System/Library/PrivateFrameworks/PassKitCore.framework class:com.apple.app-sandbox.read
+2026-10-23 18:47:36.229687-0500 0x50f2     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) mach-lookup com.apple.tccd.system
+2026-10-23 18:47:36.252405-0500 0x50f2     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for passd deny(1) mach-lookup com.apple.tccd.system
+2026-10-23 18:47:36.252408-0500 0x50f2     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) mach-lookup com.apple.CoreLocation.agent
+2026-10-23 18:47:36.256782-0500 0x50f2     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) mach-lookup com.apple.bird
+2026-10-23 18:47:36.277249-0500 0x5455     Default     0x0                  0      0    kernel: ifnet_attach: Waiting for all kernel threads created for interface utun2 to get scheduled at least once.
+2026-10-23 18:47:36.277256-0500 0x5455     Default     0x0                  0      0    kernel: ifnet_attach: All kernel threads created for interface utun2 have been scheduled at least once. Proceeding.
+2026-10-23 18:47:36.316688-0500 0x5435     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target setoken:1358
+2026-10-23 18:47:36.317174-0500 0x5585     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:36.336521-0500 0x5586     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:36.336785-0500 0x5586     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:36.336941-0500 0x5586     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:36.338721-0500 0x5588     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:36.342119-0500 0x5586     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManagerUserClient: start: session_uid = 1f5.
+2026-10-23 18:47:36.342417-0500 0x5586     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(22) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:36.342454-0500 0x5586     Default     0x0                  0      0    kernel: (AppleCredentialManager) ACMFirstResponderKernelService: _onGetCapabilities: T208: NO.
+2026-10-23 18:47:36.342779-0500 0x5586     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(36) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:36.343028-0500 0x5586     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(19) took 1 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:36.427751-0500 0x5555     Default     0x0                  0      0    kernel: (AppleSEPManager) SEP EP 12 enabled
+2026-10-23 18:47:36.427990-0500 0x5555     Default     0x0                  0      0    kernel: (AppleSEPManager) AppleSEP:WARNING: _cmsgSend: error returned - opcode 1 result 11 endpoint 0 extra-debug 0x0 0xc 0x4 0x1a
+2026-10-23 18:47:36.427996-0500 0x5555     Default     0x0                  0      0    kernel: (AppleSEPManager) AppleSEP:WARNING: cmsgSET_OOL_IN: SET_REMOTE_DMA_IN failed 0xe00002e9 target_ep 0xc pageaddr 0x4934 size 0x4000
+2026-10-23 18:47:36.428000-0500 0x5555     Default     0x0                  0      0    kernel: (AppleSSE) AssertMacros: err == 0  (value: 0x<private>),  file: /System/Volumes/Data/SWE/macOS/BuildRoots/5f3ad454b9/Library/Caches/com.apple.xbs/Sources/AppleSSE/AppleSSE-212.120.1/AppleSSE/AppleSSE.cpp, line: 2261
+2026-10-23 18:47:36.428027-0500 0x5555     Default     0x0                  0      0    kernel: (AppleSSE) AppleSSE::hasBridgeSSE - SSE not present (ep = 0, sendBuf = 0)
+2026-10-23 18:47:36.439755-0500 0x5555     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Library/Preferences/com.apple.ViewBridge.plist
+2026-10-23 18:47:36.467759-0500 0x5476     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: progressd(1156) deny(1) process-info-pidinfo others [accountsd(402)]
+2026-10-23 18:47:36.481490-0500 0x541a     Error       0x0                  0      0    kernel: (Sandbox) System Policy: cfprefsd(389) deny(1) file-read-data /Users/boulder/Library/Group Containers/group.com.apple.notes
+2026-10-23 18:47:36.487350-0500 0x5570     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for cfprefsd deny(1) file-read-data /Users/boulder/Library/Group Containers/group.com.apple.notes
+2026-10-23 18:47:36.487353-0500 0x5570     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) mach-lookup com.apple.AppSSO.service-xpc
+2026-10-23 18:47:36.492601-0500 0x55e5     Error       0x0                  0      0    kernel: (Sandbox) System Policy: cfprefsd(133) deny(1) file-read-data /private/var/folders/z5/3hrt7fqx69zb6qj5fv16xqmr0000gn/0/com.apple.routined/dv/Cache
+2026-10-23 18:47:36.494120-0500 0x55eb     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for cfprefsd deny(1) file-read-data /private/var/folders/z5/3hrt7fqx69zb6qj5fv16xqmr0000gn/0/com.apple.routined/dv/Cache
+2026-10-23 18:47:36.494122-0500 0x55eb     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: secd(407) deny(1) user-preference-write secd
+2026-10-23 18:47:36.497872-0500 0x55a7     Error       0x0                  0      0    kernel: (Sandbox) System Policy: cfprefsd(133) deny(1) file-read-data /Users/boulder/Library/Group Containers/group.com.apple.notes
+2026-10-23 18:47:36.538026-0500 0x5337     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: secd(407) deny(1) user-preference-write secd
+2026-10-23 18:47:36.686141-0500 0x556a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) system-socket domain:32 type:2 protocol:2
+2026-10-23 18:47:39.060356-0500 0x5589     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(19) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:40.588368-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49335 > 443 in state 4, reset timer to 415
+2026-10-23 18:47:41.386460-0500 0x5570     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 3 duplicate reports for passd deny(1) system-socket domain:32 type:2 protocol:2
+2026-10-23 18:47:41.386468-0500 0x5570     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:47:43.653316-0500 0xb79      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49336 > 443 in state 4, reset timer to 370
+2026-10-23 18:47:44.081657-0500 0x5589     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(2) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:44.081833-0500 0x5585     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:46.313333-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785881 tx stats: # 600 finish 605 enter 731 wait 31 1165us close 184us flush 738us
+2026-10-23 18:47:46.440685-0500 0x555a     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:47:46.440689-0500 0x555a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/Resources
+2026-10-23 18:47:46.443506-0500 0x555a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: passd(1356) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/RegionalResources
+2026-10-23 18:47:46.513203-0500 0x5589     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:46.514892-0500 0x558b     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(36) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:46.515130-0500 0x558b     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(19) took 1 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:48.065489-0500 0x57c3     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: PasswordBreachAg(1366) deny(1) file-write-create /Users/boulder/Library/Caches/com.apple.Safari.PasswordBreachAgent
+2026-10-23 18:47:48.065793-0500 0x4cd7     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(36) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:48.066703-0500 0x4cd7     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(19) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:48.068893-0500 0x57cb     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(2) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:48.086224-0500 0x57c7     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:47:48.086980-0500 0x5570     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for parsec-fbf deny(1) file-read-data /Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist
+2026-10-23 18:47:48.086982-0500 0x5570     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) mach-lookup com.apple.securityd.xpc
+2026-10-23 18:47:48.087484-0500 0x56e9     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) user-preference-write com.apple.osprey
+2026-10-23 18:47:48.088230-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/Experiments.pbd
+2026-10-23 18:47:48.088340-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/networkDefaults.plist
+2026-10-23 18:47:48.088551-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/Resources
+2026-10-23 18:47:48.089989-0500 0x5570     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) mach-lookup com.apple.coreservices.quarantine-resolver
+2026-10-23 18:47:48.090485-0500 0x5570     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) mach-lookup com.apple.lsd.mapdb
+2026-10-23 18:47:48.090891-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) System Policy: parsec-fbf(526) deny(1) file-read-data /private/var/folders/z5/3hrt7fqx69zb6qj5fv16xqmr0000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-2549-v2.csstore
+2026-10-23 18:47:48.090955-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) System Policy: parsec-fbf(526) deny(1) file-read-metadata /private/var/folders/z5/3hrt7fqx69zb6qj5fv16xqmr0000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-2549-v2.csstore
+2026-10-23 18:47:48.099852-0500 0x5570     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 2 duplicate reports for parsec-fbf deny(1) file-read-metadata /private/var/folders/z5/3hrt7fqx69zb6qj5fv16xqmr0000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-2549-v2.csstore
+2026-10-23 18:47:48.099854-0500 0x5570     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) mach-lookup com.apple.lsd.modifydb
+2026-10-23 18:47:48.117494-0500 0x57ce     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 67 duplicate reports for parsec-fbf deny(1) mach-lookup com.apple.lsd.modifydb
+2026-10-23 18:47:48.117501-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Preferences/com.apple.LaunchServices/com.apple.LaunchServices.plist
+2026-10-23 18:47:48.228421-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/RegionalResources
+2026-10-23 18:47:48.555925-0500 0x57c6     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-write-create /Users/boulder/Library/Caches/com.apple.siri.parsec.CoreParsec
+2026-10-23 18:47:48.730936-0500 0x56f8     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) user-preference-write com.apple.osprey
+2026-10-23 18:47:49.171360-0500 0x57ce     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 2 duplicate reports for parsec-fbf deny(1) user-preference-write com.apple.osprey
+2026-10-23 18:47:49.171365-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/Resources
+2026-10-23 18:47:49.172116-0500 0x57ce     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsec-fbf(526) deny(1) file-read-data /Users/boulder/Library/Caches/GeoServices/RegionalResources
+2026-10-23 18:47:49.876466-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:47:49.876477-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:47:49.876480-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:47:52.520422-0500 0x567f     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(2) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:47:52.520572-0500 0x5585     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:47:54.888390-0500 0x56ef     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:47:55.076743-0500 0x595d     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 9 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:47:55.093322-0500 0x56ef     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:47:55.540790-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:47:55.540798-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:47:55.540800-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:47:56.900536-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:47:56.900544-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:47:56.900545-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:47:57.451923-0500 0x59f7     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 3 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:47:57.705874-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785901 tx stats: # 620 finish 625 enter 732 wait 31 1165us close 178us flush 742us
+2026-10-23 18:47:57.764357-0500 0x58bd     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for setoken:1358
+2026-10-23 18:48:05.105681-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:48:05.105694-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:48:05.105695-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:48:09.850247-0500 0xbc2      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49336 > 443 in state 4, reset timer to 25866
+2026-10-23 18:48:10.567173-0500 0x597a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: swcd(432) deny(1) system-fsctl _IO('h', 47)
+2026-10-23 18:48:10.985032-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:48:10.985042-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:48:10.985044-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:48:14.882424-0500 0x56e9     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:48:16.517174-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785921 tx stats: # 640 finish 646 enter 729 wait 35 1051us close 172us flush 743us
+2026-10-23 18:48:22.578750-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:48:22.578776-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:48:22.578777-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:48:25.683255-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:48:25.683264-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:48:25.683266-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:48:35.613625-0500 0x465      Default     0x0                  0      0    kernel: (AppleKeyStore) AppleKeyStore:10739:0: AppleKeyStoreUserClient: Assertion timer fired
+2026-10-23 18:48:42.166626-0500 0x5c84     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 13 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:48:42.166634-0500 0x5c84     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:48:50.457470-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:48:50.457480-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:48:50.457482-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:48:55.540885-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:48:55.540894-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:48:55.540895-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:48:56.085277-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785941 tx stats: # 660 finish 666 enter 722 wait 35 1051us close 167us flush 737us
+2026-10-23 18:48:56.086050-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:48:56.086058-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:48:56.086059-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:48:58.169673-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:48:58.169683-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:49:01.146928-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:49:01.146938-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:49:01.577006-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:49:01.577015-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:49:04.501496-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:49:04.501510-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:49:04.501512-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:49:04.502854-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:49:04.502863-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:49:04.502865-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:49:05.136907-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:49:05.136915-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:49:05.136916-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:49:23.717708-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:49:23.717718-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:49:25.683430-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:49:25.683439-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:49:25.683441-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:49:26.231993-0500 0x5fd3     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:49:26.231997-0500 0x5fd3     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: routined(429) deny(1) mach-lookup com.apple.Maps.MapsSync.store
+2026-10-23 18:49:49.613834-0500 0x5f74     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 15 duplicate reports for routined deny(1) mach-lookup com.apple.Maps.MapsSync.store
+2026-10-23 18:49:49.613837-0500 0x5f74     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsecd(520) deny(1) mach-lookup com.apple.osanalytics.osanalyticshelper
+2026-10-23 18:49:49.614901-0500 0x6001     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsecd(520) deny(1) file-write-mode /Users/boulder/Library/Logs/DiagnosticReports
+2026-10-23 18:49:49.614958-0500 0x6001     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: parsecd(520) deny(1) file-write-create /Users/boulder/Library/Logs/DiagnosticReports/.SiriSearchFeedback-2026-10-23-184949.diag
+2026-10-23 18:49:49.639245-0500 0x5f74     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: App Store(1483) deny(1) mach-lookup com.apple.symptom_analytics
+2026-10-23 18:49:49.768759-0500 0x5f21     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for App Store deny(1) mach-lookup com.apple.symptom_analytics
+2026-10-23 18:49:49.768764-0500 0x5f21     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: storeuid(1484) deny(1) user-preference-read com.apple.speech.recognition.AppleSpeechRecognition.prefs
+2026-10-23 18:49:49.778418-0500 0x6274     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: storeuid(1484) deny(1) user-preference-read com.apple.HIToolbox
+2026-10-23 18:49:49.791205-0500 0x6274     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for storeuid deny(1) user-preference-read com.apple.HIToolbox
+2026-10-23 18:49:49.791209-0500 0x6274     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: storeuid(1484) deny(1) file-read-data /Library/Preferences/com.apple.ViewBridge.plist
+2026-10-23 18:49:51.259138-0500 0x5f74     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: VTDecoderXPCServ(1485) deny(1) mach-lookup com.apple.tccd.system
+2026-10-23 18:49:51.273253-0500 0x62d8     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:49:51.273254-0500 0x62d8     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:49:51.275813-0500 0x62d8     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:49:51.275814-0500 0x62d8     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:49:51.305149-0500 0x62d8     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:49:51.305156-0500 0x62d8     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:49:56.977752-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:49:56.977765-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:49:56.977767-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:49:59.897684-0500 0x5f74     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for VTDecoderXPCServ deny(1) mach-lookup com.apple.tccd.system
+2026-10-23 18:49:59.897687-0500 0x5f74     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:50:00.939594-0500 0x5f90     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:50:00.939598-0500 0x5f90     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: WindowServer(137) deny(1) file-issue-extension target:/ class:com.apple.app-sandbox.read
+2026-10-23 18:50:00.993009-0500 0x636a     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for WindowServer deny(1) file-issue-extension target:/ class:com.apple.app-sandbox.read
+2026-10-23 18:50:00.993011-0500 0x636a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: MTLCompilerServi(1489) deny(1) file-read-metadata /private/var/empty
+2026-10-23 18:50:02.086937-0500 0x619d     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49481 > 443 in state 4, reset timer to 407
+2026-10-23 18:50:02.089275-0500 0x619d     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49480 > 443 in state 4, reset timer to 412
+2026-10-23 18:50:02.090415-0500 0x619d     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49479 > 443 in state 4, reset timer to 413
+2026-10-23 18:50:04.662393-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:50:04.662403-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:50:04.662405-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:50:04.662418-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:50:04.662421-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:50:04.662422-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:50:11.279552-0500 0x63ec     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:50:11.279553-0500 0x63ec     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:50:16.892637-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49499 > 443 in state 4, reset timer to 376
+2026-10-23 18:50:17.213849-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49505 > 443 in state 4, reset timer to 395
+2026-10-23 18:50:17.213855-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49504 > 443 in state 4, reset timer to 395
+2026-10-23 18:50:17.312828-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49507 > 443 in state 4, reset timer to 358
+2026-10-23 18:50:17.461522-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49510 > 443 in state 4, reset timer to 329
+2026-10-23 18:50:17.486323-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49509 > 443 in state 4, reset timer to 370
+2026-10-23 18:50:17.486330-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49508 > 443 in state 4, reset timer to 370
+2026-10-23 18:50:18.452772-0500 0x5b50     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49518 > 443 in state 4, reset timer to 358
+2026-10-23 18:50:31.325879-0500 0xbc2      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49411 > 443 in state 4, reset timer to 97548
+2026-10-23 18:50:31.370169-0500 0x638      Default     0x0                  0      0    kernel: tcp_heuristic_ecn_aggressive_common disable ECN until 605821119 now 602221119 on 97b0a127ec4d4b3d
+2026-10-23 18:50:31.393502-0500 0xbc2      Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49432 > 443 in state 4, reset timer to 59260
+2026-10-23 18:50:35.297764-0500 0x667f     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:50:35.297766-0500 0x667f     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:50:35.337006-0500 0x667f     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:50:35.337007-0500 0x667f     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:50:36.258837-0500 0x6710     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:50:36.258838-0500 0x6710     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:50:36.279318-0500 0x670e     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:50:36.279319-0500 0x670e     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:50:37.905179-0500 0x670c     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:50:37.905181-0500 0x670c     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:50:37.928001-0500 0x670c     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) AMD Error:
+2026-10-23 18:50:37.928002-0500 0x670c     Default     0x0                  0      0    kernel: (AMDRadeonX6800HWLibs) TODO:  To implement support for request power
+2026-10-23 18:50:41.168970-0500 0x67ed     Error       0x0                  0      0    kernel: (Sandbox) System Policy: AUHelperService(1528) deny(1) file-issue-extension target:/Users/boulder/Downloads class:com.apple.app-sandbox.read-write
+2026-10-23 18:50:42.242297-0500 0x68b5     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: mdworker_shared(1549) deny(1) file-write-create /Users/boulder/Library/Caches/com.apple.iWork.DocumentResources (import fstype:apfs fsflag:4909000 flags:240000005E diag:0 isXCode:0 uti:com.apple.iwork.keynote.sffkey plugin:/Library/Spotlight/iWork.mdimporter - find suspect file using: sudo mdutil -t 89137151)
+2026-10-23 18:50:48.145052-0500 0x5f8f     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library/InstallCoordination
+2026-10-23 18:50:48.145095-0500 0x5f8f     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library
+2026-10-23 18:50:48.145132-0500 0x5f8f     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd
+2026-10-23 18:50:48.145891-0500 0x5f8f     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library/InstallCoordination
+2026-10-23 18:50:48.145935-0500 0x5f8f     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library
+2026-10-23 18:50:48.145967-0500 0x5f8f     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd
+2026-10-23 18:50:50.483210-0500 0x75       Default     0x0                  0      0    kernel: PMRD: PowerChangeOverride (ON_STATE->ON_STATE, f, 0x2) tag 0x3c0064
+2026-10-23 18:50:50.483215-0500 0x75       Default     0x0                  0      0    kernel: PMRD: PowerChangeDone: ON_STATE->ON_STATE
+2026-10-23 18:50:50.483361-0500 0x75       Default     0x0                  0      0    kernel: PMRD: PowerChangeOverride (ON_STATE->ON_STATE, f, 0x2) tag 0x3d0064
+2026-10-23 18:50:50.483362-0500 0x75       Default     0x0                  0      0    kernel: PMRD: PowerChangeDone: ON_STATE->ON_STATE
+2026-10-23 18:50:50.483992-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 7 args 0x97b0a127e70179ad 0x0
+2026-10-23 18:50:50.484002-0500 0x75       Default     0x0                  0      0    kernel: PMRD: PowerChangeOverride (ON_STATE->ON_STATE, f, 0x302) tag 0x3e0064
+2026-10-23 18:50:50.484169-0500 0x75       Default     0x0                  0      0    kernel: PMRD: destroyed capability client set 0x97b0a11b35ce9015
+2026-10-23 18:50:50.484559-0500 0x75       Default     0x0                  0      0    kernel: PMRD: kIOMessageSystemCapabilityChange[0] to com.apple.iokit.IOStorageFamily
+2026-10-23 18:50:50.484562-0500 0x75       Default     0x0                  0      0    kernel: PMRD: PowerChangeDone: ON_STATE->ON_STATE
+2026-10-23 18:50:51.549084-0500 0x6982     Default     0x0                  0      0    kernel: (HFS) hfs: mounted Yubico Authenticator on device disk9s1
+2026-10-23 18:50:52.622112-0500 0x69af     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: AssetCache(612) deny(1) file-read-metadata /Volumes
+2026-10-23 18:50:52.622186-0500 0x69af     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: AssetCache(612) deny(1) file-read-metadata /Volumes/UNTITLED
+2026-10-23 18:50:52.757786-0500 0x6852     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:50:58.165457-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x0,   arg0 0x0, arg1 0x10502c000, arg2 0x8010 arg3 0xba
+2026-10-23 18:50:58.165459-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x4  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:50:58.165463-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba
+2026-10-23 18:50:58.165465-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::safeRegisterClientBuffer64 <private>
+2026-10-23 18:50:58.165468-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::registerClientBuffer64  (<private>[1], 0x10502c000, 0x8010, 0xba)
+2026-10-23 18:50:58.165470-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:50:58.165471-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:50:58.165512-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer before offset: <private>, offset size: 16
+2026-10-23 18:50:58.165513-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer after offset: <private>
+2026-10-23 18:50:58.165513-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:50:58.165514-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:50:58.165515-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   creating new IOAudioClientBufferSet
+2026-10-23 18:50:58.165515-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   output
+2026-10-23 18:50:58.165517-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline
+2026-10-23 18:50:58.165518-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerClientBuffer64() result 0x0
+2026-10-23 18:50:58.165518-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::safeRegisterClientBuffer64  returns 0x0
+2026-10-23 18:50:58.165520-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba returns 0x0
+2026-10-23 18:50:58.165521-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:50:58.165531-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x3,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:50:58.165533-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:50:58.165534-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::startClient() - 0
+2026-10-23 18:50:58.165535-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine && !isInactive(). State = 0
+2026-10-23 18:50:58.165536-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine->getState() != kIOAudioEnginePaused
+2026-10-23 18:50:58.165540-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(1)
+2026-10-23 18:50:58.165541-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline() setting online
+2026-10-23 18:50:58.165542-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startClient(<private>)
+2026-10-23 18:50:58.165543-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::incrementActiveUserClients() - 0
+2026-10-23 18:50:58.165546-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startAudioEngine(state = 0)
+2026-10-23 18:50:58.165547-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 0
+2026-10-23 18:50:58.165548-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 2
+2026-10-23 18:50:58.165549-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 2
+2026-10-23 18:50:58.165551-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:50:58.165552-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:50:58.165553-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 1
+2026-10-23 18:50:58.165555-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(0,0)
+2026-10-23 18:50:58.165555-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::resetStatusBuffer()
+2026-10-23 18:50:58.174506-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x1. oldState=0)
+2026-10-23 18:50:58.174509-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::getTimerInterval()
+2026-10-23 18:50:58.174521-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startAudioEngine() returns 0x0
+2026-10-23 18:50:58.174522-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::incrementActiveUserClients() - 1 returns 0
+2026-10-23 18:50:58.174524-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startClient(<private>) returns 0x0
+2026-10-23 18:50:58.174525-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   engine started
+2026-10-23 18:50:58.174526-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   bufferSet <private>
+2026-10-23 18:50:58.174527-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   output clientBuffer <private>
+2026-10-23 18:50:58.174528-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::addClient(<private>)
+2026-10-23 18:50:58.174531-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::addClient(<private>) returns 0x0
+2026-10-23 18:50:58.174532-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient[<private>]::startClient() - 1 returns 0x0
+2026-10-23 18:50:58.174534-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:50:59.446967-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x4,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:50:59.446977-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:50:59.446985-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:50:59.446992-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:50:59.446993-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:50:59.446997-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(4,2400)
+2026-10-23 18:50:59.446999-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::decrementActiveUserClients() - 0 returns 0x0
+2026-10-23 18:50:59.447000-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::stopClient(<private>) returns 0x0
+2026-10-23 18:50:59.447003-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(0)
+2026-10-23 18:50:59.447005-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:50:59.447048-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x1,   arg0 0x10502C000, arg1 0xba, arg2 0x0 arg3 0x0
+2026-10-23 18:50:59.447050-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x2  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:50:59.447053-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::unregisterClientBuffer64(0x<private>, 0xba)
+2026-10-23 18:50:59.447054-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily)   searching for sourceBuffer 0x10502c000
+2026-10-23 18:50:59.447057-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::removeBufferSet(<private>)
+2026-10-23 18:50:59.447058-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:50:59.447060-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:50:59.447061-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:50:59.447104-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::unregisterClientBuffer64 no sourcebuffer returns 0x0
+2026-10-23 18:50:59.447106-0500 0x6a96     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:50:59.795889-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::stopAudioEngine()
+2026-10-23 18:50:59.798094-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x0. oldState=0x1)
+2026-10-23 18:50:59.798113-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 1
+2026-10-23 18:50:59.798115-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:50:59.798117-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 1
+2026-10-23 18:50:59.798119-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 1
+2026-10-23 18:50:59.798122-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:50:59.798124-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:50:59.798126-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:50:59.798127-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 0
+2026-10-23 18:50:59.798128-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopAudioEngine() returns 0x0
+2026-10-23 18:51:00.065976-0500 0x6619     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 13 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:51:00.700043-0500 0x6977     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: mdworker_shared(1578) deny(1) mach-lookup com.apple.security.syspolicy (import fstype:apfs fsflag:4909000 flags:250000025E diag:0 isXCode:0 uti:com.apple.application-bundle plugin:/Library/Spotlight/Application.mdimporter - find suspect file using: sudo mdutil -t 89137434)
+2026-10-23 18:51:03.445527-0500 0x677f     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: secinitd(419) deny(1) mach-lookup com.apple.security.syspolicy
+2026-10-23 18:51:03.917013-0500 0x677f     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:51:03.984548-0500 0x6b05     Default     0x0                  0      0    kernel: (AppleMobileFileIntegrity) AMFI: Denying core dump for pid 1579 (Yubico Authentic)
+2026-10-23 18:51:03.984609-0500 0x6b05     Default     0x0                  0      0    kernel: Yubico Authenticator[1579] Corpse allowed 1 of 5
+2026-10-23 18:51:04.633119-0500 0x68       Default     0x0                  0      0    kernel: Corpse released, count at 0
+2026-10-23 18:51:13.887075-0500 0x6852     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:51:13.887078-0500 0x6852     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:51:15.945086-0500 0x6619     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 13 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:51:17.021154-0500 0x6e0f     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:51:17.084801-0500 0x6e71     Default     0x0                  0      0    kernel: (AppleMobileFileIntegrity) AMFI: Denying core dump for pid 1594 (Yubico Authentic)
+2026-10-23 18:51:17.084861-0500 0x6e71     Default     0x0                  0      0    kernel: Yubico Authenticator[1594] Corpse allowed 1 of 5
+2026-10-23 18:51:17.318070-0500 0x68       Default     0x0                  0      0    kernel: Corpse released, count at 0
+2026-10-23 18:51:18.949068-0500 0x6e1a     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:51:18.949072-0500 0x6e1a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: swcd(432) deny(1) system-fsctl _IO('h', 47)
+2026-10-23 18:51:28.374727-0500 0x6da4     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library/InstallCoordination
+2026-10-23 18:51:28.374765-0500 0x6da4     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library
+2026-10-23 18:51:28.374800-0500 0x6da4     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd
+2026-10-23 18:51:28.376048-0500 0x6da4     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library/InstallCoordination
+2026-10-23 18:51:28.376089-0500 0x6da4     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd/Library
+2026-10-23 18:51:28.376140-0500 0x6da4     Error       0x0                  0      0    kernel: (Sandbox) System Policy: UserEventAgent(62) deny(1) file-read-data /private/var/db/installcoordinationd
+2026-10-23 18:51:30.904628-0500 0x642d     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49411 > 443 in state 4, reset timer to 58728
+2026-10-23 18:51:35.011171-0500 0x7082     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:51:37.713930-0500 0x716a     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 13 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:51:37.713934-0500 0x716a     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:51:37.724589-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785961 tx stats: # 680 finish 686 enter 787 wait 35 1051us close 162us flush 758us
+2026-10-23 18:51:37.783005-0500 0x712a     Default     0x0                  0      0    kernel: (AppleMobileFileIntegrity) AMFI: Denying core dump for pid 1612 (Yubico Authentic)
+2026-10-23 18:51:37.783062-0500 0x712a     Default     0x0                  0      0    kernel: Yubico Authenticator[1612] Corpse allowed 1 of 5
+2026-10-23 18:51:38.022546-0500 0x68       Default     0x0                  0      0    kernel: Corpse released, count at 0
+2026-10-23 18:51:52.450975-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:51:52.450985-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:51:52.450987-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:51:52.998494-0500 0x7127     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:51:52.998497-0500 0x7127     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: swcd(432) deny(1) system-fsctl _IO('h', 47)
+2026-10-23 18:51:55.017140-0500 0x70d2     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContainerMetadat(537) deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:52:00.164032-0500 0x745c     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target NewsToday2:534
+2026-10-23 18:52:00.164200-0500 0x3739     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.164239-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165476-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165531-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165587-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165623-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165669-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165735-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165777-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165841-0500 0x17aa     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165908-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.165956-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.166002-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.166050-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.166097-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.166130-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.166163-0500 0x1765     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.170497-0500 0x7463     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.170807-0500 0x373a     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.171055-0500 0x373a     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.171607-0500 0x7463     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.376325-0500 0x745e     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.376467-0500 0x745e     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:52:00.479742-0500 0x745c     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target NewsToday2:534
+2026-10-23 18:52:06.351378-0500 0x7499     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 13 duplicate reports for ContainerMetadat deny(1) user-preference-read kCFPreferencesAnyApplication
+2026-10-23 18:52:06.351381-0500 0x7499     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:52:09.267308-0500 0x74d3     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49553 > 443 in state 4, reset timer to 384
+2026-10-23 18:52:53.865773-0500 0x75       Default     0x0                  0      0    kernel: PMRD: power event 14 args 0x0 0x0
+2026-10-23 18:52:53.865783-0500 0x75       Default     0x0                  0      0    kernel: PMRD: wrangler RootDomainPower (ps 4, 0->1)
+2026-10-23 18:52:53.865792-0500 0x75       Default     0x0                  0      0    kernel: PMRD: evaluatePolicy( 0, 0x0 )
+2026-10-23 18:54:44.758122-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:54:44.758131-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:54:47.701440-0500 0x7b43     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 23 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:54:47.701444-0500 0x7b43     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: routined(429) deny(1) mach-lookup com.apple.Maps.MapsSync.store
+2026-10-23 18:54:48.035869-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:54:48.035877-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:54:48.679474-0500 0x7c2e     Default     0x0                  0      0    kernel: (IOUSBHostFamily) 001050.888451 system_profiler@(null): AppleUSBHostUserClient::start: missing entitlement com.apple.ibridge.control
+2026-10-23 18:54:48.679806-0500 0x7c2e     Default     0x0                  0      0    kernel: (IOUSBHostFamily) 001050.888784 system_profiler@(null): AppleUSBHostUserClient::start: missing entitlement com.apple.ibridge.control
+2026-10-23 18:55:21.721755-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 785981 tx stats: # 700 finish 706 enter 842 wait 36 1026us close 158us flush 763us
+2026-10-23 18:55:26.581785-0500 0x7cfd     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 15 duplicate reports for routined deny(1) mach-lookup com.apple.Maps.MapsSync.store
+2026-10-23 18:55:26.581787-0500 0x7cfd     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: ContextStoreAgen(481) deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:57:02.172188-0500 0x813c     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target NewsToday2:534
+2026-10-23 18:57:02.172291-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172370-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172432-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172480-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172514-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172551-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172590-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172618-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.172645-0500 0x17a7     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.176695-0500 0x7463     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.176910-0500 0x7463     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.177070-0500 0x7463     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.177493-0500 0x7463     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.379289-0500 0x373a     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.379422-0500 0x3739     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for NewsToday2:534
+2026-10-23 18:57:02.479533-0500 0x813f     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target NewsToday2:534
+2026-10-23 18:57:11.408222-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x0,   arg0 0x0, arg1 0x10502c000, arg2 0x8010 arg3 0xba
+2026-10-23 18:57:11.408224-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x4  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:57:11.408227-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba
+2026-10-23 18:57:11.408230-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::safeRegisterClientBuffer64 <private>
+2026-10-23 18:57:11.408233-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::registerClientBuffer64  (<private>[1], 0x10502c000, 0x8010, 0xba)
+2026-10-23 18:57:11.408235-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:57:11.408235-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:57:11.408301-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer before offset: <private>, offset size: 16
+2026-10-23 18:57:11.408302-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer after offset: <private>
+2026-10-23 18:57:11.408302-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:57:11.408303-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:57:11.408304-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   creating new IOAudioClientBufferSet
+2026-10-23 18:57:11.408305-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   output
+2026-10-23 18:57:11.408306-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline
+2026-10-23 18:57:11.408307-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerClientBuffer64() result 0x0
+2026-10-23 18:57:11.408308-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::safeRegisterClientBuffer64  returns 0x0
+2026-10-23 18:57:11.408310-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba returns 0x0
+2026-10-23 18:57:11.408310-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:57:11.408330-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x3,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:57:11.408332-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:57:11.408333-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::startClient() - 0
+2026-10-23 18:57:11.408334-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine && !isInactive(). State = 0
+2026-10-23 18:57:11.408335-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine->getState() != kIOAudioEnginePaused
+2026-10-23 18:57:11.408339-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(1)
+2026-10-23 18:57:11.408340-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline() setting online
+2026-10-23 18:57:11.408341-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startClient(<private>)
+2026-10-23 18:57:11.408343-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::incrementActiveUserClients() - 0
+2026-10-23 18:57:11.408346-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startAudioEngine(state = 0)
+2026-10-23 18:57:11.408347-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 0
+2026-10-23 18:57:11.408348-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 2
+2026-10-23 18:57:11.408349-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 2
+2026-10-23 18:57:11.408355-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:57:11.408357-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:57:11.408358-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 1
+2026-10-23 18:57:11.408359-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(0,0)
+2026-10-23 18:57:11.408360-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::resetStatusBuffer()
+2026-10-23 18:57:11.417199-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x1. oldState=0)
+2026-10-23 18:57:11.417201-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::getTimerInterval()
+2026-10-23 18:57:11.417209-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startAudioEngine() returns 0x0
+2026-10-23 18:57:11.417210-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::incrementActiveUserClients() - 1 returns 0
+2026-10-23 18:57:11.417211-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startClient(<private>) returns 0x0
+2026-10-23 18:57:11.417212-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   engine started
+2026-10-23 18:57:11.417213-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   bufferSet <private>
+2026-10-23 18:57:11.417214-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   output clientBuffer <private>
+2026-10-23 18:57:11.417215-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::addClient(<private>)
+2026-10-23 18:57:11.417217-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::addClient(<private>) returns 0x0
+2026-10-23 18:57:11.417218-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient[<private>]::startClient() - 1 returns 0x0
+2026-10-23 18:57:11.417219-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:57:12.687713-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x4,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:57:12.687728-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:57:12.687735-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:57:12.687741-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:57:12.687743-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:57:12.687747-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(4,2400)
+2026-10-23 18:57:12.687749-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::decrementActiveUserClients() - 0 returns 0x0
+2026-10-23 18:57:12.687750-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::stopClient(<private>) returns 0x0
+2026-10-23 18:57:12.687753-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(0)
+2026-10-23 18:57:12.687755-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:57:12.687802-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x1,   arg0 0x10502C000, arg1 0xba, arg2 0x0 arg3 0x0
+2026-10-23 18:57:12.687804-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x2  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:57:12.687807-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::unregisterClientBuffer64(0x<private>, 0xba)
+2026-10-23 18:57:12.687808-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily)   searching for sourceBuffer 0x10502c000
+2026-10-23 18:57:12.687811-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::removeBufferSet(<private>)
+2026-10-23 18:57:12.687813-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:57:12.687814-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:57:12.687816-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:57:12.687849-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::unregisterClientBuffer64 no sourcebuffer returns 0x0
+2026-10-23 18:57:12.687850-0500 0x81af     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:57:13.038624-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::stopAudioEngine()
+2026-10-23 18:57:13.040757-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x0. oldState=0x1)
+2026-10-23 18:57:13.040771-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 1
+2026-10-23 18:57:13.040773-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:57:13.040775-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 1
+2026-10-23 18:57:13.040776-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 1
+2026-10-23 18:57:13.040779-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:57:13.040780-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:57:13.040782-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:57:13.040783-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 0
+2026-10-23 18:57:13.040784-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopAudioEngine() returns 0x0
+2026-10-23 18:58:00.418182-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x0,   arg0 0x0, arg1 0x10502c000, arg2 0x8010 arg3 0xba
+2026-10-23 18:58:00.418185-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x4  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:00.418188-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba
+2026-10-23 18:58:00.418191-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::safeRegisterClientBuffer64 <private>
+2026-10-23 18:58:00.418194-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::registerClientBuffer64  (<private>[1], 0x10502c000, 0x8010, 0xba)
+2026-10-23 18:58:00.418196-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:58:00.418197-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:58:00.418234-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer before offset: <private>, offset size: 16
+2026-10-23 18:58:00.418235-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer after offset: <private>
+2026-10-23 18:58:00.418236-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:58:00.418237-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:58:00.418238-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   creating new IOAudioClientBufferSet
+2026-10-23 18:58:00.418239-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   output
+2026-10-23 18:58:00.418240-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline
+2026-10-23 18:58:00.418241-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerClientBuffer64() result 0x0
+2026-10-23 18:58:00.418242-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::safeRegisterClientBuffer64  returns 0x0
+2026-10-23 18:58:00.418244-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba returns 0x0
+2026-10-23 18:58:00.418245-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:00.418259-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x3,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:58:00.418260-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:00.418262-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::startClient() - 0
+2026-10-23 18:58:00.418263-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine && !isInactive(). State = 0
+2026-10-23 18:58:00.418264-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine->getState() != kIOAudioEnginePaused
+2026-10-23 18:58:00.418268-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(1)
+2026-10-23 18:58:00.418269-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline() setting online
+2026-10-23 18:58:00.418271-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startClient(<private>)
+2026-10-23 18:58:00.418272-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::incrementActiveUserClients() - 0
+2026-10-23 18:58:00.418275-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startAudioEngine(state = 0)
+2026-10-23 18:58:00.418276-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 0
+2026-10-23 18:58:00.418277-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 2
+2026-10-23 18:58:00.418284-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 2
+2026-10-23 18:58:00.418286-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:58:00.418287-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:58:00.418288-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 1
+2026-10-23 18:58:00.418290-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(0,0)
+2026-10-23 18:58:00.418291-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::resetStatusBuffer()
+2026-10-23 18:58:00.427149-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x1. oldState=0)
+2026-10-23 18:58:00.427152-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::getTimerInterval()
+2026-10-23 18:58:00.427161-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startAudioEngine() returns 0x0
+2026-10-23 18:58:00.427162-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::incrementActiveUserClients() - 1 returns 0
+2026-10-23 18:58:00.427163-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startClient(<private>) returns 0x0
+2026-10-23 18:58:00.427164-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   engine started
+2026-10-23 18:58:00.427165-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   bufferSet <private>
+2026-10-23 18:58:00.427166-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   output clientBuffer <private>
+2026-10-23 18:58:00.427166-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::addClient(<private>)
+2026-10-23 18:58:00.427169-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::addClient(<private>) returns 0x0
+2026-10-23 18:58:00.427170-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient[<private>]::startClient() - 1 returns 0x0
+2026-10-23 18:58:00.427171-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:01.698529-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x4,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:58:01.698532-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:01.698538-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:01.698544-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:58:01.698545-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:01.698549-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(4,2400)
+2026-10-23 18:58:01.698551-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::decrementActiveUserClients() - 0 returns 0x0
+2026-10-23 18:58:01.698552-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::stopClient(<private>) returns 0x0
+2026-10-23 18:58:01.698555-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(0)
+2026-10-23 18:58:01.698557-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:01.698601-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x1,   arg0 0x10502C000, arg1 0xba, arg2 0x0 arg3 0x0
+2026-10-23 18:58:01.698603-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x2  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:01.698606-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::unregisterClientBuffer64(0x<private>, 0xba)
+2026-10-23 18:58:01.698607-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily)   searching for sourceBuffer 0x10502c000
+2026-10-23 18:58:01.698610-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::removeBufferSet(<private>)
+2026-10-23 18:58:01.698611-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:01.698613-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:58:01.698614-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:01.698650-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::unregisterClientBuffer64 no sourcebuffer returns 0x0
+2026-10-23 18:58:01.698651-0500 0x8398     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:02.048620-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::stopAudioEngine()
+2026-10-23 18:58:02.050861-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x0. oldState=0x1)
+2026-10-23 18:58:02.050879-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 1
+2026-10-23 18:58:02.050882-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:58:02.050884-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 1
+2026-10-23 18:58:02.050886-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 1
+2026-10-23 18:58:02.050889-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:58:02.050890-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:58:02.050892-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:58:02.050894-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 0
+2026-10-23 18:58:02.050895-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopAudioEngine() returns 0x0
+2026-10-23 18:58:09.787818-0500 0x8499     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(36) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.788482-0500 0x8499     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(3) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.788769-0500 0x57cb     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(36) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.788992-0500 0x8499     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(2) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.789630-0500 0x57cb     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(3) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.794663-0500 0x57cb     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(2) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.809905-0500 0x849b     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(36) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.810766-0500 0x849b     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(3) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.811431-0500 0x849b     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(3) took 0 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.812247-0500 0x849b     Default     0x0                  0      0    kernel: (AppleCredentialManager) AppleCredentialManager: sendSEPCommand: SEP cmd(2) took 1 ms -> ioErr=0x0 acmErr=0.
+2026-10-23 18:58:09.853668-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:58:09.853676-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:58:16.052059-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: time(0) 0->0, lin 1, llk 0,
+2026-10-23 18:58:16.052072-0500 0x5ab      Default     0x0                  0      0    kernel: IOConsoleUsers: gIOScreenLockState 1, hs 0, bs 0, now 0, sm 0x0
+2026-10-23 18:58:16.408555-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x0,   arg0 0x0, arg1 0x10502c000, arg2 0x8010 arg3 0xba
+2026-10-23 18:58:16.408557-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x4  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:16.408560-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba
+2026-10-23 18:58:16.408563-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::safeRegisterClientBuffer64 <private>
+2026-10-23 18:58:16.408566-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::registerClientBuffer64  (<private>[1], 0x10502c000, 0x8010, 0xba)
+2026-10-23 18:58:16.408567-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:58:16.408568-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:58:16.408603-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer before offset: <private>, offset size: 16
+2026-10-23 18:58:16.408604-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   clientBuffer->mAudioClientBuffer32.sourceBuffer after offset: <private>
+2026-10-23 18:58:16.408604-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   null clientBufferSetList
+2026-10-23 18:58:16.408605-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   did not find clientBufferSetList for ID 0xba
+2026-10-23 18:58:16.408606-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   creating new IOAudioClientBufferSet
+2026-10-23 18:58:16.408607-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   output
+2026-10-23 18:58:16.408608-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline
+2026-10-23 18:58:16.408609-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerClientBuffer64() result 0x0
+2026-10-23 18:58:16.408610-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::safeRegisterClientBuffer64  returns 0x0
+2026-10-23 18:58:16.408612-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::registerBuffer64 0x0 0x10502c000 0x8010 0xba returns 0x0
+2026-10-23 18:58:16.408612-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:16.408622-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x3,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:58:16.408624-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:16.408625-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::startClient() - 0
+2026-10-23 18:58:16.408626-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine && !isInactive(). State = 0
+2026-10-23 18:58:16.408627-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   audioEngine->getState() != kIOAudioEnginePaused
+2026-10-23 18:58:16.408631-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(1)
+2026-10-23 18:58:16.408631-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   !isOnline() setting online
+2026-10-23 18:58:16.408633-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startClient(<private>)
+2026-10-23 18:58:16.408634-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::incrementActiveUserClients() - 0
+2026-10-23 18:58:16.408637-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::startAudioEngine(state = 0)
+2026-10-23 18:58:16.408638-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 0
+2026-10-23 18:58:16.408639-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 2
+2026-10-23 18:58:16.408640-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 2
+2026-10-23 18:58:16.408642-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:58:16.408643-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 2 returns 0x0
+2026-10-23 18:58:16.408644-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStarting() - numRunningAudioEngines = 1
+2026-10-23 18:58:16.408646-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(0,0)
+2026-10-23 18:58:16.408646-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::resetStatusBuffer()
+2026-10-23 18:58:16.417468-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x1. oldState=0)
+2026-10-23 18:58:16.417471-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::getTimerInterval()
+2026-10-23 18:58:16.417489-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startAudioEngine() returns 0x0
+2026-10-23 18:58:16.417491-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::incrementActiveUserClients() - 1 returns 0
+2026-10-23 18:58:16.417492-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::startClient(<private>) returns 0x0
+2026-10-23 18:58:16.417493-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   engine started
+2026-10-23 18:58:16.417494-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   bufferSet <private>
+2026-10-23 18:58:16.417495-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   output clientBuffer <private>
+2026-10-23 18:58:16.417496-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::addClient(<private>)
+2026-10-23 18:58:16.417498-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::addClient(<private>) returns 0x0
+2026-10-23 18:58:16.417499-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient[<private>]::startClient() - 1 returns 0x0
+2026-10-23 18:58:16.417501-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:17.145911-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x4,   arg0 0x0, arg1 0x0, arg2 0x0 arg3 0x0
+2026-10-23 18:58:17.145914-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x0  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:17.145921-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:17.145928-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:58:17.145929-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:17.145933-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopEngineAtPosition(3,400)
+2026-10-23 18:58:17.145935-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::decrementActiveUserClients() - 0 returns 0x0
+2026-10-23 18:58:17.145937-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngine[<private>]::stopClient(<private>) returns 0x0
+2026-10-23 18:58:17.145941-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::setOnline(0)
+2026-10-23 18:58:17.145942-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:17.145984-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient::externalMethod, selector=0x1,   arg0 0x10502C000, arg1 0xba, arg2 0x0 arg3 0x0
+2026-10-23 18:58:17.145986-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   scalarInputCount=0x2  structureInputSize 0x0, scalarOutputCount 0x0, structureOutputSize 0x0
+2026-10-23 18:58:17.145989-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngineUserClient[<private>]::unregisterClientBuffer64(0x<private>, 0xba)
+2026-10-23 18:58:17.145990-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily)   searching for sourceBuffer 0x10502c000
+2026-10-23 18:58:17.145993-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +- IOAudioEngineUserClient[<private>]::removeBufferSet(<private>)
+2026-10-23 18:58:17.145995-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:17.145997-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioStream[<private>]::safeLogError kErrorLogDumpCounters mStreamErrorCountsUpdated=0
+2026-10-23 18:58:17.145998-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioStream[<private>]::removeClient(<private>)
+2026-10-23 18:58:17.146036-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::unregisterClientBuffer64 no sourcebuffer returns 0x0
+2026-10-23 18:58:17.146038-0500 0x8510     Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngineUserClient::externalMethod returns 0x0
+2026-10-23 18:58:17.527006-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioEngine[<private>]::stopAudioEngine()
+2026-10-23 18:58:17.529244-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) +-IOAudioEngine[<private>]::setState(0x0. oldState=0x1)
+2026-10-23 18:58:17.529282-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 1
+2026-10-23 18:58:17.529284-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:58:17.529287-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 2 - pending = 1
+2026-10-23 18:58:17.529289-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) + IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 2 - pending = 1
+2026-10-23 18:58:17.529292-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::protectedCompletePowerStateChange() - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:58:17.529294-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::initiatePowerStateChange(0x0) - current = 1 - pending = 1 returns 0x0
+2026-10-23 18:58:17.529302-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::scheduleIdleAudioSleep: idleSleepDelayTime = 00
+2026-10-23 18:58:17.529304-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioDevice[<private>]::audioEngineStopped() - numRunningAudioEngines = 0
+2026-10-23 18:58:17.529305-0500 0x465      Default     0x0                  0      0    kernel: (IOAudioFamily) - IOAudioEngine[<private>]::stopAudioEngine() returns 0x0
+2026-10-23 18:58:26.177051-0500 0x84e7     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(3) target SafariQuickLookPreview:1884
+2026-10-23 18:58:26.194016-0500 0x8614     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.222190-0500 0x861c     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.259876-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.260126-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.261932-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.262174-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.262513-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.263009-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.267039-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.267101-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.267226-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.267335-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.267531-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.267790-0500 0x8629     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.268061-0500 0x8614     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.270803-0500 0x861c     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.271151-0500 0x861c     Default     0x0                  0      0    kernel: memorystatus: assertion priority 3 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.271640-0500 0x8556     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(9) target SafariQuickLookPreview:1884
+2026-10-23 18:58:26.271909-0500 0x861c     Default     0x0                  0      0    kernel: memorystatus: assertion priority 9 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.274255-0500 0x861a     Default     0x0                  0      0    kernel: memorystatus: assertion priority 9 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.332041-0500 0x8614     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 5 duplicate reports for ContextStoreAgen deny(1) mach-lookup com.apple.ocspd
+2026-10-23 18:58:26.332043-0500 0x8614     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: SafariQuickLookP(1884) deny(1) device-microphone
+2026-10-23 18:58:26.332050-0500 0x8614     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: SafariQuickLookP(1884) deny(1) device-camera
+2026-10-23 18:58:26.374292-0500 0x8614     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: SafariQuickLookP(1884) deny(1) file-read-data /private/var/db/nsurlstoraged/dafsaData.bin
+2026-10-23 18:58:26.414832-0500 0x8644     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.WebKit(1885) deny(1) file-read-data /Users/boulder/Library/Preferences/.GlobalPreferences_m.plist
+2026-10-23 18:58:26.415075-0500 0x8644     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for com.apple.WebKit deny(1) file-read-data /Users/boulder/Library/Preferences/.GlobalPreferences_m.plist
+2026-10-23 18:58:26.415077-0500 0x8644     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.WebKit(1885) deny(1) file-read-data /Library/Preferences/.GlobalPreferences.plist
+2026-10-23 18:58:26.453961-0500 0x8494     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for com.apple.WebKit deny(1) file-read-data /Library/Preferences/.GlobalPreferences.plist
+2026-10-23 18:58:26.453964-0500 0x8494     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.WebKit(1886) allow mach-lookup com.apple.trustd.agent
+2026-10-23 18:58:26.477302-0500 0x8644     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.WebKit(1885) deny(1) iokit-get-properties Product Identification
+2026-10-23 18:58:26.591102-0500 0x8494     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: 1 duplicate report for com.apple.WebKit deny(1) iokit-get-properties Product Identification
+2026-10-23 18:58:26.591105-0500 0x8494     Default     0x0                  0      0    kernel: (Sandbox) Sandbox: com.apple.WebKit(1885) allow mach-lookup com.apple.fonts
+2026-10-23 18:58:26.638266-0500 0x8614     Default     0x0                  0      0    kernel: memorystatus: assertion priority 9 overrides priority 0 for SafariQuickLookPreview:1884
+2026-10-23 18:58:26.739979-0500 0x8616     Default     0x0                  0      0    kernel: memorystatus: set assertion priority(0) target SafariQuickLookPreview:1884
+2026-10-23 18:58:26.981373-0500 0x798a     Default     0x0                  0      0    kernel: tcp_timers: tcp_output() returned 0 with retransmission timer disabled for 49590 > 80 in state 4, reset timer to 570
+2026-10-23 18:58:50.148959-0500 0x4af      Default     0x0                  0      0    kernel: (apfs) tx_flush:1182: disk7 xid 786001 tx stats: # 720 finish 726 enter 870 wait 39 984us close 153us flush 769us
+2026-10-23 18:59:01.224436-0500 0x582      Default     0x0                  0      0    kernel: (IOTimeSyncFamily) IOTimeSyncClockManager::addgPTPServices adding services
+2026-10-23 18:59:01.224724-0500 0x582      Default     0x0                  0      0    kernel: (IOTimeSyncFamily) IOTimeSyncClockManager::addgPTPServices adding services
+2026-10-23 18:59:13.766808-0500 0x8760     Error       0x0                  0      0    kernel: (Sandbox) Sandbox: VTDecoderXPCServ(1921) deny(1) mach-lookup com.apple.powerlog.plxpclogger.xpc
+2026-10-23 18:59:16.570853-0500 0x8a46     Default     0x0                  0      0    kernel: (IOUSBHostFamily) 001318.779830 system_profiler@(null): AppleUSBHostUserClient::start: missing entitlement com.apple.ibridge.control
+2026-10-23 18:59:16.571184-0500 0x8a46     Default     0x0                  0      0    kernel: (IOUSBHostFamily) 001318.780161 system_profiler@(null): AppleUSBHostUserClient::start: missing entitlement com.apple.ibridge.control

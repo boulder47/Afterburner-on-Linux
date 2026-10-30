@@ -1,0 +1,33 @@
+[151590.059491] afterburner_flash 0000:0f:00.0: Apple Afterburner [106b:0205] Phase 2 first-write-test (flash READ) + IRQ discovery
+[151590.059606] afterburner_flash 0000:0f:00.0: ID block +0x4 = 0x10020014 (reference for flash READ comparison)
+[151590.059615] afterburner_flash 0000:0f:00.0: --- scanning candidate Flash bases (non-destructive READ each) ---
+[151590.059624] afterburner_flash 0000:0f:00.0:   [flash@+0x5000] pre: busy=0xffffffff cmd=0xffffffff rdback=0xffffffff done=0xffffffff
+[151590.127668] afterburner_flash 0000:0f:00.0:   [flash@+0x5000] post: busy=0xffffffff iters=32 readback(bswap)=0xffffffff
+[151590.127685] afterburner_flash 0000:0f:00.0:   [flash@+0x6000] pre: busy=0xffffffff cmd=0xffffffff rdback=0xffffffff done=0xffffffff
+[151590.197611] afterburner_flash 0000:0f:00.0:   [flash@+0x6000] post: busy=0xffffffff iters=32 readback(bswap)=0xffffffff
+[151590.197626] afterburner_flash 0000:0f:00.0:   [flash@+0x7000] pre: busy=0xffffffff cmd=0xffffffff rdback=0xffffffff done=0xffffffff
+[151590.263589] afterburner_flash 0000:0f:00.0:   [flash@+0x7000] post: busy=0xffffffff iters=32 readback(bswap)=0xffffffff
+[151590.263604] afterburner_flash 0000:0f:00.0:   [flash@+0x8000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263615] afterburner_flash 0000:0f:00.0:   [flash@+0x8000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263624] afterburner_flash 0000:0f:00.0:   [flash@+0x9000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263632] afterburner_flash 0000:0f:00.0:   [flash@+0x9000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263639] afterburner_flash 0000:0f:00.0:   [flash@+0xa000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263647] afterburner_flash 0000:0f:00.0:   [flash@+0xa000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263654] afterburner_flash 0000:0f:00.0:   [flash@+0xb000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263662] afterburner_flash 0000:0f:00.0:   [flash@+0xb000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263669] afterburner_flash 0000:0f:00.0:   [flash@+0xc000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263676] afterburner_flash 0000:0f:00.0:   [flash@+0xc000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263683] afterburner_flash 0000:0f:00.0:   [flash@+0xd000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263691] afterburner_flash 0000:0f:00.0:   [flash@+0xd000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263698] afterburner_flash 0000:0f:00.0:   [flash@+0xe000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263705] afterburner_flash 0000:0f:00.0:   [flash@+0xe000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263713] afterburner_flash 0000:0f:00.0:   [flash@+0xf000] pre: busy=0x00000000 cmd=0x00000000 rdback=0x00000000 done=0x00000000
+[151590.263720] afterburner_flash 0000:0f:00.0:   [flash@+0xf000] post: busy=0x00000000 iters=0 readback(bswap)=0x00000000
+[151590.263727] afterburner_flash 0000:0f:00.0:   [flash@+0x10000] pre: busy=0xffffffff cmd=0xffffffff rdback=0xffffffff done=0xffffffff
+[151590.332605] afterburner_flash 0000:0f:00.0:   [flash@+0x10000] post: busy=0xffffffff iters=32 readback(bswap)=0xffffffff
+[151590.332620] afterburner_flash 0000:0f:00.0:   [flash@+0x11000] pre: busy=0xffffffff cmd=0xffffffff rdback=0xffffffff done=0xffffffff
+[151590.398592] afterburner_flash 0000:0f:00.0:   [flash@+0x11000] post: busy=0xffffffff iters=32 readback(bswap)=0xffffffff
+[151590.398608] afterburner_flash 0000:0f:00.0:   [flash@+0x12000] pre: busy=0xffffffff cmd=0xffffffff rdback=0xffffffff done=0xffffffff
+[151590.472643] afterburner_flash 0000:0f:00.0:   [flash@+0x12000] post: busy=0xffffffff iters=32 readback(bswap)=0xffffffff
+[151590.472655] afterburner_flash 0000:0f:00.0: --- flash READ scan done (best non-trivial readback: 0x00000000) ---
+[151590.472662] afterburner_flash 0000:0f:00.0: MSI: pci_msi_vecs_count=1 (card advertises 64-bit MSI count=1)

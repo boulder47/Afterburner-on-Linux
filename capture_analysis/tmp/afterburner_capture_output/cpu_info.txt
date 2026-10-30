@@ -1,0 +1,1 @@
+machdep.cpu.brand_string: Intel(R) Xeon(R) W-3265M CPU @ 2.70GHz

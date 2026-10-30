@@ -1,0 +1,187 @@
+[
+ {
+  "i": 0,
+  "kind": "V",
+  "name": "externalMethod"
+ },
+ {
+  "i": 1,
+  "kind": "V",
+  "name": "registerNotificationPort"
+ },
+ {
+  "i": 2,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 3,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 4,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 5,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 6,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 7,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 8,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 9,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 10,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 11,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 12,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 13,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 14,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 15,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 16,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 17,
+  "kind": "R",
+  "name": "IOUserClient"
+ },
+ {
+  "i": 18,
+  "kind": "V",
+  "name": "init"
+ },
+ {
+  "i": 19,
+  "kind": "V",
+  "name": "init"
+ },
+ {
+  "i": 20,
+  "kind": "V",
+  "name": "initWithTask"
+ },
+ {
+  "i": 21,
+  "kind": "V",
+  "name": "initWithTask"
+ },
+ {
+  "i": 22,
+  "kind": "V",
+  "name": "free"
+ },
+ {
+  "i": 23,
+  "kind": "V",
+  "name": "clientClose"
+ },
+ {
+  "i": 24,
+  "kind": "V",
+  "name": "clientDied"
+ },
+ {
+  "i": 25,
+  "kind": "V",
+  "name": "getService"
+ },
+ {
+  "i": 26,
+  "kind": "V",
+  "name": "registerNotificationPort"
+ },
+ {
+  "i": 27,
+  "kind": "V",
+  "name": "getNotificationSemaphore"
+ },
+ {
+  "i": 28,
+  "kind": "V",
+  "name": "connectClient"
+ },
+ {
+  "i": 29,
+  "kind": "V",
+  "name": "clientMemoryForType"
+ },
+ {
+  "i": 30,
+  "kind": "V",
+  "name": "exportObjectToClient"
+ },
+ {
+  "i": 31,
+  "kind": "V",
+  "name": "getExternalMethodForIndex"
+ },
+ {
+  "i": 32,
+  "kind": "V",
+  "name": "getExternalAsyncMethodForIndex"
+ },
+ {
+  "i": 33,
+  "kind": "V",
+  "name": "getTargetAndMethodForIndex"
+ },
+ {
+  "i": 34,
+  "kind": "V",
+  "name": "getAsyncTargetAndMethodForIndex"
+ },
+ {
+  "i": 35,
+  "kind": "V",
+  "name": "getExternalTrapForIndex"
+ },
+ {
+  "i": 36,
+  "kind": "V",
+  "name": "getTargetAndTrapForIndex"
+ }
+]

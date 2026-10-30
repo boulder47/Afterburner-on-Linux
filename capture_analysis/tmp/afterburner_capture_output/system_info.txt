@@ -1,0 +1,10 @@
+=== System Info ===
+ProductName:	macOS
+ProductVersion:	11.7.10
+BuildVersion:	20G1427
+
+=== Kernel Version ===
+Darwin Boulders-Mac-Pro.local 20.6.0 Darwin Kernel Version 20.6.0: Thu Jul  6 22:12:47 PDT 2023; root:xnu-7195.141.49.702.12~1/RELEASE_X86_64 x86_64
+
+=== PCI Device Info (lspci equivalent) ===
+(system_profiler did not find Afterburner — checking ioreg)

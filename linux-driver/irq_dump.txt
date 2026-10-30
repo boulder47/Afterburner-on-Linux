@@ -1,0 +1,9 @@
+[152742.660620] afterburner_irq 0000:0f:00.0: Apple Afterburner [106b:0205] Phase 2b Bitfile interrupt handler (MSI)
+[152742.660839] afterburner_irq 0000:0f:00.0: MSI enabled, vector=334
+[152742.660865] afterburner_irq 0000:0f:00.0: IRQ handler registered on vector 334
+[152742.660870] afterburner_irq 0000:0f:00.0: --- self-test: attempting benign trigger writes ---
+[152742.660873] afterburner_irq 0000:0f:00.0:   trigger A: write 1 to +0x2034 (counter slot 0 ctrl)
+[152743.167885] afterburner_irq 0000:0f:00.0:     (no IRQ within 500ms)
+[152743.167893] afterburner_irq 0000:0f:00.0:   trigger B: write 1 to +0x8028 (engine bank 0 ctrl)
+[152743.672739] afterburner_irq 0000:0f:00.0:     (no IRQ within 500ms)
+[152743.672748] afterburner_irq 0000:0f:00.0: --- self-test done: total IRQs observed = 0 ---

@@ -1,0 +1,1736 @@
+[
+ {
+  "i": 0,
+  "class": "OSObject",
+  "name": "release",
+  "kind": "V"
+ },
+ {
+  "i": 1,
+  "class": "OSObject",
+  "name": "taggedRelease",
+  "kind": "V"
+ },
+ {
+  "i": 2,
+  "class": "OSObject",
+  "name": "init",
+  "kind": "V"
+ },
+ {
+  "i": 3,
+  "class": "OSObject",
+  "name": "free",
+  "kind": "V"
+ },
+ {
+  "i": 4,
+  "class": "OSObject",
+  "name": "getRetainCount",
+  "kind": "V"
+ },
+ {
+  "i": 5,
+  "class": "OSObject",
+  "name": "retain",
+  "kind": "V"
+ },
+ {
+  "i": 6,
+  "class": "OSObject",
+  "name": "release",
+  "kind": "V"
+ },
+ {
+  "i": 7,
+  "class": "OSObject",
+  "name": "taggedRetain",
+  "kind": "V"
+ },
+ {
+  "i": 8,
+  "class": "OSObject",
+  "name": "taggedRelease",
+  "kind": "V"
+ },
+ {
+  "i": 9,
+  "class": "OSObject",
+  "name": "serialize",
+  "kind": "V"
+ },
+ {
+  "i": 10,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 11,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 12,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 13,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 14,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 15,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 16,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 17,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 18,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 19,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 20,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 21,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 22,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 23,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 24,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 25,
+  "class": "OSObject",
+  "name": "OSObject",
+  "kind": "R"
+ },
+ {
+  "i": 26,
+  "class": "IORegistryEntry",
+  "name": "copyProperty",
+  "kind": "V"
+ },
+ {
+  "i": 27,
+  "class": "IORegistryEntry",
+  "name": "copyProperty",
+  "kind": "V"
+ },
+ {
+  "i": 28,
+  "class": "IORegistryEntry",
+  "name": "copyProperty",
+  "kind": "V"
+ },
+ {
+  "i": 29,
+  "class": "IORegistryEntry",
+  "name": "copyParentEntry",
+  "kind": "V"
+ },
+ {
+  "i": 30,
+  "class": "IORegistryEntry",
+  "name": "copyChildEntry",
+  "kind": "V"
+ },
+ {
+  "i": 31,
+  "class": "IORegistryEntry",
+  "name": "runPropertyAction",
+  "kind": "V"
+ },
+ {
+  "i": 32,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 33,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 34,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 35,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 36,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 37,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 38,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 39,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 40,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 41,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 42,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 43,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 44,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 45,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 46,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 47,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 48,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 49,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 50,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 51,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 52,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 53,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 54,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 55,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 56,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 57,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 58,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 59,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 60,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 61,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 62,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 63,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 64,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 65,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 66,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 67,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 68,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 69,
+  "class": "IORegistryEntry",
+  "name": "IORegistryEntry",
+  "kind": "R"
+ },
+ {
+  "i": 70,
+  "class": "IORegistryEntry",
+  "name": "init",
+  "kind": "V"
+ },
+ {
+  "i": 71,
+  "class": "IORegistryEntry",
+  "name": "free",
+  "kind": "V"
+ },
+ {
+  "i": 72,
+  "class": "IORegistryEntry",
+  "name": "setPropertyTable",
+  "kind": "V"
+ },
+ {
+  "i": 73,
+  "class": "IORegistryEntry",
+  "name": "setProperty",
+  "kind": "V"
+ },
+ {
+  "i": 74,
+  "class": "IORegistryEntry",
+  "name": "setProperty",
+  "kind": "V"
+ },
+ {
+  "i": 75,
+  "class": "IORegistryEntry",
+  "name": "setProperty",
+  "kind": "V"
+ },
+ {
+  "i": 76,
+  "class": "IORegistryEntry",
+  "name": "setProperty",
+  "kind": "V"
+ },
+ {
+  "i": 77,
+  "class": "IORegistryEntry",
+  "name": "setProperty",
+  "kind": "V"
+ },
+ {
+  "i": 78,
+  "class": "IORegistryEntry",
+  "name": "setProperty",
+  "kind": "V"
+ },
+ {
+  "i": 79,
+  "class": "IORegistryEntry",
+  "name": "setProperty",
+  "kind": "V"
+ },
+ {
+  "i": 80,
+  "class": "IORegistryEntry",
+  "name": "removeProperty",
+  "kind": "V"
+ },
+ {
+  "i": 81,
+  "class": "IORegistryEntry",
+  "name": "removeProperty",
+  "kind": "V"
+ },
+ {
+  "i": 82,
+  "class": "IORegistryEntry",
+  "name": "removeProperty",
+  "kind": "V"
+ },
+ {
+  "i": 83,
+  "class": "IORegistryEntry",
+  "name": "getProperty",
+  "kind": "V"
+ },
+ {
+  "i": 84,
+  "class": "IORegistryEntry",
+  "name": "getProperty",
+  "kind": "V"
+ },
+ {
+  "i": 85,
+  "class": "IORegistryEntry",
+  "name": "getProperty",
+  "kind": "V"
+ },
+ {
+  "i": 86,
+  "class": "IORegistryEntry",
+  "name": "getProperty",
+  "kind": "V"
+ },
+ {
+  "i": 87,
+  "class": "IORegistryEntry",
+  "name": "getProperty",
+  "kind": "V"
+ },
+ {
+  "i": 88,
+  "class": "IORegistryEntry",
+  "name": "getProperty",
+  "kind": "V"
+ },
+ {
+  "i": 89,
+  "class": "IORegistryEntry",
+  "name": "copyProperty",
+  "kind": "V"
+ },
+ {
+  "i": 90,
+  "class": "IORegistryEntry",
+  "name": "copyProperty",
+  "kind": "V"
+ },
+ {
+  "i": 91,
+  "class": "IORegistryEntry",
+  "name": "copyProperty",
+  "kind": "V"
+ },
+ {
+  "i": 92,
+  "class": "IORegistryEntry",
+  "name": "dictionaryWithProperties",
+  "kind": "V"
+ },
+ {
+  "i": 93,
+  "class": "IORegistryEntry",
+  "name": "serializeProperties",
+  "kind": "V"
+ },
+ {
+  "i": 94,
+  "class": "IORegistryEntry",
+  "name": "setProperties",
+  "kind": "V"
+ },
+ {
+  "i": 95,
+  "class": "IORegistryEntry",
+  "name": "getParentIterator",
+  "kind": "V"
+ },
+ {
+  "i": 96,
+  "class": "IORegistryEntry",
+  "name": "applyToParents",
+  "kind": "V"
+ },
+ {
+  "i": 97,
+  "class": "IORegistryEntry",
+  "name": "getParentEntry",
+  "kind": "V"
+ },
+ {
+  "i": 98,
+  "class": "IORegistryEntry",
+  "name": "getChildIterator",
+  "kind": "V"
+ },
+ {
+  "i": 99,
+  "class": "IORegistryEntry",
+  "name": "applyToChildren",
+  "kind": "V"
+ },
+ {
+  "i": 100,
+  "class": "IORegistryEntry",
+  "name": "getChildEntry",
+  "kind": "V"
+ },
+ {
+  "i": 101,
+  "class": "IORegistryEntry",
+  "name": "isChild",
+  "kind": "V"
+ },
+ {
+  "i": 102,
+  "class": "IORegistryEntry",
+  "name": "isParent",
+  "kind": "V"
+ },
+ {
+  "i": 103,
+  "class": "IORegistryEntry",
+  "name": "inPlane",
+  "kind": "V"
+ },
+ {
+  "i": 104,
+  "class": "IORegistryEntry",
+  "name": "getDepth",
+  "kind": "V"
+ },
+ {
+  "i": 105,
+  "class": "IORegistryEntry",
+  "name": "attachToParent",
+  "kind": "V"
+ },
+ {
+  "i": 106,
+  "class": "IORegistryEntry",
+  "name": "detachFromParent",
+  "kind": "V"
+ },
+ {
+  "i": 107,
+  "class": "IORegistryEntry",
+  "name": "attachToChild",
+  "kind": "V"
+ },
+ {
+  "i": 108,
+  "class": "IORegistryEntry",
+  "name": "detachFromChild",
+  "kind": "V"
+ },
+ {
+  "i": 109,
+  "class": "IORegistryEntry",
+  "name": "detachAbove",
+  "kind": "V"
+ },
+ {
+  "i": 110,
+  "class": "IORegistryEntry",
+  "name": "detachAll",
+  "kind": "V"
+ },
+ {
+  "i": 111,
+  "class": "IORegistryEntry",
+  "name": "getName",
+  "kind": "V"
+ },
+ {
+  "i": 112,
+  "class": "IORegistryEntry",
+  "name": "copyName",
+  "kind": "V"
+ },
+ {
+  "i": 113,
+  "class": "IORegistryEntry",
+  "name": "compareNames",
+  "kind": "V"
+ },
+ {
+  "i": 114,
+  "class": "IORegistryEntry",
+  "name": "compareName",
+  "kind": "V"
+ },
+ {
+  "i": 115,
+  "class": "IORegistryEntry",
+  "name": "setName",
+  "kind": "V"
+ },
+ {
+  "i": 116,
+  "class": "IORegistryEntry",
+  "name": "setName",
+  "kind": "V"
+ },
+ {
+  "i": 117,
+  "class": "IORegistryEntry",
+  "name": "getLocation",
+  "kind": "V"
+ },
+ {
+  "i": 118,
+  "class": "IORegistryEntry",
+  "name": "copyLocation",
+  "kind": "V"
+ },
+ {
+  "i": 119,
+  "class": "IORegistryEntry",
+  "name": "setLocation",
+  "kind": "V"
+ },
+ {
+  "i": 120,
+  "class": "IORegistryEntry",
+  "name": "setLocation",
+  "kind": "V"
+ },
+ {
+  "i": 121,
+  "class": "IORegistryEntry",
+  "name": "getPath",
+  "kind": "V"
+ },
+ {
+  "i": 122,
+  "class": "IORegistryEntry",
+  "name": "getPathComponent",
+  "kind": "V"
+ },
+ {
+  "i": 123,
+  "class": "IORegistryEntry",
+  "name": "childFromPath",
+  "kind": "V"
+ },
+ {
+  "i": 124,
+  "class": "IORegistryEntry",
+  "name": "init",
+  "kind": "V"
+ },
+ {
+  "i": 125,
+  "class": "IOService",
+  "name": "requestTerminate",
+  "kind": "V"
+ },
+ {
+  "i": 126,
+  "class": "IOService",
+  "name": "willTerminate",
+  "kind": "V"
+ },
+ {
+  "i": 127,
+  "class": "IOService",
+  "name": "didTerminate",
+  "kind": "V"
+ },
+ {
+  "i": 128,
+  "class": "IOService",
+  "name": "nextIdleTimeout",
+  "kind": "V"
+ },
+ {
+  "i": 129,
+  "class": "IOService",
+  "name": "systemWillShutdown",
+  "kind": "V"
+ },
+ {
+  "i": 130,
+  "class": "IOService",
+  "name": "copyClientWithCategory",
+  "kind": "V"
+ },
+ {
+  "i": 131,
+  "class": "IOService",
+  "name": "configureReport",
+  "kind": "V"
+ },
+ {
+  "i": 132,
+  "class": "IOService",
+  "name": "updateReport",
+  "kind": "V"
+ },
+ {
+  "i": 133,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 134,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 135,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 136,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 137,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 138,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 139,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 140,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 141,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 142,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 143,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 144,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 145,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 146,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 147,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 148,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 149,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 150,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 151,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 152,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 153,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 154,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 155,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 156,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 157,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 158,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 159,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 160,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 161,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 162,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 163,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 164,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 165,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 166,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 167,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 168,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 169,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 170,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 171,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 172,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 173,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 174,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 175,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 176,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 177,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 178,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 179,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 180,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 181,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 182,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 183,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 184,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 185,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 186,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 187,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 188,
+  "class": "IOService",
+  "name": "IOService",
+  "kind": "R"
+ },
+ {
+  "i": 189,
+  "class": "IOService",
+  "name": "getState",
+  "kind": "V"
+ },
+ {
+  "i": 190,
+  "class": "IOService",
+  "name": "registerService",
+  "kind": "V"
+ },
+ {
+  "i": 191,
+  "class": "IOService",
+  "name": "probe",
+  "kind": "V"
+ },
+ {
+  "i": 192,
+  "class": "IOService",
+  "name": "start",
+  "kind": "V"
+ },
+ {
+  "i": 193,
+  "class": "IOService",
+  "name": "stop",
+  "kind": "V"
+ },
+ {
+  "i": 194,
+  "class": "IOService",
+  "name": "open",
+  "kind": "V"
+ },
+ {
+  "i": 195,
+  "class": "IOService",
+  "name": "close",
+  "kind": "V"
+ },
+ {
+  "i": 196,
+  "class": "IOService",
+  "name": "isOpen",
+  "kind": "V"
+ },
+ {
+  "i": 197,
+  "class": "IOService",
+  "name": "handleOpen",
+  "kind": "V"
+ },
+ {
+  "i": 198,
+  "class": "IOService",
+  "name": "handleClose",
+  "kind": "V"
+ },
+ {
+  "i": 199,
+  "class": "IOService",
+  "name": "handleIsOpen",
+  "kind": "V"
+ },
+ {
+  "i": 200,
+  "class": "IOService",
+  "name": "terminate",
+  "kind": "V"
+ },
+ {
+  "i": 201,
+  "class": "IOService",
+  "name": "finalize",
+  "kind": "V"
+ },
+ {
+  "i": 202,
+  "class": "IOService",
+  "name": "init",
+  "kind": "V"
+ },
+ {
+  "i": 203,
+  "class": "IOService",
+  "name": "init",
+  "kind": "V"
+ },
+ {
+  "i": 204,
+  "class": "IOService",
+  "name": "free",
+  "kind": "V"
+ },
+ {
+  "i": 205,
+  "class": "IOService",
+  "name": "lockForArbitration",
+  "kind": "V"
+ },
+ {
+  "i": 206,
+  "class": "IOService",
+  "name": "unlockForArbitration",
+  "kind": "V"
+ },
+ {
+  "i": 207,
+  "class": "IOService",
+  "name": "terminateClient",
+  "kind": "V"
+ },
+ {
+  "i": 208,
+  "class": "IOService",
+  "name": "getBusyState",
+  "kind": "V"
+ },
+ {
+  "i": 209,
+  "class": "IOService",
+  "name": "adjustBusy",
+  "kind": "V"
+ },
+ {
+  "i": 210,
+  "class": "IOService",
+  "name": "matchPropertyTable",
+  "kind": "V"
+ },
+ {
+  "i": 211,
+  "class": "IOService",
+  "name": "matchPropertyTable",
+  "kind": "V"
+ },
+ {
+  "i": 212,
+  "class": "IOService",
+  "name": "matchLocation",
+  "kind": "V"
+ },
+ {
+  "i": 213,
+  "class": "IOService",
+  "name": "addNeededResource",
+  "kind": "V"
+ },
+ {
+  "i": 214,
+  "class": "IOService",
+  "name": "compareProperty",
+  "kind": "V"
+ },
+ {
+  "i": 215,
+  "class": "IOService",
+  "name": "compareProperty",
+  "kind": "V"
+ },
+ {
+  "i": 216,
+  "class": "IOService",
+  "name": "compareProperties",
+  "kind": "V"
+ },
+ {
+  "i": 217,
+  "class": "IOService",
+  "name": "attach",
+  "kind": "V"
+ },
+ {
+  "i": 218,
+  "class": "IOService",
+  "name": "detach",
+  "kind": "V"
+ },
+ {
+  "i": 219,
+  "class": "IOService",
+  "name": "getProvider",
+  "kind": "V"
+ },
+ {
+  "i": 220,
+  "class": "IOService",
+  "name": "getWorkLoop",
+  "kind": "V"
+ },
+ {
+  "i": 221,
+  "class": "IOService",
+  "name": "getProviderIterator",
+  "kind": "V"
+ },
+ {
+  "i": 222,
+  "class": "IOService",
+  "name": "getOpenProviderIterator",
+  "kind": "V"
+ },
+ {
+  "i": 223,
+  "class": "IOService",
+  "name": "getClient",
+  "kind": "V"
+ },
+ {
+  "i": 224,
+  "class": "IOService",
+  "name": "getClientIterator",
+  "kind": "V"
+ },
+ {
+  "i": 225,
+  "class": "IOService",
+  "name": "getOpenClientIterator",
+  "kind": "V"
+ },
+ {
+  "i": 226,
+  "class": "IOService",
+  "name": "callPlatformFunction",
+  "kind": "V"
+ },
+ {
+  "i": 227,
+  "class": "IOService",
+  "name": "callPlatformFunction",
+  "kind": "V"
+ },
+ {
+  "i": 228,
+  "class": "IOService",
+  "name": "getResources",
+  "kind": "V"
+ },
+ {
+  "i": 229,
+  "class": "IOService",
+  "name": "getDeviceMemoryCount",
+  "kind": "V"
+ },
+ {
+  "i": 230,
+  "class": "IOService",
+  "name": "getDeviceMemoryWithIndex",
+  "kind": "V"
+ },
+ {
+  "i": 231,
+  "class": "IOService",
+  "name": "mapDeviceMemoryWithIndex",
+  "kind": "V"
+ },
+ {
+  "i": 232,
+  "class": "IOService",
+  "name": "getDeviceMemory",
+  "kind": "V"
+ },
+ {
+  "i": 233,
+  "class": "IOService",
+  "name": "setDeviceMemory",
+  "kind": "V"
+ },
+ {
+  "i": 234,
+  "class": "IOService",
+  "name": "registerInterrupt",
+  "kind": "V"
+ },
+ {
+  "i": 235,
+  "class": "IOService",
+  "name": "unregisterInterrupt",
+  "kind": "V"
+ },
+ {
+  "i": 236,
+  "class": "IOService",
+  "name": "getInterruptType",
+  "kind": "V"
+ },
+ {
+  "i": 237,
+  "class": "IOService",
+  "name": "enableInterrupt",
+  "kind": "V"
+ },
+ {
+  "i": 238,
+  "class": "IOService",
+  "name": "disableInterrupt",
+  "kind": "V"
+ },
+ {
+  "i": 239,
+  "class": "IOService",
+  "name": "causeInterrupt",
+  "kind": "V"
+ },
+ {
+  "i": 240,
+  "class": "IOService",
+  "name": "requestProbe",
+  "kind": "V"
+ },
+ {
+  "i": 241,
+  "class": "IOService",
+  "name": "message",
+  "kind": "V"
+ },
+ {
+  "i": 242,
+  "class": "IOService",
+  "name": "messageClient",
+  "kind": "V"
+ },
+ {
+  "i": 243,
+  "class": "IOService",
+  "name": "messageClients",
+  "kind": "V"
+ },
+ {
+  "i": 244,
+  "class": "IOService",
+  "name": "registerInterest",
+  "kind": "V"
+ },
+ {
+  "i": 245,
+  "class": "IOService",
+  "name": "applyToProviders",
+  "kind": "V"
+ },
+ {
+  "i": 246,
+  "class": "IOService",
+  "name": "applyToClients",
+  "kind": "V"
+ },
+ {
+  "i": 247,
+  "class": "IOService",
+  "name": "applyToInterested",
+  "kind": "V"
+ },
+ {
+  "i": 248,
+  "class": "IOService",
+  "name": "acknowledgeNotification",
+  "kind": "V"
+ },
+ {
+  "i": 249,
+  "class": "IOService",
+  "name": "newUserClient",
+  "kind": "V"
+ },
+ {
+  "i": 250,
+  "class": "IOService",
+  "name": "newUserClient",
+  "kind": "V"
+ },
+ {
+  "i": 251,
+  "class": "IOService",
+  "name": "stringFromReturn",
+  "kind": "V"
+ },
+ {
+  "i": 252,
+  "class": "IOService",
+  "name": "errnoFromReturn",
+  "kind": "V"
+ },
+ {
+  "i": 253,
+  "class": "IOService",
+  "name": "serializeProperties",
+  "kind": "V"
+ },
+ {
+  "i": 254,
+  "class": "IOService",
+  "name": "PMinit",
+  "kind": "V"
+ },
+ {
+  "i": 255,
+  "class": "IOService",
+  "name": "PMstop",
+  "kind": "V"
+ },
+ {
+  "i": 256,
+  "class": "IOService",
+  "name": "joinPMtree",
+  "kind": "V"
+ },
+ {
+  "i": 257,
+  "class": "IOService",
+  "name": "registerPowerDriver",
+  "kind": "V"
+ },
+ {
+  "i": 258,
+  "class": "IOService",
+  "name": "requestPowerDomainState",
+  "kind": "V"
+ },
+ {
+  "i": 259,
+  "class": "IOService",
+  "name": "activityTickle",
+  "kind": "V"
+ },
+ {
+  "i": 260,
+  "class": "IOService",
+  "name": "setAggressiveness",
+  "kind": "V"
+ },
+ {
+  "i": 261,
+  "class": "IOService",
+  "name": "getAggressiveness",
+  "kind": "V"
+ },
+ {
+  "i": 262,
+  "class": "IOService",
+  "name": "systemWake",
+  "kind": "V"
+ },
+ {
+  "i": 263,
+  "class": "IOService",
+  "name": "temperatureCriticalForZone",
+  "kind": "V"
+ },
+ {
+  "i": 264,
+  "class": "IOService",
+  "name": "youAreRoot",
+  "kind": "V"
+ },
+ {
+  "i": 265,
+  "class": "IOService",
+  "name": "setPowerParent",
+  "kind": "V"
+ },
+ {
+  "i": 266,
+  "class": "IOService",
+  "name": "addPowerChild",
+  "kind": "V"
+ },
+ {
+  "i": 267,
+  "class": "IOService",
+  "name": "removePowerChild",
+  "kind": "V"
+ },
+ {
+  "i": 268,
+  "class": "IOService",
+  "name": "command_received",
+  "kind": "V"
+ },
+ {
+  "i": 269,
+  "class": "IOService",
+  "name": "PM_idle_timer_expiration",
+  "kind": "V"
+ },
+ {
+  "i": 270,
+  "class": "IOService",
+  "name": "PM_Clamp_Timer_Expired",
+  "kind": "V"
+ },
+ {
+  "i": 271,
+  "class": "IOService",
+  "name": "setIdleTimerPeriod",
+  "kind": "V"
+ },
+ {
+  "i": 272,
+  "class": "IOService",
+  "name": "getPMworkloop",
+  "kind": "V"
+ },
+ {
+  "i": 273,
+  "class": "IOService",
+  "name": "setPowerState",
+  "kind": "V"
+ },
+ {
+  "i": 274,
+  "class": "IOService",
+  "name": "clampPowerOn",
+  "kind": "V"
+ },
+ {
+  "i": 275,
+  "class": "IOService",
+  "name": "maxCapabilityForDomainState",
+  "kind": "V"
+ },
+ {
+  "i": 276,
+  "class": "IOService",
+  "name": "initialPowerStateForDomainState",
+  "kind": "V"
+ },
+ {
+  "i": 277,
+  "class": "IOService",
+  "name": "powerStateForDomainState",
+  "kind": "V"
+ },
+ {
+  "i": 278,
+  "class": "IOService",
+  "name": "powerStateWillChangeTo",
+  "kind": "V"
+ },
+ {
+  "i": 279,
+  "class": "IOService",
+  "name": "powerStateDidChangeTo",
+  "kind": "V"
+ },
+ {
+  "i": 280,
+  "class": "IOService",
+  "name": "didYouWakeSystem",
+  "kind": "V"
+ },
+ {
+  "i": 281,
+  "class": "IOService",
+  "name": "newTemperature",
+  "kind": "V"
+ },
+ {
+  "i": 282,
+  "class": "IOService",
+  "name": "askChangeDown",
+  "kind": "V"
+ },
+ {
+  "i": 283,
+  "class": "IOService",
+  "name": "tellChangeDown",
+  "kind": "V"
+ },
+ {
+  "i": 284,
+  "class": "IOService",
+  "name": "tellNoChangeDown",
+  "kind": "V"
+ },
+ {
+  "i": 285,
+  "class": "IOService",
+  "name": "tellChangeUp",
+  "kind": "V"
+ },
+ {
+  "i": 286,
+  "class": "IOService",
+  "name": "allowPowerChange",
+  "kind": "V"
+ },
+ {
+  "i": 287,
+  "class": "IOService",
+  "name": "cancelPowerChange",
+  "kind": "V"
+ },
+ {
+  "i": 288,
+  "class": "IOService",
+  "name": "powerChangeDone",
+  "kind": "V"
+ }
+]

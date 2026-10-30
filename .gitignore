@@ -1,0 +1,9 @@
+# Regenerable test media (kept on disk, not in git)
+prorestest.mov
+frame0.yuv
+
+# Kernel build intermediates
+*.o
+Module.symvers
+modules.order
+.*.cmd

@@ -1,0 +1,19 @@
+[154022.864701] afterburner_submit 0000:0f:00.0: Apple Afterburner [106b:0205] Phase 3b FIRST REAL DMA SUBMIT
+[154022.864795] afterburner_submit 0000:0f:00.0: Ring allocated: va=ffff8d493d010000 pa=0x3d010000 size=128 bytes (4 slots)
+[154022.864806] afterburner_submit 0000:0f:00.0: Data buffer allocated: va=ffff8d493d011000 pa=0x3d011000 size=4096 bytes
+[154022.864812] afterburner_submit 0000:0f:00.0: Descriptor filled: data_pa=0x3d011000 len=4096 ctrl=0xad5b0013
+[154022.864818] afterburner_submit 0000:0f:00.0: Writing descriptor PA to card desc registers...
+[154022.864822] afterburner_submit 0000:0f:00.0:   desc_lo readback = 0xffffffff (expected 0x3d010000)
+[154022.864827] afterburner_submit 0000:0f:00.0: Ringing single-shot doorbell: writel(0xFFE7F, bar0+0x1004)
+[154022.864830] afterburner_submit 0000:0f:00.0: Polling for completion (max 2s)...
+[154023.918190] afterburner_submit 0000:0f:00.0:     ... still polling at 1s ...
+[154024.978230] afterburner_submit 0000:0f:00.0:     (no desc_lo change within 2s — may need different completion signal)
+[154024.978240] afterburner_submit 0000:0f:00.0:   [post-submit register readback]
+[154024.978245] afterburner_submit 0000:0f:00.0:     bar0+0x1004 (single doorbell) = 0x00000000
+[154024.978251] afterburner_submit 0000:0f:00.0:     bar0+0x2004 (batch doorbell)  = 0x00000100
+[154024.978255] afterburner_submit 0000:0f:00.0:     bar0+0x5080 (desc_lo)         = 0xffffffff
+[154024.978260] afterburner_submit 0000:0f:00.0:     bar0+0x5084 (desc_hi)         = 0xffffffff
+[154024.978264] afterburner_submit 0000:0f:00.0:     bar0+0x5088 (desc_mid)        = 0xffffffff
+[154024.978268] afterburner_submit 0000:0f:00.0:     bar0+0x2034 (counter slot 0 ctrl) = 0x00000001
+[154024.978272] afterburner_submit 0000:0f:00.0:     bar0+0x8014 (engine bank 0 ctrl)  = 0x00000004
+[154024.978275] afterburner_submit 0000:0f:00.0: --- Phase 3b submit complete ---

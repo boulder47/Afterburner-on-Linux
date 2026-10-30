@@ -1,0 +1,2 @@
+root              1930   0.0  0.0  4404392   1508 s000  S+    6:59PM   0:00.01 /bin/bash ./afterburner_capture.sh /tmp/afterburner_capture_output
+root              1929   0.0  0.0  4421260   6604 s000  S+    6:59PM   0:00.02 sudo ./afterburner_capture.sh /tmp/afterburner_capture_output
