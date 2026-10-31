@@ -1,0 +1,5 @@
+In file included from pp_IOBufferMemoryDescriptor.c:5:
+OSMetaClass.h:33:10: fatal error: libkern/OSReturn.h: No such file or directory
+   33 | #include <libkern/OSReturn.h>
+      |          ^~~~~~~~~~~~~~~~~~~~
+compilation terminated.

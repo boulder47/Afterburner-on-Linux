@@ -2396,3 +2396,62 @@ hi32=**0x0010** with lo32 = vmaddr; import refs (superClass) use hi32=**0x4030**
 0x9698/0x985c; framePath commits via vtable call on object at self->+0xa8; channel object
 self->+0x150; FPGA 4KB config write fn@0x6b94 (blob from self->+0x174 → PCI ext-config [0,4096));
 flash update fn@0x821c; bitfile load fn@0x42f2 / resource callback fn@0x43fa.
+
+## 23. Vtable/import model — FULLY RESOLVED (Phase 3p, cycles 18–23)
+
+**This section supersedes the "UNRESOLVED" list in §22 items 1–4.** All four are now closed.
+
+### 23.1 Import resolution — FINAL
+- `imports_map.json` IS correct and authoritative (cycle-20 "misalignment" was an indexing error).
+- True mapping: **GOT slot i → indirect_symtab[43+i] → symtab[symidx] → strtab**. Verified 0/54 mismatches.
+- The 97-entry array @0x1f528 = LC_DYSYMTAB `indirect_symbol` table (§22 item 2 CLOSED). Entries 0–42 are unused padding; entries 43–96 map to GOT slots 0–53.
+- `imports_map.json` (368 keys) indexes the alphabetically-sorted undefined-symbol list, NOT GOT slots.
+- **PLT stubs**: __stubs @0xE83C–0xEA3C, exactly **43 stubs**, each 12 bytes (ADRP #0x14000 + LDR [reg,#off] + BR). `stub_map.json` = complete address→slot map. The 11 slots with NO stub are exactly the data symbols: PAGE_SHIFT_CONST(10), IOPCIDevice::metaClass(14), IOUserClient::gMetaClass(18), IOMapper::gSystem(31), IOService::gMetaClass(34), ZTV_IOUserClient(40), **ZTV_IOService(41)**, stack_chk_guard(44), gIODTModelKey(46), gIODTTypeKey(47), kOSBooleanTrue(48).
+- GOT[41] = `__ZTV9IOService` — the kernel's IOService vtable, **raw start** (offset-to-top @+0, typeinfo @+8, first virtual @+16).
+
+### 23.2 The "GOT[52] mystery" — CLOSED
+Cycle-20 sites labeled "GOT[52]" were an arithmetic error: offset #0x148 = slot **41**, not 52. All such sites load the IOService vtable base and forward virtual calls to inherited methods via thunks. No mystery object exists.
+
+### 23.3 Vtable entry encoding (PAC-tagged, bits [63:48])
+- tag **0x8011** = local function, low32 = vmaddr in __text.
+- tag **0xc011** = kernel symbol reference, **low32 = index into the 368-entry undefined-symbol list**.
+- tag **0x4010** = on-disk GOT placeholder (in __got only).
+- Terminator entries: `0xc041...` after each table.
+
+### 23.4 AppleAfterburner instance vtable — COMPLETE DECODE
+- Base **0x141F8**, exactly **271 slots** (0–270), terminator @0x14a70, ends 0x14a78. Full decode: `ab_vtable_true2.txt`.
+- Layout = kernel symbols in **reverse-alphabetical order of mangled name** with local overrides inserted at fixed positions. This ordering is the Apple kext convention (deterministic linking); it matches the kernel's IOService vtable layout slot-for-slot, which is why inherited methods need no reordering — only thunks where AB does not override.
+- **The +2 rule explained**: GOT[41] points at the RAW table start; instance vptrs point 2 entries in (past offset-to-top + typeinfo). So raw_index = slot + 2. There are NO "extra virtuals" — it is standard Itanium pre-virtual data.
+- Local overrides found: [0]/[1] dtor thunks, **[7]=getMetaClass() @0x40ec**, [22] thunk (free path), **[77]=init override @0xc8c0** ✓ (matches earlier model), [132]/[133] thunks → IOSvc 132/133, **[189]=probe() @0xc998**, **[190]=start() @0x4254**, [191]=close? @0xc0a4, [198]/[199] thunks, **[259]=@0x7c60** (setLocation override).
+- C2/D2 at slots 28/29 (= virtual indices 28/29) are REAL vtable entries holding IOService::D2/C2 — dispatch targets for the OSMetaClass fVTOffset mechanism (`OSMetaClass.h` `_ptmf2ptf`: byte-offset member pointers, bit0 = virtual flag). NOT a layout anomaly.
+- Slot 164 = OSObject::init(); slots 165–180 = _RESERVEDOSObject15..0 (16 reserved); slot 160 = IOService::gMetaClass data ref; slots 162/163 = OSObject operator new/delete.
+- Slots 207–238 = 32× _RESERVEDIORegistryEntry*.
+
+### 23.5 Metaclass table @0x14a90 — DECODED (32 slots)
+Set as vptr of the gMetaClass object (@0x10198) by ctor fn@0xcacc:
+```
+OSMetaClassC2(gMetaClass_obj, "AppleAfterburner"@0x6f0, GOT[34]=&IOService::gMetaClass, 0x1310)   ; GOT[15]
+vptr = PAC(0x14a90, obj)
+```
+- [0] @0x4048 = `b GOT[16]` (OSMetaClassD2); [1] @0xcac8 = same (dtor pair).
+- **[21] @0x4140 = THE INSTANCE ALLOCATOR** — this is how OSMetaClass::alloc() creates AppleAfterburner objects:
+```
+buf  = OSObject::operator new(0x1310)        ; GOT[33]
+IOService::C2(buf, gMetaClass_obj)           ; GOT[36]
+vptr_of_buf = PAC(0x141F8, buf)              ; instance vtable
+gMetaClass_obj->instanceConstructed()        ; GOT[38]
+return buf
+```
+- Slots 2–16/22–28 = IORegistryEntry const methods (reverse-alpha); [17]–[20] = OSMetaClass serialize/release×2/retain.
+- Two identical C2 wrappers @0x4050/@0x4080: `IOService::C2(x0, meta); vptr=PAC(0x141F8)` — direct-construction helpers (place() path).
+
+### 23.6 Object construction model — COMPLETE
+- AppleAfterburner instance = **0x1310 bytes**, allocated via OSObject::operator new, constructed by IOService::C2 (no AB-specific C2), vptr → 0x141F8.
+- Destructor: complete dtor @0x40b8 tail-calls GOT[37]=IOServiceD2; deleting dtor @0x40bc calls it then frees size 0x1310. **AB does not override the destructor.**
+- UserClient: gMetaClass @0x101c0, ctor fn@0xcb1c/0xe770, instance vtable @0x14b98 (base), metaclass table follows same pattern; descriptor entries at 0x14b88/0x14b90 (hi32=0x0010 local / 0x4030 import encoding confirmed).
+- §22 item 3 (MetaClass vtable) CLOSED by this decode. Item 5 (dispatch table @0x15680) and item 6 (__LINKEDIT dump) remain open but low-value.
+
+### 23.7 Remaining static open items (low priority)
+- fn@0xc0a4 identity (close? or stop?) — one disassembly away.
+- fn@0x7c60 identity (slot 259, setLocation override candidate).
+- Dispatch table @0x15680 full named list.
