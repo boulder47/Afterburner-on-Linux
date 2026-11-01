@@ -2454,4 +2454,39 @@ return buf
 ### 23.7 Remaining static open items (low priority)
 - fn@0xc0a4 identity (close? or stop?) — one disassembly away.
 - fn@0x7c60 identity (slot 259, setLocation override candidate).
-- Dispatch table @0x15680 full named list.
+- ~~Dispatch table @0x15680 full named list~~ — **RESOLVED 2026-11-01 (Phase 3r)**: it is the UC's
+  `sMethods` external-method dispatch table. Seven 24-byte records {trampoline fn, A=scalar u64 in
+  count, B=input struct size bytes, C=output qwords}: submitFrame(0x28)/queryCompletion(A=1)/
+  bindFrame(0x20,C=2)/cardStatus/checkForSpace(0x10)/unbindAll/getPercent. Trampolines @0xcd7c–0xcfc8
+  lock IOLock@UC+0x1960, PAC-verify target vptr (auth data = object ptr, tag 0xcda1), read arg block
+  scalar@+0x20 / struct@+0x30 / out@+0x48, tail-call raw vtable slots **308–314** (= live-relative
+  306–312; the seven frame methods are appended at the very end of the UC vtable after the four
+  inherited IOUserClient external-method virtuals @slots 304–307). Full ABI + submitFrame control
+  flow + provider engine map: **docs/videotoolbox-afterburner-decode-path.md**.
+
+### 23.8 Phase 3r — VideoToolbox ↔ kext decode path (2026-11-01)
+Consolidated analysis written to `docs/videotoolbox-afterburner-decode-path.md` (extends
+`docs/wwdc20-10090-transcript.md`). Key results:
+- **VT side:** clients never touch Afterburner directly — FFmpeg/sxplayer use only stock VT APIs;
+  macOS routes ProRes internally. Public entry point for professional sessions =
+  `VTRegisterProfessionalVideoWorkflowVideoDecoders()` (Apple docs topic "professional video
+  workflows"; dotnet/macios binds it as `VTProfessionalVideoWorkflow.RegisterVideoDecoders`).
+- **UC ABI:** `externalMethod` override @0xcfc8 → sMethods @0x15680 (see §23.7 resolution).
+  UC method signatures (c++filt on kext's own mangled names): submitFrame(s_inputDataStruct*, u64*),
+  queryCompletion(u64*, u64*), bindFrame(s_bindDataStruct*, u64*), cardStatus(u64*),
+  checkForSpace(s_bufDataStruct*), unbindAll(), getPercent(u64*). Note: second args are POINTERS.
+- **submitFrame:** slot bounds vs UC->+0x18f0; slotObj@UC+0xf0+i·0x18 (PAC-verified, virtual
+  "prepare" must return 1); DMA pair @UC+0xf8+i·0x18; engine call = provider submitFrame(sContext*,
+  inDesc, outDesc, &token, u32×3, sDescriptorLengthOffsetInfo). Outcomes: accept (token→UC->+0x1958) /
+  no-space 0xE000_02D8 (release input buffer object via buf_vt+0x220/+0x0, pass code through) /
+  other failure IOLog "Could not submit frame: %u!". Error base 0xE000_02C2; no-provider/inactive +0x17.
+- **Decoded-output path (plan.md §7 item 2):** provider takes an OUTPUT IOMemoryDescriptor; decoded
+  YUV c2h-DMA'd directly into the user buffer bound via bindFrame ("bad argument (frame in use)"
+  guard @0x33e9). No intermediate kernel copy on happy path. Live confirmation pending.
+- **Engine behavior (log strings):** hang watchdog "Possible hang, frameNum %llu"; self-reset on
+  query timeout; decoder enable/disable via Decoder Control Register ("Decoder not ready!!"); hard-
+  error reset paths with offending frameNum; **frame drops under thermal distress** (6 ADC channels);
+  h2c/c2h status + dmaQ/descDmaQ leak detection — matches live BAR1 send/receive channel findings.
+- **PLT:** all 43 stubs @0xE83C–0xEA3C resolved via GOT tag-0x4010 → imports_map.json (IOLockLock/
+  Unlock, IOLog, IOMemoryDescriptor::withAddressRange, OSMetaClassBase::instanceConstructed,
+  IOService::isInactive, kernel_debug, microtime, snprintf, strlen, timevalsub).

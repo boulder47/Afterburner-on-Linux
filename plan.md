@@ -268,13 +268,32 @@ complete for chain submits — unresolved.
 2. **Find the decoded-output path:** where does ProRes YUV land after a successful chain submit?
    Look at the receive-side DMA descriptors / BAR0 channel blocks (+0x8000..+0xf000) and any
    user-buffer mapping in fn@0x9c5c's caller (the frame wrapper ~0xa698).
+   → **RESOLVED statically (2026-11-01, Phase 3r):** provider `AppleAfterburner::submitFrame`
+   takes an *output* IOMemoryDescriptor; the UC wires input+output descriptors per slot and the
+   engine c2h-DMA's decoded YUV directly into the user buffer bound via `bindFrame` (per-slot DMA
+   qword pair at UC+0xf8+i·0x18). See docs/videotoolbox-afterburner-decode-path.md §8. Live
+   confirmation still pending (item 3 below).
 3. **Live:** re-run mode=9 R9-1 with a longer poll + BAR0 channel-block snapshot before/after to
    catch decode-side activity; try count≥1 batch completions deliberately (multiple submits in one
    rung) to exercise the +0x1044 path and BAR0[hdr+0x10] index.
 4. **Static open items** (FINDINGS.md §22 "UNRESOLVED"): u32 array @0x1806c, MetaClass vtable
-   reconciliation, dispatch table @0x15680 named list, x86_64 NULLs / −2 slot shift.
+   reconciliation, ~~dispatch table @0x15680 named list~~ — **RESOLVED 2026-11-01**: it is the UC's
+   `sMethods` external-method dispatch table (7×24B records: submitFrame/queryCompletion/bindFrame/
+   cardStatus/checkForSpace/unbindAll/getPercent; fields = trampoline fn, scalar-in count, input
+   struct size, output qwords). Full ABI in docs/videotoolbox-afterburner-decode-path.md §3.
+   x86_64 NULLs / −2 slot shift remain open.
 5. **Phase 4** (userspace interface) and **Phase 5** (flash/bitfile port — RE done in §20) remain.
 
 > Safety: Phase 0 is read-only (no doorbells, no flash). It cannot alter card state beyond
 > enabling the device + mapping its BARs, which any driver must do anyway. Flash writes stay
 > last and opt-in.
+
+**Phase 3r (2026-11-01) — VideoToolbox ↔ kext decode path consolidated:**
+docs/videotoolbox-afterburner-decode-path.md ties WWDC20-10090 + third-party VT references
+(FFmpeg, sxplayer, dotnet/macios, docs.rs, Apple docs) to the fully decoded UserClient ABI:
+externalMethod override @0xcfc8 → sMethods @0x15680; trampoline mechanism (IOLock@UC+0x1960,
+PAC vptr verify tag 0xcda1, arg block scalar@+0x20/struct@+0x30/out@+0x48); live dispatch = raw
+vtable slots 308–314 (Itanium +2 offset — earlier "slot 306" was an indexing error); submitFrame
+full control flow incl. per-slot model (N=UC->+0x18f0, slotObj@UC+0xf0+i·0x18, DMA pair@+0xf8),
+error codes (base 0xE000_02C2; no-space 0xE000_02D8); provider engine symbol map + log-string
+behavior (hang watchdog, thermal frame drops, h2c/c2h DMA health). All 43 PLT stubs resolved.

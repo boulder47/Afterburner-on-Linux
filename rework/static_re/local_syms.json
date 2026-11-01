@@ -1,0 +1,854 @@
+[
+ {
+  "i": 0,
+  "val": "0x5f0",
+  "sect": 1,
+  "demangled": "__ZL12livePointer0"
+ },
+ {
+  "i": 1,
+  "val": "0x630",
+  "sect": 1,
+  "demangled": "__ZL12livePointer1"
+ },
+ {
+  "i": 2,
+  "val": "0x670",
+  "sect": 1,
+  "demangled": "__ZL14goldenPointer0"
+ },
+ {
+  "i": 3,
+  "val": "0x6b0",
+  "sect": 1,
+  "demangled": "__ZL14goldenPointer1"
+ },
+ {
+  "i": 4,
+  "val": "0x4048",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner9MetaClassD1Ev"
+ },
+ {
+  "i": 5,
+  "val": "0xcac8",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner9MetaClassD0Ev"
+ },
+ {
+  "i": 6,
+  "val": "0xcacc",
+  "sect": 3,
+  "demangled": "__GLOBAL__sub_I_Athena.cpp"
+ },
+ {
+  "i": 7,
+  "val": "0xcb1c",
+  "sect": 3,
+  "demangled": "__GLOBAL__D_a"
+ },
+ {
+  "i": 8,
+  "val": "0xcb70",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient9MetaClassD1Ev"
+ },
+ {
+  "i": 9,
+  "val": "0xe76c",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient9MetaClassD0Ev"
+ },
+ {
+  "i": 10,
+  "val": "0xe770",
+  "sect": 3,
+  "demangled": "__GLOBAL__sub_I_AthenaUserClient.cpp"
+ },
+ {
+  "i": 11,
+  "val": "0xe7c0",
+  "sect": 3,
+  "demangled": "__GLOBAL__D_a"
+ },
+ {
+  "i": 12,
+  "val": "0xe7cc",
+  "sect": 3,
+  "demangled": "__start"
+ },
+ {
+  "i": 13,
+  "val": "0xe7ec",
+  "sect": 3,
+  "demangled": "_OSKextGetCurrentIdentifier"
+ },
+ {
+  "i": 14,
+  "val": "0xe7fc",
+  "sect": 3,
+  "demangled": "_OSKextGetCurrentVersionString"
+ },
+ {
+  "i": 15,
+  "val": "0xe80c",
+  "sect": 3,
+  "demangled": "_OSKextGetCurrentLoadTag"
+ },
+ {
+  "i": 16,
+  "val": "0xe81c",
+  "sect": 3,
+  "demangled": "__stop"
+ },
+ {
+  "i": 17,
+  "val": "0x100c4",
+  "sect": 5,
+  "demangled": "__kext_apple_cc"
+ },
+ {
+  "i": 18,
+  "val": "0x100c8",
+  "sect": 5,
+  "demangled": "__ZL18sAthenaPowerStates"
+ },
+ {
+  "i": 19,
+  "val": "0x10188",
+  "sect": 6,
+  "demangled": "__realmain"
+ },
+ {
+  "i": 20,
+  "val": "0x10190",
+  "sect": 6,
+  "demangled": "__antimain"
+ },
+ {
+  "i": 21,
+  "val": "0xbd90",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner10cardStatusEPy"
+ },
+ {
+  "i": 22,
+  "val": "0x10198",
+  "sect": 6,
+  "demangled": "__ZN16AppleAfterburner10gMetaClassE"
+ },
+ {
+  "i": 23,
+  "val": "0xbda0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner10getPercentEPy"
+ },
+ {
+  "i": 24,
+  "val": "0x821c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner10spiprogramEjjPvmb"
+ },
+ {
+  "i": 25,
+  "val": "0xa67c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner10submitDataEP8sContextP18IOMemoryDescriptorjPyjjjyy"
+ },
+ {
+  "i": 26,
+  "val": "0x141e0",
+  "sect": 11,
+  "demangled": "__ZN16AppleAfterburner10superClassE"
+ },
+ {
+  "i": 27,
+  "val": "0xa28c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner11getSegmentsEP8sContextP18IOMemoryDescriptorPN12IODMACommand9Segment64EPjyyy"
+ },
+ {
+  "i": 28,
+  "val": "0x8628",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner11loadBitfileEPKcj"
+ },
+ {
+  "i": 29,
+  "val": "0x6a00",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner11sleep_timerEP18IOTimerEventSource"
+ },
+ {
+  "i": 30,
+  "val": "0xa9ac",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner11submitFrameEP8sContextP18IOMemoryDescriptorS3_Pyjjj27sDescriptorLengthOffsetInfo"
+ },
+ {
+  "i": 31,
+  "val": "0xbf6c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner11unbindFrameEP18IOMemoryDescriptor"
+ },
+ {
+  "i": 32,
+  "val": "0xca80",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner12didTerminateEP9IOServicejPb"
+ },
+ {
+  "i": 33,
+  "val": "0xbfec",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner13checkForSpaceEPy"
+ },
+ {
+  "i": 34,
+  "val": "0x7c60",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner13setPowerStateEmP9IOService"
+ },
+ {
+  "i": 35,
+  "val": "0xca68",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner13willTerminateEP9IOServicej"
+ },
+ {
+  "i": 36,
+  "val": "0x8580",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner14change_pointerEj"
+ },
+ {
+  "i": 37,
+  "val": "0x74c4",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner14reconfig_timerEP18IOTimerEventSource"
+ },
+ {
+  "i": 38,
+  "val": "0x8af0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner14submitResourceEP24IOBufferMemoryDescriptorj"
+ },
+ {
+  "i": 39,
+  "val": "0x9be0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner14updateIdleTimeEv"
+ },
+ {
+  "i": 40,
+  "val": "0x5aec",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner15handleInterruptEP8OSObjectP22IOInterruptEventSourcei"
+ },
+ {
+  "i": 41,
+  "val": "0xb88c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner15queryCompletionEP8sContextPyS2_"
+ },
+ {
+  "i": 42,
+  "val": "0x803c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner15readDMARegisterEj"
+ },
+ {
+  "i": 43,
+  "val": "0x985c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner15submitDataGatedEP10sDmaConfig"
+ },
+ {
+  "i": 44,
+  "val": "0x55c0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner16readBAR0RegisterEj"
+ },
+ {
+  "i": 45,
+  "val": "0x6b94",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner16reconfig_handlerEP22IOInterruptEventSourcei"
+ },
+ {
+  "i": 46,
+  "val": "0xbe64",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner16updateActiveTimeEv"
+ },
+ {
+  "i": 47,
+  "val": "0x8030",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner16writeDMARegisterEjj"
+ },
+ {
+  "i": 48,
+  "val": "0x9c5c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner17getDescriptorListEP8sContextPN12IODMACommand9Segment64EjjPyPjy"
+ },
+ {
+  "i": 49,
+  "val": "0x8084",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner17readFlashRegisterEj"
+ },
+ {
+  "i": 50,
+  "val": "0x8024",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner17writeBAR0RegisterEjj"
+ },
+ {
+  "i": 51,
+  "val": "0x5ad4",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner18readDecodeRegisterEj"
+ },
+ {
+  "i": 52,
+  "val": "0x8090",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner18writeFlashRegisterEjj"
+ },
+ {
+  "i": 53,
+  "val": "0x5a3c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner19configureInterruptsEv"
+ },
+ {
+  "i": 54,
+  "val": "0x8d5c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner19getResourceSegmentsEP24IOBufferMemoryDescriptorPN12IODMACommand9Segment64EPjy"
+ },
+ {
+  "i": 55,
+  "val": "0x806c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner19readBitfileRegisterEj"
+ },
+ {
+  "i": 56,
+  "val": "0x8054",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner19readThermalRegisterEj"
+ },
+ {
+  "i": 57,
+  "val": "0x55cc",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner19readVersionRegisterEj"
+ },
+ {
+  "i": 58,
+  "val": "0x9698",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner19submitResourceGatedEP10sDmaConfig"
+ },
+ {
+  "i": 59,
+  "val": "0x8014",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner19writeDecodeRegisterEjj"
+ },
+ {
+  "i": 60,
+  "val": "0xb634",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner20queryCompletionGatedEPyPi"
+ },
+ {
+  "i": 61,
+  "val": "0x87c8",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner20resourceLoadCallbackEjiPKvjPv"
+ },
+ {
+  "i": 62,
+  "val": "0x8078",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner20writeBitfileRegisterEjj"
+ },
+ {
+  "i": 63,
+  "val": "0x8060",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner20writeThermalRegisterEjj"
+ },
+ {
+  "i": 64,
+  "val": "0x8048",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner20writeVersionRegisterEjj"
+ },
+ {
+  "i": 65,
+  "val": "0x7c1c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner21pointer_restore_timerEP18IOTimerEventSource"
+ },
+ {
+  "i": 66,
+  "val": "0x7508",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner23pointer_restore_handlerEP22IOInterruptEventSourcei"
+ },
+ {
+  "i": 67,
+  "val": "0x90d0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner25getResourceDescriptorListEPN12IODMACommand9Segment64EjjPyPjy"
+ },
+ {
+  "i": 68,
+  "val": "0x55d8",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner26updateIORegistryPropertiesEv"
+ },
+ {
+  "i": 69,
+  "val": "0x888c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner27resourceLoadCallbackHandlerEjiPKvj"
+ },
+ {
+  "i": 70,
+  "val": "0xc984",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner4freeEv"
+ },
+ {
+  "i": 71,
+  "val": "0xc8c0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner4initEP12OSDictionary"
+ },
+ {
+  "i": 72,
+  "val": "0xc0a4",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner4stopEP9IOService"
+ },
+ {
+  "i": 73,
+  "val": "0xc998",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner5probeEP9IOServicePi"
+ },
+ {
+  "i": 74,
+  "val": "0xaea8",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner5resetEv"
+ },
+ {
+  "i": 75,
+  "val": "0x4254",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner5startEP9IOService"
+ },
+ {
+  "i": 76,
+  "val": "0xb0ec",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner7cleanUpEP8sContext"
+ },
+ {
+  "i": 77,
+  "val": "0xcab0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner8finalizeEj"
+ },
+ {
+  "i": 78,
+  "val": "0x809c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner8spieraseEj"
+ },
+ {
+  "i": 79,
+  "val": "0x4000",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner9MetaClassC1Ev"
+ },
+ {
+  "i": 80,
+  "val": "0x40f8",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner9MetaClassC2Ev"
+ },
+ {
+  "i": 81,
+  "val": "0xbedc",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner9bindFrameEP18IOMemoryDescriptor"
+ },
+ {
+  "i": 82,
+  "val": "0xc058",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner9freeSpaceEPy"
+ },
+ {
+  "i": 83,
+  "val": "0x141d8",
+  "sect": 11,
+  "demangled": "__ZN16AppleAfterburner9metaClassE"
+ },
+ {
+  "i": 84,
+  "val": "0xca98",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburner9terminateEj"
+ },
+ {
+  "i": 85,
+  "val": "0x4080",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerC1EPK11OSMetaClass"
+ },
+ {
+  "i": 86,
+  "val": "0x41a4",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerC1Ev"
+ },
+ {
+  "i": 87,
+  "val": "0x404c",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerC2EPK11OSMetaClass"
+ },
+ {
+  "i": 88,
+  "val": "0x41fc",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerC2Ev"
+ },
+ {
+  "i": 89,
+  "val": "0x40bc",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerD0Ev"
+ },
+ {
+  "i": 90,
+  "val": "0x40b8",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerD1Ev"
+ },
+ {
+  "i": 91,
+  "val": "0x40b4",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerD2Ev"
+ },
+ {
+  "i": 92,
+  "val": "0x40e8",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnerdlEPvm"
+ },
+ {
+  "i": 93,
+  "val": "0x41a0",
+  "sect": 3,
+  "demangled": "__ZN16AppleAfterburnernwEm"
+ },
+ {
+  "i": 94,
+  "val": "0xe2a4",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient10cardStatusEPy"
+ },
+ {
+  "i": 95,
+  "val": "0xd534",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient10clientDiedEv"
+ },
+ {
+  "i": 96,
+  "val": "0x101c0",
+  "sect": 6,
+  "demangled": "__ZN26AppleAfterburnerUserClient10gMetaClassE"
+ },
+ {
+  "i": 97,
+  "val": "0xe6a4",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient10getPercentEPy"
+ },
+ {
+  "i": 98,
+  "val": "0xce34",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient10sBindFrameEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "i": 99,
+  "val": "0xcf20",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient10sUnbindAllEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "i": 100,
+  "val": "0x14b90",
+  "sect": 11,
+  "demangled": "__ZN26AppleAfterburnerUserClient10superClassE"
+ },
+ {
+  "i": 101,
+  "val": "0xd3f8",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient11clientCloseEv"
+ },
+ {
+  "i": 102,
+  "val": "0xceb0",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient11sCardStatusEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "i": 103,
+  "val": "0xcf90",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient11sGetPercentEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "i": 104,
+  "val": "0xd708",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient11submitFrameEP17s_inputDataStructPy"
+ },
+ {
+  "i": 105,
+  "val": "0xd60c",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient12didTerminateEP9IOServicejPb"
+ },
+ {
+  "i": 106,
+  "val": "0xd004",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient12initWithTaskEP4taskPvjP12OSDictionary"
+ },
+ {
+  "i": 107,
+  "val": "0xcd7c",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient12sSubmitFrameEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "i": 108,
+  "val": "0xe36c",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient13checkForSpaceEP15s_bufDataStruct"
+ },
+ {
+  "i": 109,
+  "val": "0xd54c",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient13willTerminateEP9IOServicej"
+ },
+ {
+  "i": 110,
+  "val": "0xcfc8",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient14externalMethodEjP25IOExternalMethodArgumentsP24IOExternalMethodDispatchP8OSObjectPv"
+ },
+ {
+  "i": 111,
+  "val": "0xcee8",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient14sCheckForSpaceEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "i": 112,
+  "val": "0xdcc4",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient15queryCompletionEPyS0_"
+ },
+ {
+  "i": 113,
+  "val": "0xcdf8",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient16sQueryCompletionEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "i": 114,
+  "val": "0xd25c",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient4stopEP9IOService"
+ },
+ {
+  "i": 115,
+  "val": "0xd1e4",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient5startEP9IOService"
+ },
+ {
+  "i": 116,
+  "val": "0xd6f0",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient8finalizeEj"
+ },
+ {
+  "i": 117,
+  "val": "0x15680",
+  "sect": 11,
+  "demangled": "__ZN26AppleAfterburnerUserClient8sMethodsE"
+ },
+ {
+  "i": 118,
+  "val": "0xcb28",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient9MetaClassC1Ev"
+ },
+ {
+  "i": 119,
+  "val": "0xcc20",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient9MetaClassC2Ev"
+ },
+ {
+  "i": 120,
+  "val": "0xdd9c",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient9bindFrameEP16s_bindDataStructPy"
+ },
+ {
+  "i": 121,
+  "val": "0x14b88",
+  "sect": 11,
+  "demangled": "__ZN26AppleAfterburnerUserClient9metaClassE"
+ },
+ {
+  "i": 122,
+  "val": "0xd6d8",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient9terminateEj"
+ },
+ {
+  "i": 123,
+  "val": "0xe4c0",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClient9unbindAllEv"
+ },
+ {
+  "i": 124,
+  "val": "0xcba8",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientC1EPK11OSMetaClass"
+ },
+ {
+  "i": 125,
+  "val": "0xcccc",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientC1Ev"
+ },
+ {
+  "i": 126,
+  "val": "0xcb74",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientC2EPK11OSMetaClass"
+ },
+ {
+  "i": 127,
+  "val": "0xcd24",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientC2Ev"
+ },
+ {
+  "i": 128,
+  "val": "0xcbe4",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientD0Ev"
+ },
+ {
+  "i": 129,
+  "val": "0xcbe0",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientD1Ev"
+ },
+ {
+  "i": 130,
+  "val": "0xcbdc",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientD2Ev"
+ },
+ {
+  "i": 131,
+  "val": "0xcc10",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientdlEPvm"
+ },
+ {
+  "i": 132,
+  "val": "0xccc8",
+  "sect": 3,
+  "demangled": "__ZN26AppleAfterburnerUserClientnwEm"
+ },
+ {
+  "i": 133,
+  "val": "0x40ec",
+  "sect": 3,
+  "demangled": "__ZNK16AppleAfterburner12getMetaClassEv"
+ },
+ {
+  "i": 134,
+  "val": "0x4140",
+  "sect": 3,
+  "demangled": "__ZNK16AppleAfterburner9MetaClass5allocEv"
+ },
+ {
+  "i": 135,
+  "val": "0xcc14",
+  "sect": 3,
+  "demangled": "__ZNK26AppleAfterburnerUserClient12getMetaClassEv"
+ },
+ {
+  "i": 136,
+  "val": "0xcc68",
+  "sect": 3,
+  "demangled": "__ZNK26AppleAfterburnerUserClient9MetaClass5allocEv"
+ },
+ {
+  "i": 137,
+  "val": "0x141e8",
+  "sect": 11,
+  "demangled": "__ZTV16AppleAfterburner"
+ },
+ {
+  "i": 138,
+  "val": "0x14b98",
+  "sect": 11,
+  "demangled": "__ZTV26AppleAfterburnerUserClient"
+ },
+ {
+  "i": 139,
+  "val": "0x14a80",
+  "sect": 11,
+  "demangled": "__ZTVN16AppleAfterburner9MetaClassE"
+ },
+ {
+  "i": 140,
+  "val": "0x15578",
+  "sect": 11,
+  "demangled": "__ZTVN26AppleAfterburnerUserClient9MetaClassE"
+ },
+ {
+  "i": 141,
+  "val": "0x10000",
+  "sect": 5,
+  "demangled": "_kmod_info"
+ }
+]
