@@ -1,7 +1,7 @@
 # VideoToolbox ↔ Afterburner ProRes Decode Path — Consolidated Analysis
 
 **Date:** 2026-11-01 · **Phase:** 3r (static RE + third-party VT reference mining)
-**Sources:** WWDC20-10090 transcript (`docs/wwdc20-10090-transcript.md`), Apple VideoToolbox docs JSON, FFmpeg `libavcodec/videotoolbox.c`, Streambox sxplayer `decoder_vt.c`, dotnet/macios `VTProfessionalVideoWorkflow.cs`, docs.rs `videotoolbox` crate, and the local kext binary RE artifacts (`rework/arm64e.bin`, `rework/static_re/`).
+**Sources:** WWDC20-10090 transcript (`docs/wwdc20-10090-transcript.md`), Apple VideoToolbox docs JSON, **MacOSX10.15.sdk VideoToolbox headers (phracker/MacOSX-SDKs → `rework/vt_sdk_10.15/Headers/`)**, FFmpeg `libavcodec/videotoolbox.c`, Streambox sxplayer `decoder_vt.c`, dotnet/macios `VTProfessionalVideoWorkflow.cs`, docs.rs `videotoolbox` crate, and the local kext binary RE artifacts (`rework/arm64e.bin`, `rework/static_re/`).
 
 ---
 
@@ -54,30 +54,66 @@ The Afterburner ProRes decode path is a **two-layer system**:
 
 ## 2. The VideoToolbox side (public API surface)
 
-### 2.1 Session creation — what every client does
+### 2.1 Session creation — what every client does (exact signatures, MacOSX10.15.sdk)
 
-FFmpeg (`libavcodec/videotoolbox.c`) and sxplayer both follow the same stock pattern:
+Full VideoToolbox headers captured from phracker/MacOSX-SDKs into
+`rework/vt_sdk_10.15/Headers/`. The stock pattern used by FFmpeg and sxplayer:
+
+```c
+// VTDecompressionSession.h (10.15 SDK)
+typedef void (*VTDecompressionOutputCallback)(
+    void *decompressionOutputRefCon, void *sourceFrameRefCon, OSStatus status,
+    VTDecodeInfoFlags infoFlags, CVImageBufferRef imageBuffer,
+    CMTime presentationTimeStamp, CMTime presentationDuration);
+
+OSStatus VTDecompressionSessionCreate(
+    CFAllocatorRef allocator,
+    CMVideoFormatDescriptionRef videoFormatDescription,
+    CFDictionaryRef videoDecoderSpecification,      // spec keys below
+    CFDictionaryRef destinationImageBufferAttributes,
+    const VTDecompressionOutputCallbackRecord *outputCallback,
+    VTDecompressionSessionRef *decompressionSessionOut);
+
+OSStatus VTDecompressionSessionDecodeFrame(
+    VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer,
+    VTDecodeFrameFlags decodeFlags /* bit 0 = enableAsynchronousDecompression */);
+```
 
 - Build a `CMVideoFormatDescription` from the codec parameters. For ProRes, sxplayer maps
   FourCC tags to CM types: `apcn→AppleProRes422`, `apch→AppleProRes422HQ`, `apcs→AppleProRes422LT`,
   `apo→AppleProRes422Proxy`, `ap4x`/`ap4h→AppleProRes4444`.
-- Create the session with `VTDecompressionSessionCreate(...)` and a spec dictionary containing:
-  - `kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder` (FFmpeg)
-  - `kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder` (FFmpeg, when HW is mandatory)
-- Register an output callback (`decompressionOutputCallback` in FFmpeg) that receives decoded
-  `CMSampleBuffer`s; the client owns buffer release (`videotoolbox_buffer_release`).
+- Spec dictionary keys (from `VTDecompressionProperties.h`, all `CFBoolean` unless noted):
+  - `kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder` — *"true by default"*;
+    header note: **"In MacOS 10.15 and later, hardware decode is enabled in VTDecompressionSessions
+    by default."** (matches the WWDC20-10090 statement that HW decode incl. Afterburner is on by default)
+  - `kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder` — session creation fails if no HW decoder
+  - `kVTVideoDecoderSpecification_PreferredDecoderGPURegistryID` / `_RequiredDecoderGPURegistryID`
+    (macOS-only, `#if !TARGET_OS_IPHONE`) — steer the HW decoder to a specific GPU by IORegistry ID;
+    shows VT's general mechanism for pinning hardware decoders to specific devices.
 
 **Neither project references Afterburner by name anywhere.** The engine choice is opaque to them —
 this confirms the routing decision lives entirely inside macOS.
 
 ### 2.2 Professional workflow registration (the Afterburner-relevant API)
 
-Apple's VideoToolbox documentation exposes a dedicated topic section for professional workflows with
-two public C functions:
+From `VTProfessionalVideoWorkflow.h` (MacOSX10.15.sdk, © 2013-2014 Apple — same era as the first
+Afterburner-equipped Mac Pro):
 
-- `VTRegisterProfessionalVideoWorkflowVideoDecoders()` — *"Loads decoders appropriate for the
-  client's professional video workflows."*
-- `VTRegisterProfessionalVideoWorkflowVideoEncoders()` — encoder counterpart.
+```c
+/*! @abstract Allows the client to use decoders appropriate for professional video workflows.
+    @discussion Loads the video decoders within
+        "/Library/Video/Professional Video Workflow Plug-Ins/", if any are present. */
+VT_EXPORT void VTRegisterProfessionalVideoWorkflowVideoDecoders(void) VT_AVAILABLE_STARTING(10_9);
+
+/*! @abstract Allows the client to use encoders appropriate for professional video workflows. */
+VT_EXPORT void VTRegisterProfessionalVideoWorkflowVideoEncoders(void) VT_AVAILABLE_STARTING(10_10);
+```
+
+**Key fact: the plugin directory is `/Library/Video/Professional Video Workflow Plug-Ins/`.** On a
+Mac with an Afterburner card, that folder holds the userspace twin of `AppleAfterburner.kext` — the
+VT plugin bundle whose decoders register into VT and hold the IOKit connection driving the seven
+user methods decoded in §3. (Resolves the "locate the plugin/bundle" open item from the WWDC
+transcript doc; on this Linux box it can only be inspected on a macOS machine.)
 
 dotnet/macios binds this as class `VTProfessionalVideoWorkflow` with static methods
 `RegisterVideoDecoders` / `RegisterVideoEncoders`. The docs.rs `videotoolbox` crate (safe Rust
@@ -96,6 +132,24 @@ From FFmpeg's callback handling and Apple docs: the engine delivers decoded fram
 after consumption. For Afterburner this maps to: **decoded YUV lands in user-space buffers that were
 pre-bound via `bindFrame`** (see §8), and completion is signalled per-frame through
 `queryCompletion`.
+
+### 2.4 Client-visible errors & flags ↔ kext behavior (VTErrors.h)
+
+The VT error domain gives the client-side face of what we decoded on the kext side:
+
+| VT constant | value | kext-side correlate (verified in §3–§6) |
+|---|---|---|
+| `kVTCouldNotFindVideoDecoderErr` | -12906 | session creation with `_RequireHardwareAccelerated…`=true when no Afterburner plugin loaded / card absent |
+| `kVTVideoDecoderMalfunctionErr` | -12911 | engine hard-error paths: "HARD error from decoder", "Decoder error (resetting)", self-reset on query timeout |
+| `kVTVideoDecoderNotAvailableNowErr` | -12913 | no-space rejection (`0xE000_02D8`) / thermal distress — transient, retry later |
+| `kVTVideoDecoderBadDataErr` / `_UnsupportedDataFormatErr` | -12909/-12910 | malformed ProRes input rejected before/inside engine |
+| `kVTVideoDecoderRemovedErr` | -17690 | card removed / kext unloaded mid-session (`clientDied`) |
+| `kVTDecodeInfo_FrameDropped` (info flag, 1<<1) | — | **"dropping frame due to thermal distress condition"** — the client sees dropped frames as an info flag in the output callback, not an error |
+| `kVTDecodeFrame_EnableAsynchronousDecompression` (flag bit 0) | 1 | async decode mode; with it clear "the video decoder is compelled to emit every frame before it returns" — matches the serialized one-frame-at-a-time completion model of queryCompletion |
+
+Note the kext's own error codes (`0xE000_02C2` base, `0xE000_02D8` no-space) are kernel IOReturns
+consumed by the VT plugin; they never reach the app — the plugin translates them into the -129xx
+domain above.
 
 ---
 
@@ -399,7 +453,9 @@ happy path — the "output memory descriptor" *is* the user's pixel buffer (or i
 ## 9. Open items (updated)
 
 Resolved this session: dispatch table @0x15680 named list (plan.md §7 item 4, FINDINGS §23.7);
-decoded-output path (plan.md §7 item 2); trampoline→vtable slot mapping incl. the Itanium +2 offset.
+decoded-output path (plan.md §7 item 2); trampoline→vtable slot mapping incl. the Itanium +2 offset;
+**VT plugin location** — `/Library/Video/Professional Video Workflow Plug-Ins/` per
+`VTProfessionalVideoWorkflow.h`.
 
 Still open:
 - `fn@0xc0a4` identity (close? or stop?) and `fn@0x7c60` (slot 259) — one disassembly each (FINDINGS §23.7).
@@ -408,5 +464,7 @@ Still open:
 - Why bindFrame takes the slot stride from userspace (`in[+0x10]`) while submitFrame hardcodes 0x18 —
   probably defensive/legacy; live traffic capture on macOS would settle it.
 - `s_bufDataStruct` (16B) field layout beyond "carries a size" — checkForSpace body not yet fully walked.
-- Live confirmation of the whole ABI: dtrace/IOKit-trace a real Final Cut Pro session on macOS to
-  capture actual selector traffic and struct contents.
+- Live confirmation of the whole ABI on a Mac with an Afterburner card: inspect
+  `/Library/Video/Professional Video Workflow Plug-Ins/` (the Afterburner VT plugin bundle — its
+  binary will show exactly which selectors it calls and how it fills `s_inputDataStruct`), then
+  dtrace/IOKit-trace a real Final Cut Pro session to capture actual selector traffic and struct contents.
