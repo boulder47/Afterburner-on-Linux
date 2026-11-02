@@ -54,7 +54,7 @@ to port — that simplifies Phase 3 and means we should not look for encode regi
 | 3n — Recovery matrix | ✅ **DONE** (live: rung A works) | mode=8 = full bring-up (fw gate + walk + enable/disable/enable + init writer + ready poll), then a ladder of len=64 submits until one is consumed: **A** as-is after bring-up → **B** after `writel(0, BAR1+0x2018)` → **C** after also clearing `+0x2014` → **D** after PCIe FLR (`pci_reset_function`) + BAR1 re-init. **LIVE RESULT: rung A CONSUMED immediately — the decoder disable/enable cycle (full bring-up) alone un-wedges the engine; no ack clears, no FLR needed.** B/C never ran (short-circuit). Anomaly: writes to `+0x2018`/`+0x2014` do NOT stick (wrote 0x1, read back 0x3) — those registers are engine-owned; the only reliable reset is the decoder re-enable cycle. |
 | 3o — Chain-submit ladder (multi-segment frames) | ✅ **DONE** (live: R9-1 SUCCESS, send channel dead) | mode=9/10/11 live runs with the real ProRes frame. **R9-1 (chain → batch bank +0x5080, doorbell 0x80FFE7F): engine consumed the full 5-desc chain and completed** (status VALID, count=0, data(+0x44)=6, wordB=5). mode=10 (chain → send bank +0x4080, 0xFFE7F) and mode=11 (N=5/4K + N=10/2K via send doorbell): **no completion in 30 s each**. Conclusion: batch/receive channel is the working submit path — likely kext-exact; send channel needs different setup or serves another purpose. See FINDINGS.md §21.10. |
 | 3p — Static RE of kext binary (vtables/class map) | ✅ **DONE** (core), open items listed | Four vtables mapped + fully named-decoded (`rework/static_re/vtable_named.txt`); probe()=fn@0xc998, start()=fn@0x4254, externalMethod=fn@0xcfc8; import mechanism = LC_DYSYMTAB @0x520 + 368-name strtab @0x1862c (NO chained fixups); symtabs parsed (arm64e 510 / x86_64 503, 16-B nlist); sources = Athena.cpp + AthenaUserClient.cpp. Open: u32 array @0x1806c purpose, MetaClass vtable reconciliation, dispatch table @0x15680 named list, x86_64 NULLs/−2 slot shift. See FINDINGS.md §22. |
-| 3q — Confirm kext frame-commit path (static) | ⬜ **NEXT** | Disassemble the vtable[+0x150] method on the context object at self->+0xa8 (called by fn@0x9c5c to commit chains): confirm it stages to +0x5080 and rings 0x80FFE7F, or find what extra setup the send path needs. Then locate where decoded YUV output lands (receive DMA? user buffer?) — that's the missing half of "actually decode a frame". |
+| 3q — Confirm kext frame-commit path (static) | ✅ **DONE** (2026-11-02, FINDINGS.md §25) | Premise was wrong: vtable[+0x150] is IOKit return-to-pool. Real commit = UC trampoline @0xd708 → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified: channel cmd[+0x1c] (userland scalar via `mov x4,x21` @0xdb14), send = clear +4 / stage +0x4080..C / ring 0xFFE7F, batch = clear +0x1004 / stage +0x5080..C / ring 0x80FFE7F — **byte-exact match with our Linux driver**. BAR1 base = ctx->+0x130 (NOT +0x148 = BAR0+0x2000). Completion handler fn@0x985c: gated by +0x12f8, polls *(ctx->+0x90) vtable[+0x200/+0x210], send-completion writes BAR0[hdr+0xC]. |
 | 4 — Userspace interface | ⬜ | |
 | 5 — Flash / bitfile mgmt | 🟡 **RE complete** (port pending) | Kext-side path fully decoded: descriptor chain, version selection by fuse word, two-phase update, SPI erase/program at flash addr `0x1400000`, pointer tables. See FINDINGS.md §20. Linux port still high-risk / last. |
 
@@ -265,9 +265,13 @@ ack via write-back to +0x2018 (+0x2014). Send channel (+0x4080 / doorbell +4 = 0
 complete for chain submits — unresolved.
 
 **Next actions (in order):**
-1. **Phase 3q (static):** disassemble the vtable[+0x150] method on the context object at
-   self->+0xa8 (called from fn@0x9c5c) to confirm which bank/doorbell the kext's real frame
-   commit uses. Artifacts in `rework/static_re/` (see FINDINGS.md §22 for all anchors).
+1. ~~Phase 3q (static): disassemble the vtable[+0x150] method...~~ → **RESOLVED (2026-11-02, FINDINGS.md §25):**
+   premise was wrong — vtable[+0x150] is IOKit return-to-pool. Real commit chain: UC trampoline @0xd708
+   → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified (channel cmd[+0x1c] from
+   userland scalar; send = clear +4/stage +0x4080..C/ring 0xFFE7F, batch = clear +0x1004/stage
+   +0x5080..C/ring 0x80FFE7F — byte-exact match with our driver). BAR1 base = ctx->+0x130 (correction:
+   +0x148 is BAR0+0x2000, not BAR1). Completion handler fn@0x985c writes BAR0[hdr+0xC] on send-channel
+   completion — a firmware "frame done" signal we don't currently write (check live for multi-frame).
 2. **Find the decoded-output path:** where does ProRes YUV land after a successful chain submit?
    Look at the receive-side DMA descriptors / BAR0 channel blocks (+0x8000..+0xf000) and any
    user-buffer mapping in fn@0x9c5c's caller (the frame wrapper ~0xa698).

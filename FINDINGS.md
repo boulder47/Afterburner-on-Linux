@@ -2533,3 +2533,116 @@ live card (card was already dead from run #1's overflow). Command:
 **Lesson:** descriptor chains longer than 256 entries are impossible in one chain (8-bit count);
 for outputs > ~32 MB at seg=128 KB, either raise segment size further or split into multiple
 chained submits. Always sanity-check `count@i0 = N−2 ≤ 255` before ringing the doorbell.
+
+## 25. Kext frame-commit path — FULLY DECODED (Phase 3q, static)
+
+**Question (plan item):** "Disassemble the vtable[+0x150] method on the context object at
+self->+0xa8 to confirm which bank/doorbell the kext's real frame commit uses."
+
+**Answer: premise was wrong — vtable[+0x150] is IOKit return-to-pool, not a card commit.** The real
+commit path is fully traced and byte-verified below. Every doorbell constant matches our Linux driver
+exactly (Phase 3g/3i send single-shot; Phase 3o mode=9 batch chain).
+
+### 25.1 Commit call chain (frame)
+
+```
+UserClient trampoline @0xd708   (= UC vtable slot 167, offset +0x558; reached via externalMethod
+                                 selector "submitFrame"; args: (UC* self=x20, argblock* x22, u64 CHANNEL=x21))
+  → AppleAfterburner::submitFrame(sContext*, IOMemoryDescriptor*, IOMemoryDescriptor*,
+                                  uint64_t, unsigned channel, unsigned, unsigned, sDescLenOffInfo) @0xa9ac
+      call site 0xdb18: x0=UC->+0xd8 (ctx), x1=&UC[+0x18f8] (inDesc), x2=x23 (outDesc),
+                        x3=x25 (u64 offset), **x4=x21 (channel — `mov x4,x21` @0xdb14)**,
+                        w5/w6/w7 = argblock[+0x18/+0x1c/+0x20]
+      - IOLock ctx->+0x12b8; busy byte ctx->+0x12c8 (nonzero → retry/error); space counter ctx->+0x160
+        (decremented per submit; 0 → error 0xE000_02D8 "no space")
+      - pre-submit: BAR0[hdr+0x18] = 0x1F when ready (hdr = ctx->+0x158) — byte-verified @0xa714
+  → AppleAfterburner::submitData(ctx, inDesc, outDesc, offset, channel, ...) @0xa67c
+      - primary: getSegments @0xa28c (direct segments from IOMemoryDescriptor)
+      - fallback: getDescriptorList @0x9c5c (32B descriptor chain; N = ctx->+0x11e0>>4,
+        ctrl=0xAD4B0000|((N-2-i)<<8), final 0xAD4B0013)
+      - cold block @0xa8c8 (getDescriptorList returned 0): IOMalloc(72) command descriptor:
+          [+0x10] = u64 PA (first segment/descriptor — getDescriptorList x5 output)
+          [+0x18] = u32 (x6 output)
+          [+0x1c] = channel   ← bank selector
+          [+0x3c] = 1         ← per-command sequence counter (completion matching; ++ on completion)
+        registered with *(ctx->+0x90) via vtable[+0x1e8](callback=fn@0x985c, cmd, ...)
+```
+
+### 25.2 Doorbell function — fn@0x6800 (byte-verified)
+
+BAR1 base = **ctx->+0x130**. Staging words from the command descriptor: A=cmd[+0x10], B=cmd[+0x14],
+C=cmd[+0x18]. Channel != {0,1} → kernel_debug + IOMemoryFree.
+
+| step | send channel (cmd[+0x1c]==0) | batch channel (cmd[+0x1c]==1) |
+|---|---|---|
+| 1 clear doorbell | BAR1[+4] = 0 | BAR1[+0x1004] = 0 |
+| 2 stage A | BAR1[+0x4080] = cmd[+0x10] | BAR1[+0x5080] = cmd[+0x10] |
+| 3 stage B | BAR1[+0x4084] = cmd[+0x14] | BAR1[+0x5084] = cmd[+0x14] |
+| 4 stage C | BAR1[+0x4088] = cmd[+0x18] | BAR1[+0x5088] = cmd[+0x18] |
+| 5 ring | BAR1[+4] = **0xFFE7F** (`mov w8,#0xfe7f; movk #0xf,lsl#16`) | BAR1[+0x1004] = **0x80FFE7F** (`mov w8,#0xfe7f; movk #0x80f,lsl#16`) |
+| 6 record seq | — | ctx->+0x12e4 = cmd[+0x3c] |
+
+Clear-before-ring + three-word staging bank confirmed. **Byte-exact match with our Linux driver's
+empirical values** — no extra setup beyond bring-up is needed for frame commits.
+
+### 25.3 Channel selection — userland decides
+
+Channel is a scalar passed from userland: UC trampoline arg3 (x21) → `mov x4,x21` @0xdb14 →
+submitFrame arg5 → submitData x20 → cmd[+0x1c]. The kext does NOT hardcode it for frame commits; the
+VideoToolbox provider chooses per submission. Empirically, multi-descriptor chains complete ONLY on
+the batch channel (Phase 3o), so VT passes channel=1 for ProRes frames — consistent with our working
+mode=9 path.
+
+### 25.4 Completion handler — fn@0x985c (registered in the cold block)
+
+- gated by ctx->+0x12f8 ("wake" gate byte; zero → return immediately — matches §21's conditional
+  pre-submit "Wake" call).
+- polls *(ctx->+0x90)->vtable[+0x200](busy_ptr=ctx+0x12c8, 2), then vtable[+0x210](..., 2) with a
+  clock_interval_to_deadline timeout; error base 0xE000_02BC.
+- send-channel completion: writes packed status to **BAR0[hdr+0xC]** (hdr=ctx->+0x158):
+  [31:16]=(ctx->+0xc8 − ctx->+0x1308), plus cmd[+0x38]<<8 | cmd[+0x34] | cmd[+0x30]<<4 packed.
+- batch-channel completion: per-slot list ops, [cmd+0x3c]++ (sequence increment).
+
+### 25.5 Object field layout — CORRECTED (sContext / AB instance)
+
+| offset | meaning | verified by |
+|---|---|---|
+| +0x90 | IODMACommand-like object (completion polling; vtable methods at +0x1e8/+0x200/+0x208/+0x210) | cold block, fn@0x6800, fn@0x985c |
+| +0xc0 | u32 counter (incremented per submit) | fn@0x6800 |
+| +0xc8 | u64 sequence base counter | cold block, fn@0x985c |
+| +0x12b8 | IOLock (submitFrame) | @0xa9ac |
+| +0x12c8 | busy/completion byte | submitFrame, fn@0x985c |
+| +0x12e4 | last submitted sequence counter | fn@0x6800 |
+| +0x12f8 | "wake" gate byte (pre-submit call conditional) | fn@0x985c, §21 |
+| **+0x130** | **BAR1 base** | configureInterrupts @0x5a3c line 1; fn@0x6800; fn@0x65c0 |
+| **+0x140** | **BAR0 + 0x1000** (decoder register region) | configureInterrupts writes [+0x30..+0x6C] = BAR0+0x1030..+0x106C — matches Phase 0 ground truth exactly |
+| **+0x148** | **BAR0 + 0x2000** (ProRes control block) | configureInterrupts [+0x2C]=0/[+0x30]=6/[+0x34]=0 = BAR0+0x202C/+0x2030/+0x2034; fn@0x5aec reads [ptr+0x14]=BAR0+0x2014 bit0 as state flag |
+| +0x158 | decoder channel header pointer (BAR0[hdr+0xC] completion status, [hdr+0x18]=0x1F ready) | @0xa714, fn@0x985c |
+| +0x1308 | u32 counter (sequence-delta baseline) | fn@0x985c |
+
+**Correction to earlier notes:** "BAR1 base at self->+0x148" was WRONG — +0x148 is BAR0+0x2000.
+BAR1 base is **+0x130** (byte-verified in three functions).
+
+### 25.6 configureInterrupts @0x5a3c — byte-verified init sequence
+
+```
+BAR1[+0x90]   = 0xFFFFFE      BAR1[+0x1090] = 0xFFFFFE
+BAR1[+0x2010] = 3             BAR1[+0x2004] = 0x16
+BAR0+0x1000 region (via +0x140): [+0x40]=0x2D002A80, [+0x48]=same, [+0x4C]=0x2A802800,
+  [+0x50]=0x2D002A80, [+0x54]=0xBAD3BA4D (byte-swapped 0x4DBACD3B), [+0x58]=0x2F802D00,
+  [+0x60]=same, [+0x64]=0x2D002A80, [+0x68]=0x2F802D00, [+0x6C]=0xBF58BCD3,
+  [+0x30]=[+0x34]=0x7D (Phase 0: "0x3FFF→0x7D")
+BAR0+0x2000 region (via +0x148): [+0x2C]=0, [+0x30]=6, [+0x34]=0
+```
+
+All values match the Phase 0 live capture — the init writer is fully explained.
+
+### 25.7 Implications for the Linux driver (prores422.MOV retest)
+
+1. Our mode=9 batch path (stage +0x5080/4/8, ring +0x1004=0x80FFE7F) is EXACTLY what the kext does
+   for frame chains — no extra setup beyond bring-up.
+2. The 8-bit count overflow (§24) was purely our bug; the engine's remaining-count field imposes the
+   same ≤256 chain limit on the kext too (its getDescriptorList builds N = ctx->+0x11e0>>4 segments).
+   `out_seg=131072` → N=254 is correct.
+3. On send-channel completion the kext writes BAR0[hdr+0xC] — a firmware-visible "frame done" signal
+   we do not currently write; may matter for multi-frame decode state (check live).
