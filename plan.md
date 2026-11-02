@@ -254,7 +254,10 @@ afterburner/
 ## 7. Handoff — where things stand (updated Oct 30)
 
 **Live driver state:** `afterburner_submit2.ko` is the active test module (`linux-driver/`).
-Card at `0f:00.0` is in post-bring-up idle state, healthy, ready for runs without re-init.
+⚠️ **Card at `0f:00.0` is WEDGED (2026-11-02)** — PCIe AER fatal during first 4K mode=13 run
+(our bug: 8-bit remaining-count overflow, see FINDINGS.md §24). FLR / secondary bus reset /
+D3hot cycle all failed; **needs a full reboot (power cut) before further HW runs.** After reboot:
+re-run with `out_seg=131072` (first true 4K attempt — command in FINDINGS.md §24).
 Working submit path = **batch/receive channel**: stage descriptor (or chain head) PA into
 BAR1+0x5080..C, ring BAR1+0x1004 with 0x80FFE7F; completion at +0x2044 (bit0 valid, [31:1] count),
 data words +0x44/+0x48 (count==0) or +0x1044/+0x1048 (count≥1, batch index in BAR0[hdr+0x10]),

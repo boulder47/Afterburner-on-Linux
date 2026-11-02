@@ -151,7 +151,7 @@ static const char *out_path = "/tmp/submit2_result.txt";
  *                 by desc_buf reuse while A was in flight) */
 static int mode = 1;
 module_param(mode, int, 0444);
-MODULE_PARM_DESC(mode, "0=snapshot, 1=init+submit, 2=submit-only, 3=dual-variant, 4=bring-up, 5=bring-up+submit, 6=bring-up+real-frame, 7=length-sweep, 8=recovery-matrix, 9=chain-ladder, 10=kext-exact-chain-completion, 11=instrumented-dual-chain, 12=batch-bank-chain");
+MODULE_PARM_DESC(mode, "0=snapshot, 1=init+submit, 2=submit-only, 3=dual-variant, 4=bring-up, 5=bring-up+submit, 6=bring-up+real-frame, 7=length-sweep, 8=recovery-matrix, 9=chain-ladder, 10=kext-exact-chain-completion, 11=instrumented-dual-chain, 12=batch-bank-chain, 13=kext-exact-two-stage");
 
 /* mode 7: sweep sizes (last = the real frame size that timed out in mode 6) */
 static const u32 sweep_sizes[] = { 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 20138 };
@@ -169,11 +169,61 @@ MODULE_PARM_DESC(frame_path, "mode 6: raw ProRes sample file to DMA as payload")
 
 #define MAX_FRAME_SIZE (4u * 1024 * 1024)
 
+/* descriptor buffer sizes: input chain 128 x 32B; stage B receive chain
+ * 1024 x 32B (covers up to out_seg*1024 bytes of decoded output). */
+#define DESC_BUF_BYTES     4096u
+#define OUT_DESC_BUF_BYTES 32768u
+/* Largest single coherent alloc this box can give us; bigger receives are
+ * split into chunks linked in the receive chain (ctrl words carry global
+ * remaining counts, so chunk boundaries are invisible to the engine). */
+#define OUT_CHUNK_MAX      (4u * 1024 * 1024)
+#define MAX_OUT_CHUNKS     9	/* up to 36MB total receive space */
+
 /* completion poll budget in ms (ping completes <1ms; a real frame decode may
  * take longer — pass poll_ms=2000 for mode 6). */
 static int poll_ms = 50;
 module_param(poll_ms, int, 0444);
 MODULE_PARM_DESC(poll_ms, "completion poll budget in ms (default 50)");
+
+/* ---- Phase 3s: kext-exact command word params (fn@0x985c @0x99f0-0x9a14) ---- */
+static u32 cmd_p1 = 0;		/* req[+0x30] -> cmd bits [3:0]  (kext: unmasked orr) */
+static u32 cmd_p2 = 0;		/* req[+0x34] -> cmd bits [7:4]  (kext: unmasked orr) */
+static int cmd_p3 = 0;		/* req[+0x38] -> cmd bits [15:8] (byte; kext passes slot idx) */
+static u32 local_val = 0;	/* staging bank +8 word (kext: fn@0xa28c output) */
+static int two_stage = 1;	/* also ring BATCH/recv stage B with a fresh out buffer */
+module_param(cmd_p1, uint, 0444);
+MODULE_PARM_DESC(cmd_p1, "command param p1 -> cmd_word bits [3:0] (default 0)");
+module_param(cmd_p2, uint, 0444);
+MODULE_PARM_DESC(cmd_p2, "command param p2 -> cmd_word bits [7:4] (default 0)");
+module_param(cmd_p3, int, 0444);
+MODULE_PARM_DESC(cmd_p3, "command param p3 -> cmd_word bits [15:8] (default 0)");
+module_param(local_val, uint, 0444);
+MODULE_PARM_DESC(local_val, "staging bank +8 local_val word (default 0)");
+module_param(two_stage, int, 0444);
+MODULE_PARM_DESC(two_stage, "1 = also ring BATCH stage B with fresh out buffer (default 1)");
+
+/* mode 13: dump the c2h output buffer to a file for offline analysis */
+static int dump_out = 1;
+module_param(dump_out, int, 0444);
+MODULE_PARM_DESC(dump_out, "mode 13: write out buffer to dump_path after completion (default 1)");
+
+static char *dump_path = "/tmp/ab_out.bin";
+module_param(dump_path, charp, 0444);
+MODULE_PARM_DESC(dump_path, "mode 13: output buffer dump file (default /tmp/ab_out.bin)");
+
+/* mode 13 stage B: receive chain coverage in bytes. Default = data_size
+ * (input size). For a full decoded frame use the expected YUV size, e.g.
+ * 320x180 YUV422P10 = 57600 + 115200 = 172800. */
+static u32 out_size = 0;
+module_param(out_size, uint, 0444);
+MODULE_PARM_DESC(out_size, "mode 13: stage B receive chain size in bytes (default = data_size)");
+
+/* mode 13 stage B: per-descriptor segment length for the receive chain.
+ * 65536 covers an 8MB frame with 128 descs; drop to 4096 if the engine
+ * rejects large segments (max output then = 4MB). */
+static u32 out_seg = 65536;
+module_param(out_seg, uint, 0444);
+MODULE_PARM_DESC(out_seg, "mode 13: stage B receive chain segment size in bytes");
 
 static void log_line(const char *fmt, ...)
 {
@@ -331,29 +381,75 @@ static int poll_ready(void __iomem *bar0, u32 hdr_off);
  * 0xAD4B0000 | ((N-2-i)<<8), the final one 0xAD4B0013; [+4]=seg len,
  * [+8]=segment data PA (send slot — the kext's user_data arg would pick +0x10),
  * [+0x18]=64-bit PA of next desc, 0 on the last. Returns N or 0 if bad. */
+/* pa_off: where the data PA lives inside each descriptor. KEXt-exact
+ * (chain-builder @0xa120-0xa128, w25 = direction arg): SEND (dir=0) -> +8;
+ * BATCH/RECV (dir=1) -> +0x10. The other slot stays zero. */
 static u32 build_chain(u8 *desc_buf, dma_addr_t desc_pa, dma_addr_t data_pa,
-		       u32 total_len, u32 seg_size)
+		       u32 total_len, u32 seg_size, u32 pa_off, u32 buf_bytes)
 {
 	u32 n = (total_len + seg_size - 1) / seg_size;
 	u32 off = 0;
+	u32 cap = buf_bytes / 32;
 
-	if (!n || n > 128)	/* desc_buf holds 4096/32 descriptors */
+	if (!n || n > cap)	/* desc_buf holds buf_bytes/32 descriptors */
 		return 0;
-	memset(desc_buf, 0, 4096);
+	memset(desc_buf, 0, min_t(u32, buf_bytes, n * 32));
 	for (u32 i = 0; i < n; i++) {
 		u32 *d = (u32 *)(desc_buf + i * 32);
 		u32 len = min(seg_size, total_len - off);
 
 		d[0] = (i == n - 1) ? 0xAD4B0013 : (0xAD4B0000 | ((n - 2 - i) << 8));
 		d[1] = len;			/* [+4] segment length in bytes */
-		*(u64 *)(desc_buf + i * 32 + 8) = data_pa + off;	/* [+8] PA */
+		*(u64 *)(desc_buf + i * 32 + pa_off) = data_pa + off; /* PA slot */
 		if (i < n - 1)			/* [+0x18] next-desc PA, 64-bit store */
 			*(u64 *)(desc_buf + i * 32 + 0x18) = desc_pa + (i + 1) * 32;
 		else
 			*(u64 *)(desc_buf + i * 32 + 0x18) = 0;	/* eoc */
-		log_line("chain[%u]: ctrl=0x%08x len=%-6u data_pa_off=+0x%x %s\n",
-			 i, d[0], len, off, (i == n - 1) ? "(final)" : "");
+		log_line("chain[%u]: ctrl=0x%08x len=%-6u data_pa@+%x buf_off=+0x%x %s\n",
+			 i, d[0], len, pa_off, off, (i == n - 1) ? "(final)" : "");
 		off += len;
+	}
+	return n;
+}
+
+/* Multi-chunk variant of build_chain: stage B receive chains that span
+ * several coherent allocations (large frames exceed the largest single
+ * contiguous DMA alloc on this box). Descriptor ctrl words carry the GLOBAL
+ * remaining count, so chunk boundaries are invisible to the engine. */
+static u32 build_chain_multi(u8 *desc_buf, dma_addr_t desc_pa,
+			     const dma_addr_t *pas, const u32 *lens, int nch,
+			     u32 total_len, u32 seg_size, u32 pa_off,
+			     u32 buf_bytes)
+{
+	u32 cap = buf_bytes / 32;
+	u32 n = 0, i = 0;
+
+	for (int c = 0; c < nch; c++)
+		n += (lens[c] + seg_size - 1) / seg_size;
+	if (!n || n > cap)
+		return 0;
+	memset(desc_buf, 0, min_t(u32, buf_bytes, n * 32));
+
+	for (int c = 0; c < nch && i < n; c++) {
+		u32 coff = 0;
+
+		while (coff < lens[c]) {
+			u32 *d = (u32 *)(desc_buf + i * 32);
+			u32 len = min(seg_size, lens[c] - coff);
+
+			d[0] = (i == n - 1) ? 0xAD4B0013 :
+			       (0xAD4B0000 | ((n - 2 - i) << 8));
+			d[1] = len;
+			*(u64 *)(desc_buf + i * 32 + pa_off) = pas[c] + coff;
+			if (i < n - 1)
+				*(u64 *)(desc_buf + i * 32 + 0x18) = desc_pa + (i + 1) * 32;
+			else
+				*(u64 *)(desc_buf + i * 32 + 0x18) = 0;	/* eoc */
+			log_line("chain[%u]: ctrl=0x%08x len=%-6u data_pa@+%x chunk=%d off=+0x%x %s\n",
+				 i, d[0], len, pa_off, c, coff, (i == n - 1) ? "(final)" : "");
+			coff += len;
+			i++;
+		}
 	}
 	return n;
 }
@@ -612,7 +708,10 @@ static u32 m11_submit(const char *tag, void __iomem *bar1, void __iomem *bar0,
 		mdelay(5);
 	}
 
-	u32 n = build_chain(desc_buf, desc_pa, data_pa, data_size, seg_size);
+	/* kext-exact PA slot by direction (fn@0x9c5c @0xa124): batch bank
+	 * (+0x5080, dir=1) reads data PA from desc+0x10; send bank uses +8. */
+	u32 n = build_chain(desc_buf, desc_pa, data_pa, data_size, seg_size,
+			    (bank_off == 0x5080) ? 0x10 : 8, DESC_BUF_BYTES);
 
 	if (!n) {
 		log_line("%s chain build FAILED (bad size)\n", tag);
@@ -652,6 +751,64 @@ static u32 m11_submit(const char *tag, void __iomem *bar1, void __iomem *bar0,
 	else
 		log_line("%s NO completion in %d ms window\n", tag, poll_ms);
 	return s;
+}
+
+/* ---- Phase 3s: KEXT-EXACT two-stage frame submit -------------------------
+ * Byte-exact register sequence decoded from the kext gate handler fn@0x985c
+ * (request builder fn@0xa8c8, param chain UC::submitFrame @0xd708):
+ *
+ *   Stage A (SEND, direction=0):
+ *     BAR0[hdr+0x18] = 0x1F                     ; pre-submit write (@0xa714)
+ *     cmd_word = ((seq-base)<<16)|(p3<<8)|(p2<<4)|p1   ; unmasked orrs @0x99f0-0x9a10
+ *     BAR0[hdr+0xC]  = cmd_word                 ; (@0x9a14) — SEND only, decoder block present
+ *     in_flight++                                ; self->+0xc0, max 32 (wait path @0x996c)
+ *     [slot bookkeeping + post-send hook fn@0x9be0: software-only, skipped]
+ *     BAR1+4=0; BAR1+0x4080=lo; BAR1+0x4084=hi; BAR1+0x4088=local_val; BAR1+4=0xFFE7F
+ *   Stage B (BATCH, direction=1):
+ *     in_flight++; seq++ stored to req[+0x14]    ; (@0xa988-0xa9a0) — batch consumes a seq
+ *     [slot bookkeeping: software-only, skipped]
+ *     BAR1+0x1004=0; BAR1+0x5080=lo2; BAR1+0x5084=hi2; BAR1+0x5088=local_val2; BAR1+0x1004=0x80FFE7F
+ *   Completion: shared status +0x2044, kext-exact dual ack (fn@0x5aec).
+ * p1/p2/p3 come from per-slot object fields [slotObj+0x18/+0x1c/+0x20] set by VT
+ * at bindFrame time; the kext ORs them UNMASKED, we mask to documented widths. */
+
+static u32 m13_seq = 0;	/* self->+0xc8 equivalent; base (+0x1308) = 0 per load */
+
+static void m13_ring(const char *tag, void __iomem *bar1, dma_addr_t head_pa,
+		     u32 bank_off, u32 db_off, u32 ring_val)
+{
+	writel(0, bar1 + db_off);	/* clear doorbell first (kext @0x9b38/0x9b6c) */
+	writel(lower_32_bits(head_pa), bar1 + bank_off);
+	writel(upper_32_bits(head_pa), bar1 + bank_off + 4);
+	writel(local_val, bar1 + bank_off + 8);	/* req[+0x18] */
+	log_line("%s staged: +0x%04x=0x%08x +0x%04x=0x%08x +0x%04x=0x%08x (local_val)\n",
+		 tag, bank_off, readl(bar1 + bank_off), bank_off + 4,
+		 readl(bar1 + bank_off + 4), bank_off + 8, readl(bar1 + bank_off + 8));
+	writel(ring_val, bar1 + db_off);	/* RING */
+	log_line("%s doorbell +0x%x = 0x%05X rung\n", tag, db_off, ring_val);
+}
+
+static u32 m13_poll(const char *tag, void __iomem *bar1, void __iomem *bar0,
+		    u32 hdr_off)
+{
+	u32 last = 0;
+	u32 prev = readl(bar1 + 0x2044);
+
+	for (int i = 0; i < poll_ms / 5 + 1; i++) {
+		u32 s = readl(bar1 + 0x2044);
+
+		if (s != prev) {
+			log_line("%s t=%+5d ms: status(+0x2044) 0x%08x -> 0x%08x\n",
+				 tag, i * 5, prev, s);
+			prev = s;
+		}
+		if (s && s != last) {	/* each distinct non-zero value handled once */
+			kext_handle_completion(bar1, bar0, hdr_off, s);
+			last = s;
+		}
+		mdelay(5);
+	}
+	return last;
 }
 
 /* Re-run the wedge-recovery cycle found in mode=8 rung A: decoder disable/enable
@@ -828,6 +985,13 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	dma_addr_t desc_pa, data_pa;
 	u8 *desc_buf, *data_buf;
 	const u32 DESC_SIZE = 4096;
+	/* mode 13 stage B: fresh output buffer + descriptor chain (kext uses a
+	 * per-slot pre-allocated receive descriptor for the c2h DMA target) */
+	u8 *out_chunks[MAX_OUT_CHUNKS] = {0}, *out_desc_buf = NULL;
+	dma_addr_t out_chunk_pa[MAX_OUT_CHUNKS] = {0};
+	u32 out_chunk_len[MAX_OUT_CHUNKS] = {0};
+	int n_out_chunks = 0;
+	dma_addr_t out_desc_pa = 0;
 
 	log_line("Apple Afterburner [106b:0205] Phase 3i-3k BAR1 submit + bring-up (mode=%d)\n\n", mode);
 
@@ -851,7 +1015,7 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	/* ---- Phase 3k: full decoder bring-up (modes 4, 5, 6, 8, 9 and 10) ---- */
 	u32 hdr_off = 0;
 	int ready = 0;
-	if (mode == 4 || mode == 5 || mode == 6 || mode == 8 || mode == 9 || mode == 10 || mode == 11 || mode == 12) {
+	if (mode == 4 || mode == 5 || mode == 6 || mode == 8 || mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13) {
 		if (!bar0) { log_line("BAR0 map missing — cannot bring up\n"); goto done; }
 
 		if (!fw_version_gate(bar0)) goto done;
@@ -881,10 +1045,10 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (mode == 7)
 		payload_len = SWEEP_MAX;	/* one allocation covers the whole sweep */
-	else if ((mode == 9 || mode == 10 || mode == 11 || mode == 12) && !frame_path[0])
+	else if ((mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13) && !frame_path[0])
 		payload_len = SWEEP_MAX;	/* pattern fallback sized like the real frame */
 
-	if ((mode == 6 || mode == 9 || mode == 10 || mode == 11 || mode == 12) && frame_path[0]) {
+	if ((mode == 6 || mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13) && frame_path[0]) {
 		struct file *f = filp_open(frame_path, O_RDONLY, 0);
 
 		if (!IS_ERR(f)) {
@@ -936,6 +1100,51 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		 * sweep size sees valid data in its prefix) */
 		for (u32 i = 0; i < payload_len / 4; i++)
 			((u32 *)data_buf)[i] = 0xAB5A0000 + i;
+	}
+
+	/* mode 13 stage B: fresh c2h output buffer + descriptor chain (the kext
+	 * points the BATCH doorbell at a per-slot pre-allocated receive descriptor) */
+	int do_stage_b = two_stage && mode == 13;
+	u32 out_len = do_stage_b ? (out_size ? out_size : data_size) : 0;
+
+	if (do_stage_b) {
+		out_desc_buf = dma_alloc_coherent(&pdev->dev, OUT_DESC_BUF_BYTES, &out_desc_pa, GFP_KERNEL);
+		/* One big coherent alloc first; if the box can't give us that
+		 * much contiguous DMA space, fall back to <=OUT_CHUNK_MAX chunks
+		 * linked in the receive chain. */
+		u8 *one = dma_alloc_coherent(&pdev->dev, out_len, &out_chunk_pa[0], GFP_KERNEL);
+
+		if (one) {
+			out_chunks[0] = one;
+			out_chunk_len[0] = out_len;
+			n_out_chunks = 1;
+		} else {
+			u32 rem = out_len;
+
+			log_line("mode 13: single %u-byte alloc failed — trying chunked\n", out_len);
+			while (rem && n_out_chunks < MAX_OUT_CHUNKS) {
+				u32 sz = min_t(u32, OUT_CHUNK_MAX, rem);
+
+				out_chunks[n_out_chunks] = dma_alloc_coherent(&pdev->dev, sz, &out_chunk_pa[n_out_chunks], GFP_KERNEL);
+				if (!out_chunks[n_out_chunks])
+					break;
+				memset(out_chunks[n_out_chunks], 0, sz);
+				out_chunk_len[n_out_chunks] = sz;
+				n_out_chunks++;
+				rem -= sz;
+			}
+		}
+		if (!out_desc_buf || !n_out_chunks) {
+			log_line("mode 13: out buffer DMA alloc FAILED — stage B disabled\n");
+			do_stage_b = 0;
+		} else {
+			for (int c = 0; c < n_out_chunks; c++)
+				log_line("mode 13 stage B: chunk %d: %u bytes @ PA 0x%llx\n",
+					 c, out_chunk_len[c], (unsigned long long)out_chunk_pa[c]);
+			log_line("mode 13 stage B: desc chain @ 0x%llx%s\n",
+				 (unsigned long long)out_desc_pa,
+				 out_size ? " (out_size override)" : "");
+		}
 	}
 
 	if (mode == 1 || mode == 2) {
@@ -1045,7 +1254,7 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (!ready) {
 		log_line("\n--- MODE-9: submit SKIPPED — decoder not ready after bring-up ---\n");
 	} else {
-		u32 nseg = build_chain(desc_buf, desc_pa, data_pa, data_size, 4096);
+		u32 nseg = build_chain(desc_buf, desc_pa, data_pa, data_size, 4096, 8, DESC_BUF_BYTES);
 
 		log_line("\n--- MODE-9 CHAIN LADDER (payload=%u bytes%s) ---\n",
 			 data_size, use_file ? ", real ProRes frame" : ", pattern");
@@ -1094,7 +1303,7 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (!ready) {
 		log_line("\n--- MODE-10: submit SKIPPED — decoder not ready after bring-up ---\n");
 	} else {
-		u32 nseg = build_chain(desc_buf, desc_pa, data_pa, data_size, 4096);
+		u32 nseg = build_chain(desc_buf, desc_pa, data_pa, data_size, 4096, 8, DESC_BUF_BYTES);
 
 		log_line("\n--- MODE-10 KEXT-EXACT CHAIN COMPLETION (payload=%u bytes%s) ---\n",
 			 data_size, use_file ? ", real ProRes frame" : ", pattern");
@@ -1189,9 +1398,122 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		else
 			log_line("M12-C (N=5 send): not complete in window — check next run's drain for delayed completion\n");
 	}
+	} else if (mode == 13) {
+	/* ---- Phase 3s: KEXT-EXACT two-stage frame submit (fn@0x985c) ---- */
+	if (!ready) {
+		log_line("\n--- MODE-13: submit SKIPPED — decoder not ready after bring-up ---\n");
+	} else {
+		/* Adaptive input segment size: 4KB (proven small-frame behavior),
+		 * doubled until the chain fits DESC_BUF_BYTES/32 descriptors. */
+		u32 in_seg = 4096;
+
+		while ((data_size + in_seg - 1) / in_seg > DESC_BUF_BYTES / 32)
+			in_seg <<= 1;
+		u32 nseg = build_chain(desc_buf, desc_pa, data_pa, data_size, in_seg, 8, DESC_BUF_BYTES);
+
+		log_line("\n--- MODE-13 KEXT-EXACT TWO-STAGE (payload=%u bytes%s) ---\n",
+			 data_size, use_file ? ", real ProRes frame" : ", pattern");
+		if (!nseg) {
+			log_line("chain build FAILED (bad size)\n");
+		} else {
+			u32 before = readl(bar0 + hdr_off + 0x18);
+			/* Decoder-side completion registers (kext checks these
+			 * FIRST in processCompletions, then falls back to BAR1):
+			 *   [hdr+0x14] decoder completion status
+			 *   [hdr+0x10] frame/channel index word (>>16 = index) */
+			log_line("pre-submit decoder regs: +0x14=0x%08x +0x10=0x%08x +0x08=0x%08x\n",
+				 readl(bar0 + hdr_off + 0x14),
+				 readl(bar0 + hdr_off + 0x10),
+				 readl(bar0 + hdr_off + 0x08));
+
+			/* Stage A — SEND: pre-submit write, command word, send bank */
+			writel(0x1f, bar0 + hdr_off + 0x18);	/* @0xa714 */
+			log_line("pre-submit: BAR0+0x%05x (hdr+0x18): 0x%08x -> wrote 0x1f (rb 0x%08x)\n",
+				 hdr_off + 0x18, before, readl(bar0 + hdr_off + 0x18));
+
+			u32 cmd_word = ((m13_seq << 16) & 0xffff0000u) |
+				((cmd_p3 & 0xff) << 8) |
+				((cmd_p2 & 0xf) << 4) | (cmd_p1 & 0xf);
+			u32 cw_before = readl(bar0 + hdr_off + 0xc);
+
+			writel(cmd_word, bar0 + hdr_off + 0xc);	/* @0x9a14 */
+			log_line("STAGE A (SEND): cmd_word=0x%08x -> BAR0+0x%05x (hdr+0xC) was 0x%08x rb 0x%08x\n",
+				 cmd_word, hdr_off + 0xc, cw_before, readl(bar0 + hdr_off + 0xc));
+			log_line("  seq delta=%u p3=0x%x p2=0x%x p1=0x%x (kext orrs unmasked; we mask)\n",
+				 m13_seq, cmd_p3 & 0xff, cmd_p2 & 0xf, cmd_p1 & 0xf);
+
+			m13_ring("STAGE A", bar1, desc_pa, 0x4080, 4, 0xffe7f);
+
+			/* Stage B — BATCH: receive bank with fresh out chain.
+			 * Kext-exact (fn@0x9c5c @0xa124, w25=dir=1): batch
+			 * descriptors carry the DMA target PA at +0x10, not +8. */
+			if (do_stage_b) {
+				u32 nout = build_chain_multi(out_desc_buf, out_desc_pa,
+							     out_chunk_pa, out_chunk_len,
+							     n_out_chunks, out_len, out_seg, 0x10,
+							     OUT_DESC_BUF_BYTES);
+
+				log_line("STAGE B (BATCH): seq %u -> %u (kext increments on batch @0xa988)\n",
+					 m13_seq, m13_seq + 1);
+				if (!nout) {
+					log_line("out chain build FAILED — stage B skipped\n");
+				} else {
+					m13_ring("STAGE B", bar1, out_desc_pa, 0x5080, 0x1004, 0x80ffe7f);
+					m13_seq++;
+				}
+			}
+
+			u32 s = m13_poll("M13", bar1, bar0, hdr_off);
+
+			log_line("\n--- MODE-13 VERDICT ---\n");
+			/* Decoder-side registers after polling (kext's primary
+			 * completion path — BAR0[hdr+0x14] before BAR1 status). */
+			log_line("post-poll decoder regs: +0x14=0x%08x +0x10=0x%08x +0x08=0x%08x\n",
+				 readl(bar0 + hdr_off + 0x14),
+				 readl(bar0 + hdr_off + 0x10),
+				 readl(bar0 + hdr_off + 0x08));
+			if (s) {
+				log_line("completion(s) handled kext-exact — see trajectory above\n");
+				if (do_stage_b) {
+					u32 nz = 0;
+
+					/* Engine DMA can lag behind the completion signal —
+					 * give the tail segments time to land before counting. */
+					msleep(1000);
+					for (int c = 0; c < n_out_chunks; c++)
+						for (u32 i = 0; i < out_chunk_len[c]; i++)
+							nz += !!out_chunks[c][i];
+					log_line("out buffer: %u/%u non-zero bytes after c2h DMA\n",
+						 nz, out_len);
+					/* Dump raw output for offline analysis */
+					if (dump_out) {
+						struct file *of = filp_open(dump_path,
+								O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+						if (!IS_ERR(of)) {
+							loff_t op = 0;
+
+							for (int c = 0; c < n_out_chunks; c++)
+								kernel_write(of, out_chunks[c], out_chunk_len[c], &op);
+							filp_close(of, NULL);
+							log_line("out buffer dumped to %s (%u bytes)\n",
+								 dump_path, out_len);
+						} else {
+							log_line("dump open FAILED for %s\n", dump_path);
+						}
+					}
+				}
+			} else {
+				log_line("no completion in %d ms window — check trajectory + decoder error word\n", poll_ms);
+				log_line("\n--- MODE-13 recovery: re-bring-up (mode-8 cycle) ---\n");
+				if (!rebring(bar1, bar0, hdr_off))
+					log_line("decoder NOT ready after re-bring-up\n");
+			}
+		}
+	}
 	}
 
-	dump_regs("POST-STATE", bar1);
+dump_regs("POST-STATE", bar1);
 
 done:
 	if (bar0) pci_iounmap(pdev, bar0);

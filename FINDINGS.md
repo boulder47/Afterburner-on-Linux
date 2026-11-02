@@ -2490,3 +2490,46 @@ Consolidated analysis written to `docs/videotoolbox-afterburner-decode-path.md` 
 - **PLT:** all 43 stubs @0xE83C–0xEA3C resolved via GOT tag-0x4010 → imports_map.json (IOLockLock/
   Unlock, IOLog, IOMemoryDescriptor::withAddressRange, OSMetaClassBase::instanceConstructed,
   IOService::isInactive, kernel_debug, microtime, snprintf, strlen, timevalsub).
+
+## 24. 4K ProRes test (prores422.MOV) + PCIe AER fatal incident (2026-11-02)
+
+**New test file:** `prores422.MOV` — container tag `apch` (ProRes 422 HQ), frame header fourcc
+`apl0` (unusual; FFmpeg selects profile from the *container* tag, so its reference is reliable).
+3840×2160, BT.2020, ~2.9 MB/frame, 568 samples. Expected YUV422P10LE output:
+`(3840·2160 + 2·1920·2160)·2 = 33,177,600 B`. Artifacts: `/tmp/p4k_frame0.bin` (extracted sample 0),
+`/tmp/p4k_ref.yuv` (FFmpeg reference, exactly 33,177,600 B).
+
+**Driver changes for large frames (`afterburner_submit2.c`):**
+- Adaptive input segment sizing in mode-13 stage A: start at 4096, double until
+  `(data_size + seg − 1)/seg ≤ DESC_BUF_BYTES/32`.
+- `MAX_OUT_CHUNKS` raised 3 → 9 (up to ~36 MB receive space).
+
+**AER fatal — root cause is OUR bug, not the card:** the ctrl-word remaining-count field is only
+**8 bits**. With default `out_seg=65536`, a 33,177,600 B output needs N=507 descriptors →
+count@i0 = 505 overflows (engine sees 249) → malformed chain → engine issues bad DMA reads →
+**PCIe AER fatal error**; the function died completely (all BAR MMIO reads return 0xFFFFFFFF,
+config space + BARs intact). Correct sizing: `out_seg=131072` → N=254, count@i0=252 (fits).
+
+**Recovery attempts — ALL FAILED (card needs a full power cut / reboot):**
+| Attempt | Result |
+|---|---|
+| Wait ~30 min | still all-F's |
+| FLR (`pci_reset_function`, `ab_reset.ko`) | rc=0, no revival |
+| Secondary bus reset on pcieport 0c:10.0 (`ab_busreset.ko`) | rc=0, no revival |
+| D3hot→D0 power-state cycle (`ab_d3.ko`) | rc=0, no revival |
+
+PCIe link stays up (8 GT/s x16); BARs still mapped at 74c00000/74c20000; Command reg re-enabled —
+the ASIC simply does not answer MMIO. Note: "0c:10.0" is slot **0x10** (devfn 0x80), not decimal 10 —
+a dec/hex mixup initially broke the port lookup (`ab_find.ko` scan settled it).
+
+**Retest after reboot (first TRUE 4K attempt):** run #2 with `out_seg=131072` never actually ran on a
+live card (card was already dead from run #1's overflow). Command:
+`insmod afterburner_submit2.ko mode=13 frame_path=/tmp/p4k_frame0.bin poll_ms=8000 out_size=33177600 out_seg=131072 dump_path=/tmp/ab_out4k.bin`
+
+**New helper modules in `linux-driver/`:** `ab_reset.ko` (FLR), `ab_poll.ko` (BAR sampler),
+`ab_busreset.ko` (secondary bus reset on 0c:10.0), `ab_d3.ko` (D3hot cycle), `ab_find.ko`
+(kernel PCI-list scan — use to verify what the kernel sees vs raw lspci).
+
+**Lesson:** descriptor chains longer than 256 entries are impossible in one chain (8-bit count);
+for outputs > ~32 MB at seg=128 KB, either raise segment size further or split into multiple
+chained submits. Always sanity-check `count@i0 = N−2 ≤ 255` before ringing the doorbell.
