@@ -254,10 +254,14 @@ afterburner/
 ## 7. Handoff — where things stand (updated Oct 30)
 
 **Live driver state:** `afterburner_submit2.ko` is the active test module (`linux-driver/`).
-⚠️ **Card at `0f:00.0` is WEDGED (2026-11-02)** — PCIe AER fatal during first 4K mode=13 run
-(our bug: 8-bit remaining-count overflow, see FINDINGS.md §24). FLR / secondary bus reset /
-D3hot cycle all failed; **needs a full reboot (power cut) before further HW runs.** After reboot:
-re-run with `out_seg=131072` (first true 4K attempt — command in FINDINGS.md §24).
+⚠️ **Card at `0f:00.0` is DEAD AGAIN (2026-11-02, run #2)** — this time NOT our bug: mode=13 with
+`out_seg=131072` completed end-to-end (both stages done, c2h DMA out, `=== done ===`) but the card died
+~9 s later with an ASYNCHRONOUS AER fatal MalfTLP (device-initiated malformed MEM WR). Same all-F-BARs
+death signature; needs a full power cut / reboot. Root-cause hypothesis + the kext's actual stop command:
+**FINDINGS.md §26**. Key finding: kext `IOService::stop()` override (fn@0xc0a4, vtable slot 191) writes
+exactly ONE register on teardown — **BAR0[hdr+4] = 0 (decoder channel disable)**; BAR1+0x2004 engine-enable
+is never cleared anywhere in the kext. Our driver leaves decoder enabled + idle after completion — a state
+that never occurs on macOS (VT feeds frames continuously or disables via stop()).
 Working submit path = **batch/receive channel**: stage descriptor (or chain head) PA into
 BAR1+0x5080..C, ring BAR1+0x1004 with 0x80FFE7F; completion at +0x2044 (bit0 valid, [31:1] count),
 data words +0x44/+0x48 (count==0) or +0x1044/+0x1048 (count≥1, batch index in BAR0[hdr+0x10]),
@@ -265,6 +269,12 @@ ack via write-back to +0x2018 (+0x2014). Send channel (+0x4080 / doorbell +4 = 0
 complete for chain submits — unresolved.
 
 **Next actions (in order):**
+0. **LIVE TEST — stop-command hypothesis (FINDINGS §26.5), after power cycle:** add to mode=13 (or new
+   mode=14): after both stages complete, write `BAR0[hdr+4] = 0`, read back, idle ≥60 s, then check
+   dmesg/AER and re-probe with the map driver. Control: one run WITHOUT the disable to confirm it still
+   crashes ~9 s later. If the card survives → hypothesis confirmed; next step is multi-frame batching
+   (8 channels) per the original goal. Also reconcile output pix_fmt: card emits interleaved YUV422 8-bit
+   (`yuv422p`), not planar p10le (§26.2).
 1. ~~Phase 3q (static): disassemble the vtable[+0x150] method...~~ → **RESOLVED (2026-11-02, FINDINGS.md §25):**
    premise was wrong — vtable[+0x150] is IOKit return-to-pool. Real commit chain: UC trampoline @0xd708
    → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified (channel cmd[+0x1c] from
