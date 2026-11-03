@@ -2522,8 +2522,11 @@ PCIe link stays up (8 GT/s x16); BARs still mapped at 74c00000/74c20000; Command
 the ASIC simply does not answer MMIO. Note: "0c:10.0" is slot **0x10** (devfn 0x80), not decimal 10 —
 a dec/hex mixup initially broke the port lookup (`ab_find.ko` scan settled it).
 
-**Retest after reboot (first TRUE 4K attempt):** run #2 with `out_seg=131072` never actually ran on a
-live card (card was already dead from run #1's overflow). Command:
+**Retest after reboot (first TRUE 4K attempt):** run #2 with `out_seg=131072` DID run on a live card
+(post-reboot, post-sudo-fix; `sudo -n insmod`). It **completed successfully end-to-end** — both stages
+finished, c2h DMA produced output, log ends `=== done ===` (full log: `/tmp/submit2_result.txt`) — but the
+card then died ~9 s later with an ASYNCHRONOUS AER fatal MalfTLP. The N=254 fix was correct; a different
+trigger killed it. Full analysis in **§26**. Command:
 `insmod afterburner_submit2.ko mode=13 frame_path=/tmp/p4k_frame0.bin poll_ms=8000 out_size=33177600 out_seg=131072 dump_path=/tmp/ab_out4k.bin`
 
 **New helper modules in `linux-driver/`:** `ab_reset.ko` (FLR), `ab_poll.ko` (BAR sampler),
@@ -2646,3 +2649,92 @@ All values match the Phase 0 live capture — the init writer is fully explained
    `out_seg=131072` → N=254 is correct.
 3. On send-channel completion the kext writes BAR0[hdr+0xC] — a firmware-visible "frame done" signal
    we do not currently write; may matter for multi-frame decode state (check live).
+
+## 26. Run #2 post-mortem + the kext's STOP command — DECODED (Phase 3s)
+
+### 26.1 Run #2 timeline (mode=13, out_seg=131072, live card after reboot)
+
+| t | event |
+|---|---|
+| ts 7168.55 | kernel WARN `force_dma_unencrypted` during 33 MB DMA alloc in ab_probe (benign — run continued) |
+| +~1 s | Stage A: pre-submit `[hdr+0x18]=0x1F`, cmd_word→BAR0[hdr+0xC] (readback 0, didn't stick), send ring → completion status=**0x1** |
+| +~55 ms | Stage B: batch ring (+0x5080 bank, 0x80FFE7F) → completion status=**0x2**, card c2h-DMA'd output into receive chain |
+| — | driver log ends `=== done ===` (16,515,072 / 33,177,600 B non-zero in `/tmp/ab_out4k.bin`) |
+| ts 7177.68 (**~9 s later**) | **AER fatal MalfTLP** — malformed MEM WR TLP (0x2080 = 3DW MemWr, 2 DW), device-initiated from the card; downstream port received garbage |
+
+Same death signature as run #1: all-F BARs until power cycle. The N=254 chain fix did NOT prevent it →
+trigger is not chain length. The crash is **asynchronous post-processing**: we stopped touching the card
+long before it died. (dmesg ring wrapped on the 32K-line BAR dump; full run log recovered from
+`/tmp/submit2_result.txt` — `log_line` writes to a FILE, not dmesg.)
+
+### 26.2 Output format: interleaved YUV422 8-bit, NOT planar p10le
+
+`/tmp/ab_out4k.bin` = 33,177,600 B = 3840×2160×**4**. Byte pattern `83 a9 | 7c a8 | 84 a4` (Y≈124–136,
+chroma≈163–210) is interleaved YUV422 **8-bit**; under planar-yuv422p10le interpretation only 0.05% of the
+Y region matches the FFmpeg reference and U/V planes are zero. The card decoded to `yuv422p` (packed), not
+the requested `yuv422p10le`. Reconcile pix_fmt/metadata in the descriptor before judging decode quality.
+
+### 26.3 THE STOP COMMAND — kext `IOService::stop()` override, fn@0xc0a4 (byte-verified)
+
+**AB instance vtable @0x141f8 (271 slots), teardown region anchored by kernel symbols:**
+slot 189 = probe (local 0xc998), slot 190 = start (local 0x4254), **slot 191 = LOCAL fn@0xc0a4**,
+slot 192 = `IOService::open`, slot 193 = `IOService::close`. The only IOService virtual between `start`
+and `open` is `stop` → **fn@0xc0a4 IS the stop() override** (runs on driver teardown: shutdown, unbind,
+last client release).
+
+Full function (0xc0a4–0xc8bc) contains exactly **ONE hardware write**:
+
+```asm
+0000c0cc: ldrb  w8, [x0, #0x11d0]     ; if (self->+0x11d0 /* decoder-enabled flag */) {
+0000c0d4: ldr   x8, [x20, #0x158]      ;    x8 = self->+0x158 (decoder channel header)
+0000c0d8: cbz   x8, skip
+0000c0dc: str   wzr, [x8, #4]          ;    BAR0[hdr+4] = 0   ← DECODER CHANNEL DISABLE — the stop command
+```
+
+Everything else in stop() is software state teardown (no other BAR writes): releases of
+[self+0x11b8]/[self+0x98]/[self+0x1300]/[self+0x1180] (IODMACommand/IOMemoryDescriptor objects via vtable
+calls), and resets: +0x1270 completionStamp, **+0x1308 frame base** (the baseline in the hdr+0xC cmd-word
+formula!), +0x12f8 "wake" gate byte, flag bytes at +0x12c8/+0x12f8.
+
+**BAR1[+0x2004] (engine enable) is written exactly ONCE in the entire kext binary** — 0x5acc during init
+(value 0x16). It is NEVER cleared, not even by stop(). The engine stays armed; only the decoder channel
+is disabled.
+
+### 26.4 UC client API structure (resolves Phase 3r open item)
+
+- UC object vtable @**0x14a90**, flat array (no pre-virtual entries — [0]/[1] are PAC'd local fns).
+  vptr stored as `pacda(0x14a90, tag 0xcda1)` (@0x4028/0x4120); AB instances use a different table
+  (vptr = auth(0x14200), @0x4060 et al.).
+- **Slot 307 = `OSObject::externalMethod` override → local fn@0xcfc8** — the single entry point for all
+  userland IOConnectCallMethod calls. Position verified against IOKit source layout: it sits exactly
+  between inherited `IOService::powerChangeDone` (slot 306) and `IOUserClient::registerNotificationPort`
+  (slot 308); slots 309+ = `_RESERVEDIOUserClient0..11`.
+- sMethods @0x15680: **24-byte records** (`umaddl x8, w1, #0x18` in externalMethod), layout
+  [trampoline u64][scalar_in u32 | input_bytes u32<<32][out_qwords u32 | ? u32]. ABI sizes match selector
+  names exactly: submitFrame(in=40B,out=1) / queryCompletion(scalar=1,out=1) / bindFrame(in=32B,out=2) /
+  cardStatus(out=1) / checkForSpace(in=16B) / **unbindAll(no args)** / getPercent(out=1).
+- Trampolines (0xcd7c…0xcf90): locked entries (IOLock@UC+0x1960, PAC-verify vptr tag 0xcda1, blraa) at
+  +0x990/+0x9a0/+0x9b8; unlocked helpers at +0x998/+0x9a8/+0x9b0/+0x9c0. NOTE: the locked dispatch targets
+  (slots 306/308/311) are NOT overridden in the UC table — they resolve to inherited kernel symbols; the
+  real per-selector work happens inside externalMethod@0xcfc8's own dispatch (`[*(0x14140)+0x890]` tail
+  call). The trampoline→slot mapping is recorded but its exact role remains open.
+
+### 26.5 Hypothesis (testable) — why run #2 crashed ~9 s after success
+
+On macOS the decoder channel is NEVER left enabled-and-idle: VideoToolbox either keeps feeding frames
+(in_flight cap 32, backpressure wait in fn@0x985c "Possible hang" path) or, when done, releases the UC →
+stop() → **BAR0[hdr+4]=0**. Our mode=13 driver created a state the firmware has never seen in production:
+decoder enabled (+0x8004=1), engine armed (+0x2004=0x16), one frame consumed, then silence. The ~9 s delay
+fits a firmware watchdog/timeout on the enabled decode loop finding no next frame (stale descriptor PAs →
+device-initiated malformed MEM WR).
+
+**Test for after power cycle:** add to mode=13 (or new mode=14): after both stages complete, write
+`BAR0[hdr+4] = 0`, read back, then idle ≥60 s and check dmesg/AER + re-probe with the map driver. If the
+card survives → stop-command hypothesis confirmed; also try leaving it enabled as a control run.
+
+### 26.6 Dead leads (do not revisit)
+
+- "resetting" IOLog template (`_frameNum %llu, completionStamp %lld, _pendingData %u`, strings @0x2a38/
+  0x2ac3/0x2b5c): no adrp/add refs in __text, no u64 pointer refs in __DATA_CONST → dead/stripped debug code.
+- AB-table-base hypothesis for trampoline dispatch (vptr=auth(0x14200) + 0x990…): entries there are
+  unrelated symbols (OSObject::release/getRetainCount) — rejected.
