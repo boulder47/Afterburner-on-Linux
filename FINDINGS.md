@@ -2738,3 +2738,247 @@ card survives → stop-command hypothesis confirmed; also try leaving it enabled
   0x2ac3/0x2b5c): no adrp/add refs in __text, no u64 pointer refs in __DATA_CONST → dead/stripped debug code.
 - AB-table-base hypothesis for trampoline dispatch (vptr=auth(0x14200) + 0x990…): entries there are
   unrelated symbols (OSObject::release/getRetainCount) — rejected.
+
+---
+
+## 27. Kext DMA staging path — IODMACommand internals (static RE, 2026-11-03)
+
+Resolves the open question "how does the kext register output destinations for large frames?"
+and reframes the 126-descriptor partial-decode mystery (§26.3).
+
+### 27.1 submitData only BUILDS the descriptor list — no BAR writes
+
+`submitData` (fn@0xa67c–0xa9ac) flow, byte-verified:
+1. `getSegments(self, inDesc, outDesc, segList, &N, flag)` → segment count for the pre-built
+   input seg list (`self->+0x11d8`, N=`self->+0x11e0>>4`). If > 0 → log @0x5ee + return count.
+2. Else fallback `getDescriptorList(self, segs, N, flag, &desc, &count, ctx)` (fn@0x9c5c) —
+   builds a **doubly-linked list of IOMalloc(0x18) nodes** over the segments and finalizes via
+   `[obj]->vtbl[?](obj, 1)`. If that returns 0 → allocates a 72-byte completion-context struct
+   (fields: [+0x10]=desc ptr, [+0x18]=count, [+0x1c]=flag, [+0x20]=ctx, [+0x28]=self->+0xc8,
+   [+0x30..40]=misc) and submits **asynchronously** via `[self->+0x90]->vtbl[?]` with the PAC'd
+   completion callback fn@0x985c.
+
+So `submitData` never touches BAR1 staging banks or doorbells. The actual commit (staging +
+doorbell) happens in a separate large function (~fn@0x5af0–0x6a40, >3 KB).
+
+### 27.2 getSegments → IODMACommand::withSpecification — maxSegmentSize decoded
+
+`getSegments` (fn@0xa28c–0xa67c) creates an `IODMACommand` via PLT→GOT[17]
+(`__ZN12IODMACommand17withSpecificationEPFbPS_NS_9Segment64EPvjEhyNS_14MappingOptionsEyjP8IOMapperS2_`,
+Apple mangling; `S_` = enclosing-class substitution — standard demanglers reject it).
+
+Call-site args (byte-verified @0xa3b8–0xa3dc):
+```
+x0 = [0x141b0]            ; segment callback — PAC-tagged value 0xc010b692_00000036
+w1 = 0                    ; numAddressBits (0 → default/unrestricted)
+w2 = 0xFFFFFC0            ; maxSegmentSize ≈ 16 MiB − 64 B
+w3 = 0                    ; mappingOptions / flags
+x4 = 0                    ; maxTransferSize (unlimited)
+w5 = 1                    ; alignment
+x6 = self->+0xb0          ; IOMapper*
+x7 = 0                    ; refCon
+```
+
+**Four call sites in the kext, two distinct maxSegmentSize values:**
+| site | enclosing fn | maxSegmentSize | purpose (inferred) |
+|------|--------------|----------------|--------------------|
+| 0x8ed8 | fn@0x8cb0    | **0xFFFFFC0 (~16 MB)** | data buffers |
+| 0x9294 | fn@0x903c    | **0x1000 (4 KB)**      | descriptor/staging structures |
+| 0x9e2c | fn@0x9c5c    | **0x1000 (4 KB)**      | the real frame path's staging |
+| 0xa3dc | getSegments @0xa28c | **0xFFFFFC0 (~16 MB)** | in/out data descriptors |
+
+The ~16 MB cap on data segments is almost certainly a firmware/hardware limit on per-descriptor
+DMA transfer size — the kext encodes it as its IODMACommand maxSegmentSize. A 33 MB output frame
+therefore becomes **~2–3 receive descriptors** in the kext, not hundreds.
+
+### 27.3 The commit function (fn@~0x5af0–0x6a40) — per-descriptor loop + direct BAR stores
+
+- Has a per-descriptor loop calling `[self->+0x90]->vtbl[+0x208/8]` (IODMACommand method, slot
+  ~103) with the staging struct as arg1 — DMA mapping work delegated to the IOKit layer.
+- Direct BAR stores (byte-verified): send path @0x68bc–0x68ec (`str wzr,[BAR1+4]`, stage
+  `w9/w8/[struct+0x18]` → +0x4080/+0x4084/+0x4088, ring 0xFFE7F); batch path @0x6978–0x69a4
+  (clear +0x1004, stage → +0x5080/+0x5084/+0x5088, ring 0x80FFE7F). **Byte-exact match with our
+  Linux driver's `do_submit_bank`.**
+- Staging struct (72 B): [+0x10]=PA_lo, [+0x14]=PA_hi, **[+0x18]=local_val**, [+0x1c]=channel.
+  One path sources it from `*ptr` (@0x675c), another uses `self->+0xc0` as base (@0x679c) — in
+  which case local_val = **self->+0xd8, a counter** that increments when the per-frame offset
+  field (`(obj->+0x10)>>16`) wraps at 0xffff. We currently write local_val=0; submissions work,
+  so it is not critical for single frames (may matter for multi-frame sequencing).
+- Frame-position tracking @0x67a4–0x67e0: `addr = self->+0x1308 (frame base) + ((obj->+0x10)>>16)
+  + (self->+0xd8 << 16)` → stored to self->+0x1270. Confirms the kext tracks output position
+  within a frame buffer across submissions — relevant for multi-frame batching later.
+
+### 27.4 MalfTLP address analysis (run 14b, dmesg t≈3910)
+
+> **CORRECTED by §28.1** — the raw TLP header hex decodes differently than written here
+> (it is a 512-byte MWr to 0x3CCC8FC0 with a reserved bit set in DW0, not a 64-byte write to
+> 0x3CCCFFF0). The high-level conclusion stands: the firmware emitted a corrupted TLP into our
+> out_desc buffer region while processing the long receive chain. See §28 for the full decode
+> and the complete root-cause chain (including why recovery killed the card ~80 s later).
+
+The fatal malformed TLP was a **64-byte MEM WR to 0x3CCCFFF0**. Our stage-B descriptor chain sat
+at PA **0x3ccc8000** in a **32 KB** coherent alloc (OUT_DESC_BUF_BYTES=32768). So the hit is at
+**chain_base + 0x7FF0 — the last 16 bytes of our 32 KB buffer**, far past descriptor #254 (which
+ends at offset 0x1FC0). The firmware wrote to the TAIL of a 32 KB region it was given only the
+head PA of. Two readings:
+- (a) The firmware assumes receive-chain buffers are a fixed size (e.g. 1024 × 32 B = 32 KB ring)
+  and stamps completion/status at the tail — our buffer happened to be exactly that size, so it
+  "worked" until something made the TLP malformed (address/length field overflow in the fw).
+- (b) The engine's internal receive ring is ~128 deep; after consuming 126 descriptors it
+  mis-computed a follow-up address. Either way: **the long chain + 32 KB buffer geometry is part
+  of the crash trigger**, not just the idle-after-enable state.
+
+### 27.5 Implications for the 126-descriptor cap (§26.3) — test design
+
+Facts: engine consumed exactly 126 of our 254 receive descriptors (wordB=126;
+126 × 131072 = 16,515,072 B ≈ 15.75 MiB); deterministic across runs; stop point is NOT at a
+chunk boundary (mid-chunk-3). Kext uses ≤~16 MB segments → ~3 descriptors for the same frame.
+
+Two live-testable hypotheses:
+- **H1 — descriptor-count cap (~126/128 ring depth):** fix = fewer, larger receive descriptors.
+  `out_seg=4MB` → 8 descriptors for 33 MB (one per existing 4 MB chunk). If all 8 consumed and
+  the full frame decodes → H1 confirmed; partial-decode mystery closed.
+- **H2 — total-bytes cap (~16 MiB/submission):** only ~4 of the 8 chunks would decode
+  (≈16 MB), rest flat filler → need multi-submission protocol for >16 MB frames.
+
+**Test after power cycle:** `mode=14 out_seg=4194304` (no code change needed — out_seg is a
+module param; the existing 8×4MB chunk fallback supplies one descriptor per chunk). Mode 14
+already includes the Phase-3t stop-command block (BAR0[hdr+4]=0 post-completion + idle_s=75) and
+we now also check dmesg/AER for liveness. Control: `mode=15 out_seg=4194304` (no disable write).
+
+### 27.6 Dead ends / notes
+
+- Segment callback at [0x141b0] = 0xc010b692_00000036: PAC-tagged; no plain low-bits extraction
+  yields a __text address (range 0x4000–0xe83c). Authentication must happen at the call site via
+  AUTDA/AUTDB inside IODMACommand or in getSegments' caller — not worth chasing further: the
+  callback's job is standard Segment64 output ({PA,len} pairs), which matches our descriptor
+  format (verified working live, §21.10).
+- `numAddressBits=0` → XNU cpp defaults it to 32 (`if (!numAddressBits) numAddressBits = 32`) —
+  all kext DMA PAs fit in 32 bits on this box anyway (observed: 0x3a400000–0x46xxxxxx).
+
+## 28. AER MalfTLP — full root cause (run 14b, dmesg t≈3910–3990) [2026-11-04]
+
+Closes the "what caused the AER error" question end-to-end: (a) what the malformed TLP actually
+is (definitive decode of the raw header, correcting §27.4), and (b) why recovery killed the card
+~80 s AFTER the error instead of immediately (device_lock held across our long probe — verified
+in vmlinux disassembly).
+
+### 28.1 Definitive TLP header decode (corrects §27.4)
+
+Raw dmesg line (recovered from saved dump `/home/archuser/.hermes/cache/exec/stdout-373f78ebc6ed.txt`
+after the ring buffer rotated):
+
+```
+[3910.596892] pcieport 0000:0c:10.0: AER:   TLP Header: 0x00002080 0x0f00c9ff 0x3ccc8fc0 0x82d07dd0
+```
+
+Field-by-field (PCIe base spec memory-request layout):
+
+| DW | value | decode |
+|----|-------|--------|
+| DW0 | 0x00002080 | Format[31:30]=**0b00 → 3DW header**; Type[29:25]=**0b00000 → MWr (Memory Write)**; Attr/LC/AT=0; **bit 13 SET — reserved for memory TLPs (spec violation)**; Length[10:0]=**128 DWs = 512 bytes** |
+| DW1 | 0x0f00c9ff | Requester ID[31:16]=**0x0F00 → bus 0f, devfn 00 = 0f:00.0 — OUR CARD**; Tag=0xC9; Last BE=F; First BE=F |
+| DW2 | 0x3ccc8fc0 | Address[31:0] (per the 3DW Format field) = **out_desc base 0x3ccc8000 + 0x8FC0** → start of **descriptor #115** (0x8FC0/32 = 115 exactly) |
+| DW3 | 0x82d07dd0 | first payload dword if the header really is 3DW — OR a garbage high address dword if the Format field itself was corrupted (intended 4DW → addr would be 0x82D07DD0_3CCC8FC0, far beyond platform PA width) |
+
+So: **our card emitted a malformed MWr TLP — 512 bytes to PA 0x3CCC8FC0 inside our own
+out_desc buffer (descriptors #115–#130), with a reserved bit set in DW0.** The write window
+straddles the firmware's hard stop at descriptor #126. Two readings of the corruption, both
+pointing at the same firmware bug:
+
+- **R1 — header-field corruption:** the fw mis-assembled the TLP (reserved bit 13; possibly a
+  Format/length mismatch). The receiver flagged MalfTLP on the reserved-bit violation.
+- **R2 — intended 64-bit write, corrupted high dword:** if the fw meant a 4DW-header write with
+  high dword 0x82D07DD0, that address is garbage (exceeds platform PA width) — an incorrect DMA
+  read/write address generation at the chain tail.
+
+Either way: **the trigger is the long receive chain hitting the fw's ~126-descriptor stop point**
+(§26.3/§27.5). Runs 14/15 (20 descriptors) completed cleanly; run 14b (257 requested, stopped at
+126) produced this TLP deterministically. The IOMMU logged zero faults — the address was inside a
+validly-mapped region (our 32 KB coherent alloc), so nothing upstream caught it before the port's
+AER logic did.
+
+### 28.2 Why recovery killed the card ~80 s later: device_lock held across probe
+
+The AER error at t=3910.596 was NON-FATAL to the card — run 14b completed successfully (both
+stages, c2h DMA, `=== done ===`). The kill came from **AER recovery running ~80 s late**, and the
+delay is fully explained by a kernel locking interaction (all verified in vmlinux disassembly;
+kernel source tree on this box is a stub):
+
+1. **Native AER path (this kernel, 7.2.11-arch1):** `aer_irq` fills a u64 queue with
+   low32=status and **high32=ALWAYS ZERO** → `info->id` is always 0 → the BDF-match branch of
+   `find_device_iter` (0xffffffff81dff360) is dead code; affected-device matching relies solely on
+   DevSta error bits + AER cap + unmasked UE status. Our card matched (it has an AER capability,
+   clean post-reset).
+2. **Recovery runs INLINE** — `aer_isr_one_error_type` (0xffffffff81e00190) calls
+   `pcie_do_recovery` (0xffffffff81e00bb0, ~0x110-byte state machine with bus walks + runtime-PM)
+   directly from the AER work context. No kfifo/workqueue deferral on this path (`aer_recover_queue`
+   is GHES-only; system has no APEI/GHES — no GHET table, no ghes platform device). DPC was not
+   triggered (no DPC lines in dmesg).
+3. **The blocking point:** the bus walk behind port 0c:10.0 calls `report_normal_detected` /
+   `report_error_detected.isra.0` (0xffffffff81e009f0) for each device — and that function does
+   `mutex_lock(&dev->mutex)` (offset +0x160 from the pci_dev*) before invoking the driver's error
+   handler or logging "can't recover".
+4. **The lock holder:** our probe ran through the sync path — `__driver_attach` →
+   `device_driver_attach` (0x820575d1–0x820576a1), which does:
+   ```c
+   mutex_lock(&dev->mutex);              // [dev+0x90]
+   ret = __driver_probe_device(dev, drv);  // → really_probe → ab_probe (OUR 80-s test!)
+   ...
+   mutex_unlock(&dev->mutex);
+   ```
+   The PCI core holds the per-device mutex for the **entire duration of the probe callback**. Our
+   `ab_probe` runs the whole test sequence — poll window (~4 s) + c2h settle (1 s) + 33 MB dump +
+   mode-14 post-completion phase (**75-s idle loop**) ≈ **80 s total** — all inside probe.
+
+Timeline (all from dmesg):
+
+| t | event |
+|---|-------|
+| ~3901 | insmod; ab_probe starts (holds dev->mutex) |
+| 3910.584 | order-13 page-allocator warning (33 MB out buffer) |
+| **3910.596** | MalfTLP logged at port 0c:10.0; AER work starts recovery INLINE → bus walk reaches our card → **blocks on dev->mutex held by ab_probe** |
+| ~3989–3990.4 | run 14b finishes (75-s idle loop ends), `=== done ===`, probe returns, mutex released |
+| **3990.525** | recovery unblocks: "AER: can't recover (no error_detected callback)" — our driver has no `.err_handler` |
+| **3990.653** | `aer_root_reset()` (function-pointer reset phase of pcie_do_recovery) → "Downstream Port link has been reset" — card dead |
+| 4930.82 | fresh insmod succeeds ~17 min later, no power cycle needed |
+
+The 79.9 s gap = 75 s idle + ~1 s c2h sleep + poll window + dump time — matches the probe's own
+log structure exactly. The system was completely silent during the gap (no second AER error, no
+DPC, no module events) because recovery was parked on the mutex, not waiting for anything else.
+
+### 28.3 Complete causal chain (one paragraph)
+
+Firmware bug at the ~126-descriptor receive-chain cap → card emits a malformed MWr TLP into its own
+out_desc buffer region (descriptors #115–#130, reserved bit set in DW0 / corrupted address fields)
+→ port 0c:10.0 logs AER Uncorrectable(Fatal)/MalfTLP at t=3910.596 and starts recovery inline →
+recovery's bus walk needs our card's device mutex, which the PCI core holds across our entire
+`ab_probe` (the test sequence runs inside probe, ~80 s including a 75-s idle loop) → recovery
+blocks silently for ~80 s → probe returns at t≈3990.4 → recovery finds no `.err_handler`
+("can't recover") and proceeds to the reset phase → `aer_root_reset()` resets the link at
+t=3990.653, killing the card until re-insmod (which works without a power cycle).
+
+### 28.4 Driver implications / fixes
+
+1. **Never run long test sequences inside `.probe`.** Any concurrent PCIe error recovery is
+   delayed by the full probe duration and then resets the link immediately after probe returns —
+   exactly what happened here. Move test/verification work to a separate trigger path (ioctl,
+   sysfs store, or workqueue) so probe stays short; keep `ab_remove` doing real teardown too.
+2. **Respect the firmware's ~126-descriptor cap:** submit ≤126 output descriptors per chain
+   (or split large frames into multiple chains/submissions). 20-descriptor runs complete cleanly;
+   the 257-descriptor run deterministically triggers the malformed TLP. For >~16 MB outputs use
+   fewer, larger segments (kext uses ≤~16 MB maxSegmentSize → ~3 descriptors for a 33 MB frame).
+3. **Optional: implement `.err_handler`** so recovery doesn't log "can't recover" — though with no
+   driver-level recovery capability the state machine will likely still proceed to aer_root_reset;
+   the real fix is (1)+(2) so the error never happens while we hold the device lock.
+
+### 28.5 Dead ends / notes
+
+- `aer_recover_work_func` (GHES firmware-first, no NULL-gating on its pcie_do_recovery calls) and
+  `edr_handle_event.cold` (6th of 6 pcie_do_recovery call sites) are NOT active on this system —
+  no APEI/GHES hardware. DPC path (`dpc_handler`) exists but was not triggered.
+- The "rmmod triggered recovery" hypothesis is dead: ab_remove is empty (zero dmesg trace), and the
+  timing matches probe-return, not module unload.
+- `aer_root_reset` has no direct call sites in .text — it is passed as a function pointer to
+  pcie_do_recovery's reset phase; its "link has been reset" string ref sits at 0xffffffff81251214
+  (cold path).
