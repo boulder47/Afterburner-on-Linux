@@ -1,0 +1,322 @@
+0000dd9c: pacibsp 
+0000dda0: sub   sp, sp, #0xb0
+0000dda4: stp   x26, x25, [sp, #0x60]
+0000dda8: stp   x24, x23, [sp, #0x70]
+0000ddac: stp   x22, x21, [sp, #0x80]
+0000ddb0: stp   x20, x19, [sp, #0x90]
+0000ddb4: stp   x29, x30, [sp, #0xa0]
+0000ddb8: add   x29, sp, #0xa0
+0000ddbc: mov   x19, x0
+0000ddc0: ldr   x8, [x0, #0xd8]
+0000ddc4: cbz   x8, #0xdde0
+0000ddc8: mov   x21, x2
+0000ddcc: mov   x22, x1
+0000ddd0: ldr   w24, [x19, #0x18f0]
+0000ddd4: mov   x0, x19
+0000ddd8: bl    #0xe9d4   ; PLT->GOT[39] __ZNK9IOService10isInactiveEv
+0000dddc: cbz   w0, #0xde48
+0000dde0: ldr   x16, [x19]
+0000dde4: mov   x17, x19
+0000dde8: movk  x17, #0xcda1, lsl #48
+0000ddec: autda x16, x17
+0000ddf0: mov   x17, x16
+0000ddf4: xpacd x17
+0000ddf8: cmp   x16, x17
+0000ddfc: b.eq  #0xde04
+0000de00: brk   #0xc472
+0000de04: add   x8, x16, #0x3a8
+0000de08: ldr   x9, [x16, #0x3a8]
+0000de0c: movk  x8, #0xc9c, lsl #48
+0000de10: mov   x0, x19
+0000de14: mov   x1, #0
+0000de18: blraa x9, x8
+0000de1c: adrp  x8, #0x3000
+0000de20: add   x8, x8, #0x390
+0000de24: stp   x19, x8, [sp, #8]
+0000de28: str   x0, [sp]
+0000de2c: adrp  x0, #0x3000
+0000de30: add   x0, x0, #0x1c9
+0000de34: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000de38: mov   w8, #0x2c2
+0000de3c: movk  w8, #0xe000, lsl #16
+0000de40: add   w20, w8, #0x17
+0000de44: b     #0xdfb8
+0000de48: mov   w20, #0x2c2
+0000de4c: movk  w20, #0xe000, lsl #16
+0000de50: cbz   x22, #0xdf38
+0000de54: ldr   x8, [x22]
+0000de58: cbz   x8, #0xdf38
+0000de5c: ldr   x2, [x22, #8]
+0000de60: cbz   x2, #0xdf38
+0000de64: ldrb  w8, [x22, #0x10]
+0000de68: cbz   w8, #0xdf28
+0000de6c: cbz   x21, #0xdf38
+0000de70: ldr   x25, [x22, #0x18]
+0000de74: ldr   w8, [x19, #0x18f0]
+0000de78: cmp   x25, x8
+0000de7c: b.hs  #0xdf38
+0000de80: mov   w8, #0x18
+0000de84: madd  x26, x25, x8, x19
+0000de88: ldr   x23, [x26, #0xf0]!
+0000de8c: cbz   x23, #0xe058
+0000de90: ldr   x16, [x23]
+0000de94: mov   x17, x23
+0000de98: movk  x17, #0xcda1, lsl #48
+0000de9c: autda x16, x17
+0000dea0: mov   x17, x16
+0000dea4: xpacd x17
+0000dea8: cmp   x16, x17
+0000deac: b.eq  #0xdeb4
+0000deb0: brk   #0xc472
+0000deb4: add   x8, x16, #0x200
+0000deb8: ldr   x9, [x16, #0x200]
+0000debc: movk  x8, #0x4579, lsl #48
+0000dec0: mov   x0, x23
+0000dec4: blraa x9, x8
+0000dec8: cmp   w0, #1
+0000decc: b.ne  #0xdfd8
+0000ded0: ldr   x16, [x19]
+0000ded4: mov   x17, x19
+0000ded8: movk  x17, #0xcda1, lsl #48
+0000dedc: autda x16, x17
+0000dee0: mov   x17, x16
+0000dee4: xpacd x17
+0000dee8: cmp   x16, x17
+0000deec: b.eq  #0xdef4
+0000def0: brk   #0xc472
+0000def4: add   x8, x16, #0x3a8
+0000def8: ldr   x9, [x16, #0x3a8]
+0000defc: movk  x8, #0xc9c, lsl #48
+0000df00: mov   x0, x19
+0000df04: mov   x1, #0
+0000df08: blraa x9, x8
+0000df0c: adrp  x8, #0x3000
+0000df10: add   x8, x8, #0x390
+0000df14: stp   x19, x8, [sp, #8]
+0000df18: str   x0, [sp]
+0000df1c: adrp  x0, #0x3000
+0000df20: add   x0, x0, #0x3e9
+0000df24: b     #0xdfb4
+0000df28: cbz   x21, #0xdf38
+0000df2c: ldr   w8, [x19, #0x18f0]
+0000df30: cmp   w8, #0xff
+0000df34: b.ls  #0xe058
+0000df38: ldr   x16, [x19]
+0000df3c: mov   x17, x19
+0000df40: movk  x17, #0xcda1, lsl #48
+0000df44: autda x16, x17
+0000df48: mov   x17, x16
+0000df4c: xpacd x17
+0000df50: cmp   x16, x17
+0000df54: b.eq  #0xdf5c
+0000df58: brk   #0xc472
+0000df5c: add   x8, x16, #0x3a8
+0000df60: ldr   x9, [x16, #0x3a8]
+0000df64: movk  x8, #0xc9c, lsl #48
+0000df68: mov   x0, x19
+0000df6c: mov   x1, #0
+0000df70: blraa x9, x8
+0000df74: ldp   x8, x9, [x22]
+0000df78: ldrb  w13, [x22, #0x10]
+0000df7c: ldr   x11, [x22, #0x18]
+0000df80: ldr   w12, [x19, #0x18f0]
+0000df84: stp   x11, x21, [sp, #0x48]
+0000df88: mov   w10, #0x100
+0000df8c: stp   x10, x13, [sp, #0x38]
+0000df90: stp   x9, x12, [sp, #0x28]
+0000df94: stp   x22, x8, [sp, #0x18]
+0000df98: adrp  x8, #0x3000
+0000df9c: add   x8, x8, #0x390
+0000dfa0: stp   x19, x8, [sp, #8]
+0000dfa4: adrp  x8, #0x3000
+0000dfa8: add   x8, x8, #0x39a
+0000dfac: str   x0, [sp]
+0000dfb0: mov   x0, x8
+0000dfb4: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000dfb8: mov   x0, x20
+0000dfbc: ldp   x29, x30, [sp, #0xa0]
+0000dfc0: ldp   x20, x19, [sp, #0x90]
+0000dfc4: ldp   x22, x21, [sp, #0x80]
+0000dfc8: ldp   x24, x23, [sp, #0x70]
+0000dfcc: ldp   x26, x25, [sp, #0x60]
+0000dfd0: add   sp, sp, #0xb0
+0000dfd4: retab 
+0000dfd8: mov   x24, x23
+0000dfdc: movk  x24, #0xcda1, lsl #48
+0000dfe0: ldr   x16, [x23]
+0000dfe4: autda x16, x24
+0000dfe8: mov   x17, x16
+0000dfec: xpacd x17
+0000dff0: cmp   x16, x17
+0000dff4: b.eq  #0xdffc
+0000dff8: brk   #0xc472
+0000dffc: add   x8, x16, #0x220
+0000e000: ldr   x9, [x16, #0x220]
+0000e004: movk  x8, #0x9285, lsl #48
+0000e008: mov   x0, x23
+0000e00c: mov   w1, #0
+0000e010: blraa x9, x8
+0000e014: ldr   x16, [x23]
+0000e018: autda x16, x24
+0000e01c: mov   x17, x16
+0000e020: xpacd x17
+0000e024: cmp   x16, x17
+0000e028: b.eq  #0xe030
+0000e02c: brk   #0xc472
+0000e030: ldr   x8, [x16, #0x28]!
+0000e034: movk  x16, #0x3a87, lsl #48
+0000e038: mov   x0, x23
+0000e03c: blraa x8, x16
+0000e040: str   xzr, [x26]
+0000e044: mov   w8, #0x18
+0000e048: madd  x8, x25, x8, x19
+0000e04c: stp   xzr, xzr, [x8, #0xf8]
+0000e050: ldr   x2, [x22, #8]
+0000e054: mov   x24, x25
+0000e058: mov   w23, #0xfa4
+0000e05c: movk  w23, #0x2b61, lsl #16
+0000e060: mov   w0, #0xfa4
+0000e064: movk  w0, #0x2b61, lsl #16
+0000e068: mov   w1, #3
+0000e06c: mov   x3, #0
+0000e070: mov   x4, #0
+0000e074: mov   x5, #0
+0000e078: bl    #0xea04   ; PLT->GOT[49] _kernel_debug
+0000e07c: adrp  x8, #0x14000
+0000e080: ldr   x8, [x8, #0x50]
+0000e084: ldrsw x8, [x8]
+0000e088: mov   x9, #-1
+0000e08c: lsl   x8, x9, x8
+0000e090: ldp   x9, x25, [x22]
+0000e094: and   x0, x9, x8
+0000e098: sub   x26, x9, x0
+0000e09c: adds  x9, x26, x25
+0000e0a0: cset  w12, hs
+0000e0a4: mvn   w10, w8
+0000e0a8: sxtw  x11, w10
+0000e0ac: asr   x11, x11, #0x3f
+0000e0b0: adds  x9, x9, w10, sxtw
+0000e0b4: adcs  x11, x11, xzr
+0000e0b8: sbfx  x10, x11, #0, #1
+0000e0bc: eor   x11, x10, x11
+0000e0c0: cmp   x11, #0
+0000e0c4: cset  w11, ne
+0000e0c8: stur  x9, [x29, #-0x48]
+0000e0cc: tbnz  w12, #0, #0xdfb8
+0000e0d0: tbnz  w11, #0, #0xdfb8
+0000e0d4: tbnz  x10, #0x3f, #0xdfb8
+0000e0d8: and   x1, x9, x8
+0000e0dc: stur  x1, [x29, #-0x48]
+0000e0e0: ldr   x3, [x19, #0xe0]
+0000e0e4: mov   w2, #1
+0000e0e8: bl    #0xe938   ; PLT->GOT[24] __ZN18IOMemoryDescriptor16withAddressRangeEyyjP4task
+0000e0ec: cbz   x0, #0xe1e0
+0000e0f0: mov   x22, x0
+0000e0f4: ldr   x16, [x0]
+0000e0f8: mov   x17, x0
+0000e0fc: movk  x17, #0xcda1, lsl #48
+0000e100: autda x16, x17
+0000e104: mov   x17, x16
+0000e108: xpacd x17
+0000e10c: cmp   x16, x17
+0000e110: b.eq  #0xe118
+0000e114: brk   #0xc472
+0000e118: add   x8, x16, #0x218
+0000e11c: ldr   x9, [x16, #0x218]
+0000e120: movk  x8, #0xf5b3, lsl #48
+0000e124: mov   w1, #1
+0000e128: blraa x9, x8
+0000e12c: cbz   w0, #0xe258
+0000e130: mov   x20, x0
+0000e134: mov   x21, x22
+0000e138: movk  x21, #0xcda1, lsl #48
+0000e13c: ldr   x0, [x19, #0xd8]
+0000e140: sub   x1, x29, #0x48
+0000e144: bl    #0xc058   ; __ZN16AppleAfterburner9freeSpaceEPy
+0000e148: ldur  x8, [x29, #-0x48]
+0000e14c: ldr   x9, [x19, #0x1968]
+0000e150: sub   x8, x9, x8
+0000e154: str   x8, [x19, #0x1968]
+0000e158: ldr   x16, [x19]
+0000e15c: mov   x17, x19
+0000e160: movk  x17, #0xcda1, lsl #48
+0000e164: autda x16, x17
+0000e168: mov   x17, x16
+0000e16c: xpacd x17
+0000e170: cmp   x16, x17
+0000e174: b.eq  #0xe17c
+0000e178: brk   #0xc472
+0000e17c: add   x8, x16, #0x3a8
+0000e180: ldr   x9, [x16, #0x3a8]
+0000e184: movk  x8, #0xc9c, lsl #48
+0000e188: mov   x0, x19
+0000e18c: mov   x1, #0
+0000e190: blraa x9, x8
+0000e194: adrp  x8, #0x3000
+0000e198: add   x8, x8, #0x390
+0000e19c: stp   x8, x20, [sp, #0x10]
+0000e1a0: stp   x0, x19, [sp]
+0000e1a4: adrp  x0, #0x3000
+0000e1a8: add   x0, x0, #0x429
+0000e1ac: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000e1b0: ldr   x16, [x22]
+0000e1b4: autda x16, x21
+0000e1b8: mov   x17, x16
+0000e1bc: xpacd x17
+0000e1c0: cmp   x16, x17
+0000e1c4: b.eq  #0xe1cc
+0000e1c8: brk   #0xc472
+0000e1cc: ldr   x8, [x16, #0x28]!
+0000e1d0: movk  x16, #0x3a87, lsl #48
+0000e1d4: mov   x0, x22
+0000e1d8: blraa x8, x16
+0000e1dc: b     #0xdfb8
+0000e1e0: ldr   x0, [x19, #0xd8]
+0000e1e4: sub   x1, x29, #0x48
+0000e1e8: bl    #0xc058   ; __ZN16AppleAfterburner9freeSpaceEPy
+0000e1ec: ldur  x8, [x29, #-0x48]
+0000e1f0: ldr   x9, [x19, #0x1968]
+0000e1f4: sub   x8, x9, x8
+0000e1f8: str   x8, [x19, #0x1968]
+0000e1fc: ldr   x16, [x19]
+0000e200: mov   x17, x19
+0000e204: movk  x17, #0xcda1, lsl #48
+0000e208: autda x16, x17
+0000e20c: mov   x17, x16
+0000e210: xpacd x17
+0000e214: cmp   x16, x17
+0000e218: b.eq  #0xe220
+0000e21c: brk   #0xc472
+0000e220: add   x8, x16, #0x3a8
+0000e224: ldr   x9, [x16, #0x3a8]
+0000e228: movk  x8, #0xc9c, lsl #48
+0000e22c: mov   x0, x19
+0000e230: mov   x1, #0
+0000e234: blraa x9, x8
+0000e238: adrp  x8, #0x3000
+0000e23c: add   x8, x8, #0x390
+0000e240: stp   x19, x8, [sp, #8]
+0000e244: str   x0, [sp]
+0000e248: adrp  x0, #0x3000
+0000e24c: add   x0, x0, #0x44f
+0000e250: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000e254: b     #0xe280
+0000e258: mov   w8, #0x18
+0000e25c: madd  x8, x24, x8, x19
+0000e260: stp   x22, x26, [x8, #0xf0]
+0000e264: str   x25, [x8, #0x100]
+0000e268: stp   x24, xzr, [x21]
+0000e26c: ldr   w8, [x19, #0x18f0]
+0000e270: cmp   x24, x8
+0000e274: b.ne  #0xe280
+0000e278: add   w8, w8, #1
+0000e27c: str   w8, [x19, #0x18f0]
+0000e280: add   w0, w23, #4
+0000e284: mov   w1, #3
+0000e288: mov   x2, #0
+0000e28c: mov   x3, #0
+0000e290: mov   x4, #0
+0000e294: mov   x5, #0
+0000e298: bl    #0xea04   ; PLT->GOT[49] _kernel_debug
+0000e29c: mov   w20, #0
+0000e2a0: b     #0xdfb8

@@ -1,0 +1,151 @@
+0000bd90: ldr   w8, [x0, #0xc0]
+0000bd94: str   x8, [x1]
+0000bd98: mov   w0, #0
+0000bd9c: ret   
+0000bda0: pacibsp 
+0000bda4: sub   sp, sp, #0x40
+0000bda8: stp   x22, x21, [sp, #0x10]
+0000bdac: stp   x20, x19, [sp, #0x20]
+0000bdb0: stp   x29, x30, [sp, #0x30]
+0000bdb4: add   x29, sp, #0x30
+0000bdb8: mov   x19, x1
+0000bdbc: mov   x20, x0
+0000bdc0: add   x22, x0, #0x108
+0000bdc4: mov   x0, x22
+0000bdc8: bl    #0xea10   ; PLT->GOT[50] _microtime
+0000bdcc: ldr   q0, [x22]
+0000bdd0: str   q0, [sp]
+0000bdd4: add   x21, x20, #0xf8
+0000bdd8: mov   x0, x22
+0000bddc: mov   x1, x21
+0000bde0: bl    #0xea34   ; PLT->GOT[53] _timevalsub
+0000bde4: ldr   w8, [x20, #0x12e0]
+0000bde8: ldr   x9, [x20, #0x108]
+0000bdec: mov   w10, #0x4240
+0000bdf0: movk  w10, #0xf, lsl #16
+0000bdf4: ldrsw x11, [x20, #0x110]
+0000bdf8: madd  x9, x9, x10, x11
+0000bdfc: cbz   w8, #0xbe10
+0000be00: ldp   x10, x8, [x20, #0xe0]
+0000be04: add   x8, x8, x9
+0000be08: str   x8, [x20, #0xe8]
+0000be0c: b     #0xbe1c
+0000be10: ldp   x10, x8, [x20, #0xe0]
+0000be14: add   x10, x10, x9
+0000be18: str   x10, [x20, #0xe0]
+0000be1c: adds  x9, x10, x8
+0000be20: str   x9, [x20, #0xf0]
+0000be24: b.eq  #0xbe38
+0000be28: mov   w10, #0x64
+0000be2c: mul   x8, x8, x10
+0000be30: udiv  x8, x8, x9
+0000be34: b     #0xbe3c
+0000be38: mov   x8, #0
+0000be3c: stp   xzr, xzr, [x20, #0xe0]
+0000be40: ldr   q0, [sp]
+0000be44: str   q0, [x21]
+0000be48: str   x8, [x19]
+0000be4c: mov   w0, #0
+0000be50: ldp   x29, x30, [sp, #0x30]
+0000be54: ldp   x20, x19, [sp, #0x20]
+0000be58: ldp   x22, x21, [sp, #0x10]
+0000be5c: add   sp, sp, #0x40
+0000be60: retab 
+0000be64: pacibsp 
+0000be68: sub   sp, sp, #0x30
+0000be6c: stp   x20, x19, [sp, #0x10]
+0000be70: stp   x29, x30, [sp, #0x20]
+0000be74: add   x29, sp, #0x20
+0000be78: mov   x19, x0
+0000be7c: str   wzr, [x0, #0x12e0]
+0000be80: add   x20, x0, #0x108
+0000be84: mov   x0, x20
+0000be88: bl    #0xea10   ; PLT->GOT[50] _microtime
+0000be8c: ldr   q0, [x20]
+0000be90: str   q0, [sp]
+0000be94: add   x1, x19, #0xf8
+0000be98: mov   x0, x20
+0000be9c: bl    #0xea34   ; PLT->GOT[53] _timevalsub
+0000bea0: ldr   x8, [x19, #0x108]
+0000bea4: mov   w9, #0x4240
+0000bea8: movk  w9, #0xf, lsl #16
+0000beac: ldrsw x10, [x19, #0x110]
+0000beb0: madd  x8, x8, x9, x10
+0000beb4: ldr   x9, [x19, #0xe8]
+0000beb8: add   x8, x8, x9
+0000bebc: str   x8, [x19, #0xe8]
+0000bec0: ldr   q0, [sp]
+0000bec4: stur  q0, [x19, #0xf8]
+0000bec8: mov   w0, #0
+0000becc: ldp   x29, x30, [sp, #0x20]
+0000bed0: ldp   x20, x19, [sp, #0x10]
+0000bed4: add   sp, sp, #0x30
+0000bed8: retab 
+0000bedc: pacibsp 
+0000bee0: stp   x20, x19, [sp, #-0x20]!
+0000bee4: stp   x29, x30, [sp, #0x10]
+0000bee8: add   x29, sp, #0x10
+0000beec: mov   x19, x1
+0000bef0: mov   x20, x0
+0000bef4: ldr   x0, [x0, #0x12c0]
+0000bef8: bl    #0xe86c   ; PLT->GOT[4] _IOLockLock
+0000befc: ldr   x16, [x19]
+0000bf00: mov   x17, x19
+0000bf04: movk  x17, #0xcda1, lsl #48
+0000bf08: autda x16, x17
+0000bf0c: mov   x17, x16
+0000bf10: xpacd x17
+0000bf14: cmp   x16, x17
+0000bf18: b.eq  #0xbf20
+0000bf1c: brk   #0xc472
+0000bf20: add   x8, x16, #0x1f0
+0000bf24: ldr   x9, [x16, #0x1f0]
+0000bf28: movk  x8, #0xb392, lsl #48
+0000bf2c: mov   x0, x19
+0000bf30: blraa x9, x8
+0000bf34: ldr   x8, [x20, #0x12e8]
+0000bf38: add   x8, x8, x0
+0000bf3c: str   x8, [x20, #0x12e8]
+0000bf40: ldr   x9, [x20, #0x12f0]
+0000bf44: cmp   x8, x9
+0000bf48: mov   w8, #0x2ec
+0000bf4c: movk  w8, #0xe000, lsl #16
+0000bf50: csel  w19, w8, wzr, hi
+0000bf54: ldr   x0, [x20, #0x12c0]
+0000bf58: bl    #0xe878   ; PLT->GOT[5] _IOLockUnlock
+0000bf5c: mov   x0, x19
+0000bf60: ldp   x29, x30, [sp, #0x10]
+0000bf64: ldp   x20, x19, [sp], #0x20
+0000bf68: retab 
+0000bf6c: pacibsp 
+0000bf70: stp   x20, x19, [sp, #-0x20]!
+0000bf74: stp   x29, x30, [sp, #0x10]
+0000bf78: add   x29, sp, #0x10
+0000bf7c: mov   x19, x1
+0000bf80: mov   x20, x0
+0000bf84: ldr   x0, [x0, #0x12c0]
+0000bf88: bl    #0xe86c   ; PLT->GOT[4] _IOLockLock
+0000bf8c: ldr   x16, [x19]
+0000bf90: mov   x17, x19
+0000bf94: movk  x17, #0xcda1, lsl #48
+0000bf98: autda x16, x17
+0000bf9c: mov   x17, x16
+0000bfa0: xpacd x17
+0000bfa4: cmp   x16, x17
+0000bfa8: b.eq  #0xbfb0
+0000bfac: brk   #0xc472
+0000bfb0: add   x8, x16, #0x1f0
+0000bfb4: ldr   x9, [x16, #0x1f0]
+0000bfb8: movk  x8, #0xb392, lsl #48
+0000bfbc: mov   x0, x19
+0000bfc0: blraa x9, x8
+0000bfc4: ldr   x8, [x20, #0x12e8]
+0000bfc8: sub   x8, x8, x0
+0000bfcc: bic   x8, x8, x8, asr #63
+0000bfd0: str   x8, [x20, #0x12e8]
+0000bfd4: ldr   x0, [x20, #0x12c0]
+0000bfd8: bl    #0xe878   ; PLT->GOT[5] _IOLockUnlock
+0000bfdc: mov   w0, #0
+0000bfe0: ldp   x29, x30, [sp, #0x10]
+0000bfe4: ldp   x20, x19, [sp], #0x20
+0000bfe8: retab 

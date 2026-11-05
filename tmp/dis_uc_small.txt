@@ -1,0 +1,105 @@
+0000dcc4: pacibsp 
+0000dcc8: sub   sp, sp, #0x50
+0000dccc: stp   x22, x21, [sp, #0x20]
+0000dcd0: stp   x20, x19, [sp, #0x30]
+0000dcd4: stp   x29, x30, [sp, #0x40]
+0000dcd8: add   x29, sp, #0x40
+0000dcdc: mov   w19, #0x2d9
+0000dce0: movk  w19, #0xe000, lsl #16
+0000dce4: ldr   x8, [x0, #0xd8]
+0000dce8: cbz   x8, #0xdd84
+0000dcec: mov   x21, x2
+0000dcf0: mov   x22, x1
+0000dcf4: mov   x20, x0
+0000dcf8: bl    #0xe9d4   ; PLT->GOT[39] __ZNK9IOService10isInactiveEv
+0000dcfc: tbnz  w0, #0, #0xdd84
+0000dd00: sub   w19, w19, #0x17
+0000dd04: cbz   x22, #0xdd84
+0000dd08: cbz   x21, #0xdd84
+0000dd0c: ldr   x0, [x20, #0xd8]
+0000dd10: mov   w8, #0x18f8
+0000dd14: add   x1, x20, x8
+0000dd18: mov   x2, x22
+0000dd1c: mov   x3, x21
+0000dd20: bl    #0xb88c   ; __ZN16AppleAfterburner15queryCompletionEP8sContextPyS2_
+0000dd24: mov   x19, x0
+0000dd28: cbz   w0, #0xdd84
+0000dd2c: ldr   x16, [x20]
+0000dd30: mov   x17, x20
+0000dd34: movk  x17, #0xcda1, lsl #48
+0000dd38: autda x16, x17
+0000dd3c: mov   x17, x16
+0000dd40: xpacd x17
+0000dd44: cmp   x16, x17
+0000dd48: b.eq  #0xdd50
+0000dd4c: brk   #0xc472
+0000dd50: add   x8, x16, #0x3a8
+0000dd54: ldr   x9, [x16, #0x3a8]
+0000dd58: movk  x8, #0xc9c, lsl #48
+0000dd5c: mov   x0, x20
+0000dd60: mov   x1, #0
+0000dd64: blraa x9, x8
+0000dd68: adrp  x8, #0x2000
+0000dd6c: add   x8, x8, #0xc00
+0000dd70: stp   x20, x8, [sp, #8]
+0000dd74: str   x0, [sp]
+0000dd78: adrp  x0, #0x3000
+0000dd7c: add   x0, x0, #0x365
+0000dd80: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000dd84: mov   x0, x19
+0000dd88: ldp   x29, x30, [sp, #0x40]
+0000dd8c: ldp   x20, x19, [sp, #0x30]
+0000dd90: ldp   x22, x21, [sp, #0x20]
+0000dd94: add   sp, sp, #0x50
+0000dd98: retab 
+
+0000e2a4: pacibsp 
+0000e2a8: sub   sp, sp, #0x50
+0000e2ac: stp   x22, x21, [sp, #0x20]
+0000e2b0: stp   x20, x19, [sp, #0x30]
+0000e2b4: stp   x29, x30, [sp, #0x40]
+0000e2b8: add   x29, sp, #0x40
+0000e2bc: mov   w19, #0x2d9
+0000e2c0: movk  w19, #0xe000, lsl #16
+0000e2c4: ldr   x8, [x0, #0xd8]
+0000e2c8: cbz   x8, #0xe354
+0000e2cc: mov   x21, x1
+0000e2d0: mov   x20, x0
+0000e2d4: bl    #0xe9d4   ; PLT->GOT[39] __ZNK9IOService10isInactiveEv
+0000e2d8: tbnz  w0, #0, #0xe354
+0000e2dc: cbz   x21, #0xe350
+0000e2e0: ldr   x0, [x20, #0xd8]
+0000e2e4: mov   x1, x21
+0000e2e8: bl    #0xbd90   ; __ZN16AppleAfterburner10cardStatusEPy
+0000e2ec: mov   x19, x0
+0000e2f0: cbz   w0, #0xe354
+0000e2f4: ldr   x16, [x20]
+0000e2f8: mov   x17, x20
+0000e2fc: movk  x17, #0xcda1, lsl #48
+0000e300: autda x16, x17
+0000e304: mov   x17, x16
+0000e308: xpacd x17
+0000e30c: cmp   x16, x17
+0000e310: b.eq  #0xe318
+0000e314: brk   #0xc472
+0000e318: add   x8, x16, #0x3a8
+0000e31c: ldr   x9, [x16, #0x3a8]
+0000e320: movk  x8, #0xc9c, lsl #48
+0000e324: mov   x0, x20
+0000e328: mov   x1, #0
+0000e32c: blraa x9, x8
+0000e330: adrp  x8, #0x3000
+0000e334: add   x8, x8, #0x4a9
+0000e338: stp   x20, x8, [sp, #8]
+0000e33c: str   x0, [sp]
+0000e340: adrp  x0, #0x3000
+0000e344: add   x0, x0, #0x47b
+0000e348: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000e34c: b     #0xe354
+0000e350: sub   w19, w19, #0x17
+0000e354: mov   x0, x19
+0000e358: ldp   x29, x30, [sp, #0x40]
+0000e35c: ldp   x20, x19, [sp, #0x30]
+0000e360: ldp   x22, x21, [sp, #0x20]
+0000e364: add   sp, sp, #0x50
+0000e368: retab 

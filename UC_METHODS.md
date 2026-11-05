@@ -221,9 +221,10 @@ Note: demangled signatures say `Py` (u64) but checkForSpace/freeSpace actually t
 | unbindFrame(desc) | 0xbf6c | `(IOMemoryDescriptor*)` | `len=[desc_vt+0x1F0](desc)`; `used = max(0, used - len)` (saturating); return 0. Called per-slot by UC::unbindAll/stop | ✅ (`tmp/dis_ab_space_fns.txt`) |
 | checkForSpace | 0xbfec | `(u64* size)` | if `used > cap` → **0xE000_02EC**; else `used += *size`; return 0 | ✅ (`tmp/dis_ab_checkForSpace.txt`) |
 | freeSpace | 0xc058 | `(u64* req)` | `used = max(0, used - *req)` (saturating); does NOT write back *out; return 0. Rollback path in UC::bindFrame + UC::stop | ✅ (`tmp/dis_ab_freeSpace.txt`) |
-| cleanUp | 0xb0ec | `(sContext*)` | card-side state reset (called first by unbindAll) | 🟡 body TODO |
+| cleanUp | 0xb0ec–0xb634 | `(sContext*)` | ✅ **§15.1** — two-pass queue finalization; guard-flag skip path; engine-wait(timeout=0) + PAC'd AB::reset callback on second call | ✅ (`tmp/dis_ab_cleanUp.txt`) |
 | **reset** | **0xaea8–0xb0ec** | `()` | **per-frame teardown**: clear both doorbells, wait for c2h/h2c status to drain, free 2 desc queues, fw handshake, reset all completion tracking. See §10.3 — CRITICAL for Linux driver | ✅ (`tmp/dis_ab_reset.txt`) |
-| queryCompletion | 0xb88c–0xbd90 | `(sContext*, u64 frameID, u64* out)` | **NEVER writes *out** (x3 clobbered @0xb908; no store to it anywhere). Waits on engine via PAC'd stub, then drains 4 DMA completion queues. See §11 | ✅ (`tmp/dis_ab_queryCompletion.txt`) |
+| queryCompletion | 0xb88c–0xbd90 | `(sContext*, u64 frameID, u64* out)` | **NEVER writes *out** (x3 clobbered @0xb908; no store to it anywhere). Waits on engine via PAC'd stub, then drains 4 DMA completion queues. See §10 | ✅ (`tmp/dis_ab_queryCompletion.txt`) |
+| submitDataGated | 0x985c–0x9be0 | `(sDmaConfig*)` | ✅ **§15.2** — the real submission core: wake-wait → guard-flag check → flow control (engine vt+0x210) → completion word → queue push/coalesce → doorbell ring on both channels. Engine callback #22; no direct `bl` callers | ✅ (`tmp/dis_ab_completion_fn.txt`) |
 | cardStatus | 0xbd90–0xbda0 | `(u64* out)` | **trivial**: `*out = [AB+0xC0]` (u32 status word); return 0. AB+0xC0 is the engine-maintained status field (stub passes &AB+0xC0 to engine poll) | ✅ (`tmp/dis_ab_cardStatus_getPercent.txt`) |
 | getPercent | 0xbda0–0xbe64 | `(u64* out)` | **idle-time fraction** since last call: `pct = acc_E8·100/(acc_E0+acc_E8)`, then resets both accumulators. See §12 | ✅ (`tmp/dis_ab_cardStatus_getPercent.txt`) |
 | updateActiveTime | 0xbe64–0xbec | `()` | idle→active transition: `[AB+0x12E0]=0`; flush elapsed interval to **acc_E8**; return 0. Called from handleInterrupt @0x64c8 | ✅ (`tmp/dis_ab_space_fns.txt`) |
@@ -273,8 +274,10 @@ Strings live on two pages: `adrp #0x3000` and `adrp #0x2000`.
 | queryCompletion (AB) | dmaQ-leak fmt@**0x2BAB** · descDmaQ-leak fmt@**0x2C10** | fn-name 'queryCompletion'@**0x2C00** (used as the `%s::%s` middle arg — earlier note had these swapped) |
 | engine-query stub (`queryCompletionGated`) | timeout fmt@**0x2B27**: `"AppleAfterburner Error: %s[%p]::%s: Query timed out (resetting), frameNum %llu, completionStamp %lld, _numFrames %u, status 0x%08x\n"` | fn-name 'queryCompletionGated'@**0x2B12** |
 | reset | c2hStatus fmt@**0x2958** · h2cStatus fmt@**0x2994** · "Decoder status: 0x%08x"@**0x29CA** | — |
+| submitDataGated | Wake-fail fmt@**0x2326**: `"AppleAfterburner Error: %s[%p]::%s: Wake: 0x%08x"` · hang fmt@**0x2367**: `"...Possible hang, frameNum %llu, completionStamp %lld\n"` | fn-name 'submitDataGated'@**0x2357** |
+| cleanUp | decoder-error fmt@**0x2A05**: `"AppleAfterburner Error: %s[%p]::%s: Decoder error (resetting) _frameNum %llu, completionStamp %lld, _pendingData %u, status 0x%08x\n"` | fn-name 'cleanUp'@**0x2A89** |
 
-kernel_debug trace id: **0x2B61FA4** (class arg 3/4/5 at various points).
+kernel_debug trace ids: **0x2B61F9C / 0x2B61FA4** (handleInterrupt completion loop) · **0x2B61FB0** (submitDataGated ch1/batch doorbell ring — args: self, [cfg+0x3C], 1/*ch*/, [self+0xC0], 0).
 
 ## 10. AB::queryCompletion deep dive ✅ (body 0xb88c–0xbd90, `tmp/dis_ab_queryCompletion.txt`)
 
@@ -431,18 +434,21 @@ updateActiveTime path).
 |---|---|---|
 | +0x90   | engine object ptr | PAC-verified; vt+0x1E8 = wait-with-callback, vt+0x210 = poll-until-deadline |
 | +0xA0 / +0xA8 | notifier objects (dmaQ / descDmaQ) | vt+0x150(notifier, obj) on completion |
-| +0xC0   | status word (u32) | engine-maintained; returned by cardStatus(); &passed to engine poll; cleared by reset() |
-| +0xC8   | second status/counter word | used in done-verify `([C8] & ~[12D0]) == [12D8]`; saved to 0x1308 by reset() |
+| +0xC0   | **_pendingData** (u32) — in-flight/pending frame counter | kext-maintained: `++` by submitDataGated after flow control; `--` by handleInterrupt as fw completes frames; cleared by reset(); returned to userland by cardStatus(). cleanUp log names it `_pendingData %u`. (Earlier "engine-maintained status word" note superseded.) |
+| +0xC8   | _frameNum (u64) — frame counter | used in done-verify `([C8] & ~[12D0]) == [12D8]`; saved to 0x1308 by reset(); cleanUp log names it `_frameNum %llu` |
 | +0xD8   | IRQ-stamp high component (u64) | `[AB+0xD8]<<16` in handleInterrupt stamp calc; cleared by reset() |
 | +0xE0 / +0xE8 | acc_E0 (active) / acc_E8 (idle) time accumulators | §11 |
 | +0xF8   | last-sample timeval | §11 |
 | +0x108  | scratch timeval (microtime target) | §11 |
-| +0x11F0 / +0x1200 | desc-queue heads (72B nodes, self-ref sentinel) | freed by reset(); per-frame descriptor allocs |
+| +0x11E4 / +0x11E5 | **channel active flags** (bytes, ch0/ch1) | addressed as `[self+ch+0x11E4]` — NO index shift (verified raw bytes @9a68/6760). Set by submitDataGated on first submission to a channel; re-set by handleInterrupt when completions leave pending work; cleared by handleInterrupt after the last node is processed. **NOT** the 0x12C8 guard flag (earlier misattribution corrected) |
+| +0x11F0 / +0x1200 | per-channel queue head slots (stride 0x10: qbase = self+ch·16) | `[qbase+0x11F0]` = head node ptr (self-ref sentinel when empty); `[qbase+0x11F8]` = tail. Nodes are **sDmaConfig structs (72B)** — pending-submission queue, not raw descriptor nodes: submitDataGated links cfg in on coalesce; handleInterrupt dequeues as fw completes; reset() frees leftovers |
 | +0x12C0 | IOLock* — space pool lock | §6 |
 | +0x12D0 | stamp/mask for done-verify | written by IRQ handler & stub first-timeout; = -1 after reset() |
 | +0x12D8 | _numFrames (u32) | failure counter; cleared on IRQ / first timeout / reset() |
 | +0x12DC | status u32 | written by handleInterrupt @0x64e0 |
 | +0x12E0 | idle-flag byte | §11 |
+| +0x12C8 | **completion-wait guard flag** (byte) | SET only by queryCompletionGated@b7b4 on first timeout (also records expected stamp); CLEARED only by reset()@b0c0 (`strb wzr,[base,#0xe4]`, base=self+0x11E4). READ by submitDataGated (rejects 0xE000_02BC if set) and cleanUp. All four direct `#0x12c8` refs in __text are loads; writes use computed-base patterns |
+| +0x12E4 | batch counter mirror (u32) | written by submitDataGated ch1 path: `[self+0x12E4] = [cfg+0x3C]`; consumed by handleInterrupt IRQ completion loop |
 | +0x12E8 / +0x12F0 | space pool used / cap (u64) | §6 |
 | +0x1308 | IRQ-stamp base = saved [C8] at reset() time | handleInterrupt: `[12D0] = [1308] + ((w8>>16)) + ([D8]<<16)` |
 | +0x158  | **decoder control object** | +4 = reset-signal (write 1), +8 = decoder status (bit0=ready/ack; logged "Decoder status"), +0x14 = volatile status read at reset start |
@@ -453,8 +459,280 @@ updateActiveTime path).
 2. 🟡 handleInterrupt full body (event-type dispatch + BAR1 status reads; completion path around 0x64c8 decoded, see §12)
 3. ✅ DONE: AB::reset @0xaea8 (§10.3) — per-frame teardown sequence fully decoded
 4. 🟡 bindFrame slot-selection logic (dd9c..de8c): auto-assign vs explicit index via in[+0x18]; 0xFF cap meaning
-5. 🟡 sContext layout at UC+0x18F8 (fields consumed by AB::submitFrame/cleanUp)
-6. 🟡 `[desc_vt+0x1F8](desc, 1)` semantics on submit success
+5. ✅ DONE: AB::cleanUp @0xb0ec (§15.1) + AB::submitDataGated @0x985c (§15.2) — submission core fully decoded; guard-flag lifecycle resolved (see §13); sContext queue layout mapped (§15.3)
+6. 🟡 `[desc_vt+0x1F8](desc, 1)` semantics on submit success (note: cleanUp calls vt+0x1F8(rec, 0) on dmaQ completion records — same slot offset, different receiver; see §15.1)
 7. 🟡 IODirection enum mapping for withAddressRange dir=1/2
 8. ⬜ lifecycle overrides: start@0xd1e4 (🟡), willTerminate/didTerminate/terminate/finalize/clientClose/clientDied/getMetaClass/D1Ev/D0Ev — mostly boilerplate, decode any that touch HW/state
 9. 🟡 UC+0x1900 field semantics; s_inputDataStruct +0x14/+0x18 fields
+10. ⬜ Engine callback table (§16): 62 entries decoded & demangled — identify which are actually dispatched by firmware (the three *Gated callbacks) vs dead/legacy; decode spiprogram/loadBitfile/submitResource if needed for the Linux driver
+11. 🟡 sContext queue PUSH side: who links 24B {next,prev,desc} nodes into the four §15.3 queues (handleInterrupt / submitFrame path) — only pop/drain decoded so far
+
+## 15. Submission core deep dive — cleanUp + submitDataGated (2026-11-05)
+
+### 15.1 AB::cleanUp @0xb0ec–0xb634 ✅ (`tmp/dis_ab_cleanUp.txt`)
+
+Signature: `void AB::cleanUp(sContext* ctx)` — x0=self, x1=ctx (sContext at UC+0x18F8).
+Finalizes all in-flight work before teardown (called from the unbindAll path).
+
+**Flow:**
+
+```c
+void AB::cleanUp(sContext* ctx) {
+    // 1. Engine wait — only if not already cleaned ([ctx+0x60] bit31 clear)
+    if (!([ctx+0x60] & (1u<<31))) {
+        [engine_vt+0x1E8](engine, pacia(stub@0xb634), 0, &u32(=0), 0, 0);
+        // engine wait; PAC'd callback = queryCompletionGated stub (same as §10.1)
+    }
+
+    // 2. Decoder-error check — guard flag AB+0x12C8 set ⇒ a completion wait timed out
+    if ([self+0x12C8]) {
+        IOLog("AppleAfterburner Error: %s[%p]::%s: Decoder error (resetting) "
+              "_frameNum %llu, completionStamp %lld, _pendingData %u, status 0x%08x\n",
+              getName(self), self, "cleanUp", [C8], [1270], [C0], [12DC]);   // fmt@0x2A05
+        [engine_vt+0x1E8](engine, pacia(AB::reset@0xaea8), 0, 0, 0, 0);
+        // engine-driven reset: PAC'd callback = AB::reset itself (§10.3)
+    }
+
+    // 3. Drain all four sContext completion queues (layout §15.3)
+    for (iter = 0; iter < 2; iter++) {
+        drainQueue(&ctx->qA[iter], lock=[ctx+iter*8+0x40], notifier=[self+0xA0] /*dmaQ*/,
+                   recAction = iter==0 ? vt+0x1F8(rec,0) : vt+0x220(rec,0)+delete);
+        drainQueue(&ctx->qB[iter], lock=[ctx+iter*8+0x50], notifier=[self+0xA8] /*descDmaQ*/,
+                   recAction = vt+0x220(rec,0)+delete);   // qB always destroys records
+    }
+}
+
+void drainQueue(head_slot, IOLock* lock, notifier, recAction) {
+    while ((node = *head_slot) != head_slot) {          // self-ref sentinel = empty
+        IOLockLock(lock);
+        node = *head_slot;                              // re-check under lock
+        if (node == head_slot) { IOLockUnlock(lock); break; }
+        next = node->next;                              // +0x00
+        next->prev = head_slot;                         // +0x08
+        *head_slot = next;
+        IOLockUnlock(lock);
+
+        desc = node->desc;                              // +0x10 (IOMemoryDescriptor*)
+        rec  = [desc_vt+0x158](desc);                   // gate call — record ptr or null
+        if (!rec) continue;                             // nothing pending for this node
+        rec  = [desc_vt+0x158](desc);                   // second call → object ptr (x22)
+        [desc_vt+0x150](desc, 1);                       // release mark on desc
+        [notifier_vt+0x150](notifier, desc);            // completion notification
+        IOFree(node, 0x18);                             // node = 24B {next, prev, desc}
+        recAction(rec);                                 // qA iter0: vt+0x1F8(rec,0) only; else vt+0x220 + virtual delete via [rec+0x28]
+    }
+}
+```
+
+**Key facts:**
+- Node size **24B (0x18)** — confirmed by `IOFree(node, 0x18)` @b390/b5f0. These are NOT the sDmaConfig nodes of the AB+0x11F0/0x1200 pending-submission queues (§13) — two distinct queue systems:
+  - **sContext completion queues** (4×, this section): 24B {next, prev, IOMemoryDescriptor*} wrappers; drained per-completion by queryCompletion (§10) and finally here.
+  - **AB pending-submission queues** (2×, AB+0x11F0/+0x1200): sDmaConfig nodes (~72B); managed by submitDataGated/handleInterrupt/reset.
+- `[desc_vt+0x158](desc)` is called **twice per node**: first as a gate (null → skip), second returns the completion-record object. Same slot, presumably side-effecting detach semantics — exact contract open.
+- Record handling asymmetry: only qA iter 0 (head slot ctx+0x00) gets `vt+0x1F8(rec, 0)` release-only; all other records get `vt+0x220(rec, 0)` + virtual delete via `[rec+0x28]` destructor vtable.
+- The "already cleaned" guard is **bit 31 of [ctx+0x60]** (u64 in sContext) — distinct from the AB+0x12C8 completion-wait guard flag (§13). Who sets ctx+0x60 bit31: open (presumably UC::unbindAll/stop before first cleanUp, or a prior error path).
+- Engine wait #1 uses **frameID=0** and a local u32 timeout slot initialized to 0 @b120 — "wait for completion now, no retry budget".
+
+### 15.2 AB::submitDataGated @0x985c–0x9be0 ✅ (`tmp/dis_ab_completion_fn.txt`)
+
+Signature: `uint32_t AB::submitDataGated(sDmaConfig* cfg)` — x0=self, x1=cfg.
+**No direct `bl` callers in __text** — reached via the engine callback table (§16, entry 22) when firmware dispatches a submission request. This is the real submission core our Linux driver must replicate.
+
+**Return codes:**
+
+| value | meaning |
+|---|---|
+| 0 | success — doorbell rung (fresh channel) or coalesced into active batch |
+| 0xE000_02D5 | "queued" — cfg linked as pending node behind an active batch; no doorbell this call |
+| 0xE000_02BC | error — guard flag set, wake failure (logged), or flow-control timeout ("Possible hang", logged) |
+
+**Flow:**
+
+```c
+uint32_t AB::submitDataGated(sDmaConfig* cfg) {
+    uint32_t ret = 0xE000_02BC;                 // default: error
+    int ch = [cfg+0x20];                        // raw channel index (0/1), no shift
+
+    // 1. Wake-wait — only while wake flag AB+0x12F8 set AND cfg not urgent
+    while ([self+0x12F8]) {                     // wake/busy flag byte
+        if ([cfg+0x1C]) break;                  // urgent → skip wait entirely
+        r = [engine_vt+0x200](engine, &self->wake@AB+0x12F8, 2);   // "in use by firmware?" slot
+        if (r == 0) continue;                   // re-check flag
+        IOLog("...Wake: 0x%08x", r);            // fmt@0x2326, fn-name 'submitDataGated'@0x2357
+        return ret;                             // wake failure → error
+    }
+
+    // 2. Guard flag — completion wait in progress? reject
+    if ([self+0x12C8]) return ret;              // set by queryCompletionGated timeout (§13)
+
+    // 3. Flow control — pending frames >= 32? poll engine until space or deadline
+    while ([self+0xC0] /*_pendingData*/ > 31) {
+        if ([cfg+0x1C]) break;                  // urgent → skip wait
+        clock_interval_to_deadline(0x7D0, 0xF4240, &deadline);   // interval=2000, max=1,000,000 ticks
+        r = [engine_vt+0x210](engine, &_pendingData@AB+0xC0, deadline /*by value*/, 2);
+        if (r != 0) {
+            if (r == 1) IOLog("...Possible hang, frameNum %llu, completionStamp %lld\n",   // fmt@0x2367
+                              [C8], [1270]);
+            return ret;                         // timeout → error (frame NOT submitted)
+        }
+    }
+
+    // 4. Completion word — tell firmware what stamp to echo back (skipped if urgent)
+    if (!([cfg+0x1C]) && ([self+0x158] /*decoder ctrl*/)) {
+        u32 word = (([C8] - [1308]) << 16)      // _frameNum minus IRQ-stamp base
+                 | ([cfg+0x38] << 8)
+                 | ([cfg+0x34] << 4)
+                 |  [cfg+0x30];
+        [decoder_ctrl+0xC] = word;              // ← the completion signal missing in Phase 3l (BAR0[hdr+0xC])
+    }
+    [self+0xC0]++;                              // _pendingData++
+
+    // 5. Queue push / coalesce (per-channel pending-submission queue, §13)
+    qbase = self + ch*16;                       // head slot at qbase+0x11F0, tail at qbase+0x11F8
+    if ((head = [qbase+0x11F0]) != &slot) {     // non-empty → coalesce into active batch
+        ext = [cfg+0x40];                       // ext struct ptr
+        [ext+0x18] = [cfg+0x10];                // staging word A → ext slot
+        flags = [ext]; flags &= ~1; [ext] = flags;   // clear pending bit
+        [head+0x3C]++;                          // batch counter++ on first node
+        return 0;                               // success, no doorbell
+    }
+
+    flag_addr = self + ch + 0x11E4;             // channel active flag (NO shift!)
+    if ([flag_addr]) {                          // flag set but queue empty → pending-node path
+        tail = [qbase+0x11F8];
+        cfg[+0] = &slot; cfg[+8] = tail;        // link into list
+        *tail = cfg;                            // old_tail.next = cfg
+        [qbase+0x11F8] = cfg;                   // update tail
+        return 0xE000_02D5;                     // "queued" — fw picks up when current batch done
+    }
+
+    // 6. First submission to this channel: set flag + ring doorbell
+    [flag_addr] = 1;
+    if (!([cfg+0x1C])) AB::updateIdleTime();    // idle→active bookkeeping (gated by urgent)
+    BAR1 = [self+0x130];
+    if (ch == 0) {                              // h2c / send channel
+        [BAR1+4] = 0;                           // clear-before-ring!
+        [BAR1+0x4080] = [cfg+0x10];             // staging: word A
+        [BAR1+0x4084] = [cfg+0x14];             // staging: word B
+        [BAR1+0x4088] = [cfg+0x18];             // staging: word C
+        [BAR1+4] = 0xFFE7F;                     // RING h2c doorbell
+    } else if (ch == 1) {                       // c2h / batch channel
+        [BAR1+0x1004] = 0;                      // clear-before-ring!
+        [BAR1+0x5080] = [cfg+0x10];
+        [BAR1+0x5084] = [cfg+0x14];
+        [BAR1+0x5088] = [cfg+0x18];
+        [BAR1+0x1004] = 0x80FFE7F;              // RING batch doorbell
+        [self+0x12E4] = [cfg+0x3C];             // mirror batch counter for IRQ handler
+        kernel_debug(0x2B61FB0, self, [cfg+0x3C], 1/*ch*/, [self+0xC0]/*pending*/, 0);
+    } else {                                    // defensive: ch ∉ {0,1} → no doorbell
+    }
+    return 0;
+}
+```
+
+**Key facts:**
+- **cfg[+0x1C] = "urgent / no-completion" flag**: when non-zero it skips wake-wait, flow-control wait, completion-word write, and updateIdleTime. Exact semantics open (presumably set by firmware for internal/resource submissions).
+- **Completion word @ [decoder_ctrl+0xC]**: `(frameNum - stampBase) << 16 | cfg[+0x38]<<8 | cfg[+0x34]<<4 | cfg[+0x30]`. This is the frame-done signal firmware echoes — the write our Linux driver was missing in Phase 3l (we never wrote BAR0[hdr+0xC]).
+- **Flow-control poll** passes `&_pendingData` as x1 and deadline by value; constant w3=2. Distinct from queryCompletionGated's vt+0x210 use (§10.1).
+- **Wake slot vt+0x200** takes the wake-flag address by reference + constant 2 — same "is frame in use by firmware?" slot documented for IOMemoryDescriptor (§6), here on the engine object.
+- Doorbell staging words: cfg[+0x10/+0x14/+0x18] → BAR1[+0x4080..C] (ch0) / [BAR1+0x5080..C] (ch1). Matches Phase 3o live findings exactly.
+- **kernel_debug trace** on ch1 ring: ID 0x2B61FB0, args (self, batchCounter, 1, pendingData, 0).
+
+### 15.3 sContext layout (at UC+0x18F8) — from cleanUp + queryCompletion ✅
+
+Both functions use identical addressing (`iter*8` for locks, `iter*16` / `+0x20` for head slots), confirming a shared four-queue structure:
+
+| offset | field | notes |
+|---|---|---|
+| +0x00 | qA[0] head slot (self-ref sentinel) | notifier dmaQ [AB+0xA0]; rec → vt+0x1F8(rec,0) release-only |
+| +0x10 | qA[1] head slot | notifier dmaQ; rec → vt+0x220 + virtual delete |
+| +0x20 | qB[0] head slot | notifier descDmaQ [AB+0xA8]; rec → vt+0x220 + virtual delete |
+| +0x30 | qB[1] head slot | notifier descDmaQ; rec → vt+0x220 + virtual delete |
+| +0x40 / +0x48 | IOLock* for qA[0] / qA[1] | loaded at [ctx+iter·8+0x40] |
+| +0x50 / +0x58 | IOLock* for qB[0] / qB[1] | loaded at [ctx+iter·8+0x50] |
+| +0x60 | u64; **bit 31 = "already cleaned" guard** | gates cleanUp's engine wait (§15.1) |
+
+Node (24B, IOFree size 0x18): `{+0x00 next, +0x08 prev, +0x10 IOMemoryDescriptor*}`.
+Drained per-completion by queryCompletion (§10: notifier loads @ba50/bcc0) and finally by cleanUp. Push side (handleInterrupt / submitFrame path) not yet decoded — open item 11.
+
+**Channel mapping of the four queues is an open question** — iter 0/1 may index channels or h2c/c2h directions; the notifier split (dmaQ vs descDmaQ) follows the queue pair, not the iteration.
+
+## 16. Engine callback table @0x1d6a0–0x1da7f ✅ (`tmp/engine_callback_table.md`)
+
+62 entries × 16B = {fn_ptr(8B), selector(8B: upper32=class_tag, lower32=method_id)}.
+Located in **`__LINKEDIT`** (confirmed via pm2.py section parse) — no direct code references; consumed externally (Mach-O section walk / framework dispatch by the engine firmware bridge).
+
+Class tags observed: `0x30f` (58 entries), `0xb0f` (2: submitData, freeSpace), `0x60f` (1: cardStatus), plus 2 MetaClass ctor entries.
+
+Full demangled table (custom Python Itanium demangler; Apple 'y'=u64 extension):
+
+| # | addr | fn_ptr | name | class_tag | method_id |
+|---|---|---|---|---|---|
+| 0 | `0x1d6a0` | `0xbd90` | AppleAfterburner::cardStatus(u64 *) | `0x60f` | `0x2a` |
+| 1 | `0x1d6b0` | `0x10198` | ?? 0x10198 (data) | `0x30f` | `0x4e` |
+| 2 | `0x1d6c0` | `0xbda0` | AppleAfterburner::getPercent(u64 *) | `0x30f` | `0x74` |
+| 3 | `0x1d6d0` | `0x821c` | AppleAfterburner::spiprogram(uint32, uint32, void *, u64ll, char) | `0x30f` | `0x9e` |
+| 4 | `0x1d6e0` | `0xa67c` | AppleAfterburner::submitData(sContext *, IOMemoryDescriptor *, uint32, u64 *, uint32, uint32, uint32, u64, u64) | `0xb0f` | `0xe9` |
+| 5 | `0x1d6f0` | `0x141e0` | ?? 0x141e0 (data) | `0x30f` | `0x10d` |
+| 6 | `0x1d700` | `0xa28c` | AppleAfterburner::getSegments(sContext *, IOMemoryDescriptor *, IODMACommand::Segment64 *, uint32 *, u64, u64, u64) | `0x30f` | `0x171` |
+| 7 | `0x1d710` | `0x8628` | AppleAfterburner::loadBitfile(uchar const *, uint32) | `0x30f` | `0x19a` |
+| 8 | `0x1d720` | `0x6a00` | AppleAfterburner::sleep_timer(IOTimerEventSource *) | `0x30f` | `0x1d4` |
+| 9 | `0x1d730` | `0xa9ac` | AppleAfterburner::submitFrame(sContext *, IOMemoryDescriptor *, (subst), u64 *, uint32, uint32, uint32, sDescriptorLengthOffsetInfo) | `0x30f` | `0x23d` |
+| 10 | `0x1d740` | `0xbf6c` | AppleAfterburner::unbindFrame(IOMemoryDescriptor *) | `0x30f` | `0x277` |
+| 11 | `0x1d750` | `0xca80` | AppleAfterburner::didTerminate(IOService *, uint32, char *) | `0x30f` | `0x2ab` |
+| 12 | `0x1d760` | `0xbfec` | AppleAfterburner::checkForSpace(u64 *) | `0x30f` | `0x2d4` |
+| 13 | `0x1d770` | `0x7c60` | AppleAfterburner::setPowerState(u64ll, IOService *) | `0x30f` | `0x307` |
+| 14 | `0x1d780` | `0xca68` | AppleAfterburner::willTerminate(IOService *, uint32) | `0x30f` | `0x33a` |
+| 15 | `0x1d790` | `0x8580` | AppleAfterburner::change_pointer(uint32) | `0x30f` | `0x363` |
+| 16 | `0x1d7a0` | `0x74c4` | AppleAfterburner::reconfig_timer(IOTimerEventSource *) | `0x30f` | `0x3a0` |
+| 17 | `0x1d7b0` | `0x8af0` | AppleAfterburner::submitResource(IOBufferMemoryDescriptor *, uint32) | `0x30f` | `0x3e4` |
+| 18 | `0x1d7c0` | `0x9be0` | AppleAfterburner::updateIdleTime(void) | `0x30f` | `0x40d` |
+| 19 | `0x1d7d0` | `0x5aec` | AppleAfterburner::handleInterrupt(OSObject *, IOInterruptEventSource *, int) | `0x30f` | `0x45a` |
+| 20 | `0x1d7e0` | `0xb88c` | AppleAfterburner::queryCompletion(sContext *, u64 *, (subst)) | `0x30f` | `0x492` |
+| 21 | `0x1d7f0` | `0x803c` | AppleAfterburner::readDMARegister(uint32) | `0x30f` | `0x4bc` |
+| 22 | `0x1d800` | `0x985c` | AppleAfterburner::submitDataGated(sDmaConfig *) | `0x30f` | `0x4f2` |
+| 23 | `0x1d810` | `0x55c0` | AppleAfterburner::readBAR0Register(uint32) | `0x30f` | `0x51d` |
+| 24 | `0x1d820` | `0x6b94` | AppleAfterburner::reconfig_handler(IOInterruptEventSource *, int) | `0x30f` | `0x561` |
+| 25 | `0x1d830` | `0xbe64` | AppleAfterburner::updateActiveTime(void) | `0x30f` | `0x58c` |
+| 26 | `0x1d840` | `0x8030` | AppleAfterburner::writeDMARegister(uint32, uint32) | `0x30f` | `0x5b8` |
+| 27 | `0x1d850` | `0x9c5c` | AppleAfterburner::getDescriptorList(sContext *, IODMACommand::Segment64 *, uint32, uint32, u64 *, uint32 *, u64) | `0x30f` | `0x60f` |
+| 28 | `0x1d860` | `0x8084` | AppleAfterburner::readFlashRegister(uint32) | `0x30f` | `0x63b` |
+| 29 | `0x1d870` | `0x8024` | AppleAfterburner::writeBAR0Register(uint32, uint32) | `0x30f` | `0x668` |
+| 30 | `0x1d880` | `0x5ad4` | AppleAfterburner::readDecodeRegister(uint32) | `0x30f` | `0x695` |
+| 31 | `0x1d890` | `0x8090` | AppleAfterburner::writeFlashRegister(uint32, uint32) | `0x30f` | `0x6c3` |
+| 32 | `0x1d8a0` | `0x5a3c` | AppleAfterburner::configureInterrupts(void) | `0x30f` | `0x6f1` |
+| 33 | `0x1d8b0` | `0x8d5c` | AppleAfterburner::getResourceSegments(IOBufferMemoryDescriptor *, IODMACommand::Segment64 *, uint32 *, u64) | `0x30f` | `0x757` |
+| 34 | `0x1d8c0` | `0x806c` | AppleAfterburner::readBitfileRegister(uint32) | `0x30f` | `0x785` |
+| 35 | `0x1d8d0` | `0x8054` | AppleAfterburner::readThermalRegister(uint32) | `0x30f` | `0x7b3` |
+| 36 | `0x1d8e0` | `0x55cc` | AppleAfterburner::readVersionRegister(uint32) | `0x30f` | `0x7e1` |
+| 37 | `0x1d8f0` | `0x9698` | AppleAfterburner::submitResourceGated(sDmaConfig *) | `0x30f` | `0x81b` |
+| 38 | `0x1d900` | `0x8014` | AppleAfterburner::writeDecodeRegister(uint32, uint32) | `0x30f` | `0x84a` |
+| 39 | `0x1d910` | `0xb634` | AppleAfterburner::queryCompletionGated(u64 *, int *) | `0x30f` | `0x87c` |
+| 40 | `0x1d920` | `0x87c8` | AppleAfterburner::resourceLoadCallback(uint32, int, void const *, uint32, void *) | `0x30f` | `0x8b2` |
+| 41 | `0x1d930` | `0x8078` | AppleAfterburner::writeBitfileRegister(uint32, uint32) | `0x30f` | `0x8e2` |
+| 42 | `0x1d940` | `0x8060` | AppleAfterburner::writeThermalRegister(uint32, uint32) | `0x30f` | `0x912` |
+| 43 | `0x1d950` | `0x8048` | AppleAfterburner::writeVersionRegister(uint32, uint32) | `0x30f` | `0x942` |
+| 44 | `0x1d960` | `0x7c1c` | AppleAfterburner::pointer_restore_timer(IOTimerEventSource *) | `0x30f` | `0x986` |
+| 45 | `0x1d970` | `0x7508` | AppleAfterburner::pointer_restore_handler(IOInterruptEventSource *, int) | `0x30f` | `0x9d1` |
+| 46 | `0x1d980` | `0x90d0` | AppleAfterburner::getResourceDescriptorList(IODMACommand::Segment64 *, uint32, uint32, u64 *, uint32 *, u64) | `0x30f` | `0xa26` |
+| 47 | `0x1d990` | `0x55d8` | AppleAfterburner::updateIORegistryProperties(void) | `0x30f` | `0xa5b` |
+| 48 | `0x1d9a0` | `0x888c` | AppleAfterburner::resourceLoadCallbackHandler(uint32, int, void const *, uint32) | `0x30f` | `0xa96` |
+| 49 | `0x1d9b0` | `0xc984` | AppleAfterburner::free(void) | `0x30f` | `0xab4` |
+| 50 | `0x1d9c0` | `0xc8c0` | AppleAfterburner::init(OSDictionary *) | `0x30f` | `0xae0` |
+| 51 | `0x1d9d0` | `0xc0a4` | AppleAfterburner::stop(IOService *) | `0x30f` | `0xb08` |
+| 52 | `0x1d9e0` | `0xc998` | AppleAfterburner::probe(IOService *, int *) | `0x30f` | `0xb33` |
+| 53 | `0x1d9f0` | `0xaea8` | AppleAfterburner::reset(void) | `0x30f` | `0xb52` |
+| 54 | `0x1da00` | `0x4254` | AppleAfterburner::start(IOService *) | `0x30f` | `0xb7b` |
+| 55 | `0x1da10` | `0xb0ec` | AppleAfterburner::cleanUp(sContext *) | `0x30f` | `0xba5` |
+| 56 | `0x1da20` | `0xcab0` | AppleAfterburner::finalize(uint32) | `0x30f` | `0xbc7` |
+| 57 | `0x1da30` | `0x809c` | AppleAfterburner::spierase(uint32) | `0x30f` | `0xbe9` |
+| 58 | `0x1da40` | `0x4000` | MetaClass::ctor() | `0x30f` | `0xc0e` |
+| 59 | `0x1da50` | `0x40f8` | MetaClass::ctor() | `0x30f` | `0xc33` |
+| 60 | `0x1da60` | `0xbedc` | AppleAfterburner::bindFrame(IOMemoryDescriptor *) | `0x30f` | `0xc6a` |
+| 61 | `0x1da70` | `0xc058` | AppleAfterburner::freeSpace(u64 *) | `0xb0f` | `0xc8e` |
+
+**Notable for the Linux driver:**
+- Entry 22 = submitDataGated — firmware dispatches submissions through this table; our driver's fast path must implement the same contract (§15.2).
+- Entries 39/37 = queryCompletionGated / submitResourceGated — the three "*Gated" callbacks are the firmware-facing gated variants (vs plain queryCompletion@0xb88c, submitData@0xa67c).
+- New methods not previously decoded: **spiprogram**@0x821c, **loadBitfile**@0x8628, **submitResource**@0x8af0, **resourceLoadCallback(Handler)**@0x87c8/0x888c, register accessors (read/write BAR0/DMA/Flash/Thermal/Version/Decode/Bitfile @0x55cc–0x809c), pointer_restore_handler/timer @0x7508/0x7c1c, change_pointer@0x8580.
+- Entries 1 & 5 point to data (0x10198, 0x141e0) — not functions; likely table metadata or vtable refs.
