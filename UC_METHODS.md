@@ -682,6 +682,8 @@ if (ch != 1) → EXIT @6958                 ; ch0 done
 | +0x12E8 / +0x12F0 | space pool used / cap (u64) | §6 |
 | +0x1308 | IRQ-stamp base = saved [C8] at reset() time | handleInterrupt: `[12D0] = [1308] + ((w8>>16)) + ([D8]<<16)` |
 
+**Reconfig field group (added by §18 decode):** +0x138 firmware status block ptr, +0x150 SPI controller object, +0x169/+0x16A reconfig flags (deferred power-ack), +0x16C flash-update attempt counter, +0x170 ext-config blob pending flag, +0x174 4KB PCI-ext-config blob buffer, +0x1178/+0x1188 commit objects D/E (vt+0x1F0), +0x1198/+0x11A0 primary/secondary SPI buffer objects — full table in §18.6.
+
 ## 14. Open items / next steps
 
 1. ✅ DONE this session: queryCompletion@0xb88c (§10), cardStatus@0xbd90, getPercent@0xbda0, unbindFrame@0xbf6c, bindFrame(desc)@0xbec, updateActiveTime@0xbe64, updateIdleTime@0x9be0 — all in §6
@@ -693,13 +695,16 @@ if (ch != 1) → EXIT @6958                 ; ch0 done
 7. 🟡 IODirection enum mapping for withAddressRange dir=1/2
 8. ⬜ lifecycle overrides: start@0xd1e4 (🟡), willTerminate/didTerminate/terminate/finalize/clientClose/clientDied/getMetaClass/D1Ev/D0Ev — mostly boilerplate, decode any that touch HW/state
 9. 🟡 UC+0x1900 field semantics; s_inputDataStruct +0x14/+0x18 fields
-10. ⬜ Engine callback table (§16): 62 entries decoded & demangled — identify which are actually dispatched by firmware (the three *Gated callbacks) vs dead/legacy; decode spiprogram/loadBitfile/submitResource if needed for the Linux driver
+10. ⬜ Engine callback table (§16): 62 entries decoded & demangled — identify which are actually dispatched by firmware (the three *Gated callbacks) vs dead/legacy; spiprogram@821c + loadBitfile@8628 now decoded (§18.7), submitResource still open
 11. 🟡 sContext queue PUSH side: who links 24B {next,prev,desc} nodes into the four §15.3 queues (handleInterrupt / submitFrame path) — only pop/drain decoded so far
 12. ⬜ Engine object class (AB+0x90): now 3 known vt slots — 0x1E8 wait-with-callback (§10.1), 0x208 completion notify (§12.7/§12.8, ctx = self or &AB+0xC0), 0x210 poll-until-deadline (frameID=2). Identify the class; needed to replicate notify semantics in the Linux driver
 13. ⬜ BAR1+0x2044 bit layout: bit0=valid confirmed live (Phase 3i); bit1=channel selector inferred from dispatch (@63d4 compares status>>1 against 0/1). Higher bits unverified — may carry completion count
 14. ⬜ [decoder+0x14] frame-done/error word: & 0x1F mask gates §12.6 decoder-error check; bit0=hard error (sets guard flag + overrun limit); bits 1–4 firmware-defined, meaning unknown
 15. ⬜ AB::submitResource @0x8a1c–0x8d50 full body: only the AB+0x11B4=1 write at 0x8b74 confirmed; what resources are submitted and in what order is still open
-16. ⬜ reconfig_handler @0x6b94: separate from handleInterrupt's PR path (§12.2); body not yet decoded — likely the "partial FPGA reconfig event" responder
+16. ✅ DONE: reconfig_handler @0x6b94 — full decode in §18 (firmware image-type state machine: golden/HWTE/live/debug/unknown; SPI flash update path with 2×20MB channel programming, attempt counter, lazy bitfile load `live_2.6X_0x01_{primary,secondary}[_ecXX].bin`; commit vcall vt+0x1F0 + BAR0[+0x2004] re-enable words 0x00019000/0x0001A000; PCI ext-config 4KB blob flush). Helpers decoded: change_pointer@8580, spierase@809c, loadBitfile@8628, reconfig_timer@74c4
+17. ⬜ Who fills AB+0x174 (4KB ext-config blob)? No __text writer — presumed firmware DMA during the vt+0x1F0 commit vcall (§18.9)
+18. ⬜ Commit objects D/E ([self+0x1178]/[self+0x1188]) class + vt+0x1F0("commit", timeout) contract; vt+0x1F8 on [self+0x1180] (reconfig_timer poll) status layout
+19. ⬜ spiprogram@821c x4/w5 argument semantics across the two call styles (static descriptors w4=0x40/w5=0 vs src/dst ptrs w5=1)
 
 ## 15. Submission core deep dive — cleanUp + submitDataGated (2026-11-05)
 
@@ -1023,3 +1028,258 @@ cleanup:                                          // @6b04 — no pending, or dr
 - Ends with `IOService::acknowledgeSetPowerState()` — power-management bookkeeping (timer fired during a power-state transition).
 
 **Linux driver implications:** replicate as a periodic workqueue timer: if pending>0, poll engine status with deadline; on stuck frame → log + full reset path; on exit always refresh stamp base and ensure decoder disabled.
+
+## 18. AB::reconfig_handler @0x6b94–0x74ac ✅ (firmware image-type state machine) + reconfig_timer @0x74c4
+
+Decoded from `tmp/dis_reconfig_handler.txt` (full disasm 0x6b94–0x821c). Function spans
+**0x6b94–0x74ac** (~5.8KB) with secondary blocks placed after the epilogue @6efc–6f2c
+(compiler cold-block layout; all paths converge on tail `@6efc → retab @6f2c`).
+Names from §16 engine-callback table: reconfig_handler (this fn), **reconfig_timer**@0x74c4,
+**change_pointer**@0x8580, **spierase**@0x809c, **loadBitfile**@0x8628, **spiprogram**@0x821c.
+No direct `bl` callers — both reconfig fns are vtable-dispatched (IOKit event-source /
+engine-callback registration).
+
+### 18.1 Role
+
+Board-level firmware reconfiguration state machine. Reads the current image type from the
+firmware status block (**AB+0x138**, see §18.6) and drives one of: golden flash update,
+live→golden pointer restore, or no-op log. The SPI-flash path programs **two 20MB channel
+images** (primary/secondary) loaded from the kext bundle via `OSKextRequestResource`, then
+commits through a firmware "commit" vcall and re-enables the engine with a reconfig-specific
+BAR0[+0x2004] word.
+
+### 18.2 Entry — ext-config blob flush @6b94–6c5c
+
+```c
+void AB::reconfig_handler(void) {          // x0 = self; vtable-dispatched (no bl callers)
+    if ([self+0x170]) {                    ; reconfig-blob-pending flag (byte)
+        for (off = 0; off < 4096; off += 4)
+            IOPCIDevice::extendedConfigWrite32([self+0x88], off, [self+0x174 + off]);
+                                            ; ← writes a 4KB blob from AB+0x174 into PCI
+                                              ;   EXTENDED config space (1024 × u32)
+        [self+0x170] = 0;                  ; clear flag after flush
+    }
+
+    w24 = [[self+0x138]+4];                ; board-revision word (image type in bits[23:16])
+    name = getName();                      ; vcall vt+0x3A8(self, 0)
+    IOLog(fmt@abs0x979 "board revision: 0x%08x", name, self, "reconfig_handler"@0x160C, w24);
+
+    w25 = [[self+0x138]+8];                ; version word
+    x20 = w25 >> 16;                       ; major (u16)
+    w23 = w25 & 0xFFFF;                    ; minor (u16)
+
+    switch ((w24 >> 16) & 0xF) {           ; jump table @0x74B4, 5×s32 PC-rel to base_pc=0x6ce8
+```
+
+### 18.3 Case 0 — GOLDEN image @6cf0–6d90
+
+```c
+    case 0:   // "image type is golden" (fmt@0x161D)
+        name = getName(); IOLog(fmt@0x161D, name, self);
+        if ((w25 & (1<<17)) || (minor > 0x18))     ; bit17 of version word OR minor > 24
+            goto flash_update_entry @6f48;         ; → attempt-limited SPI update path
+        name = getName();
+        IOLog(fmt@abs0x9F7 "unsupported golden image %u.%u... bailing out",
+              name, self, major, minor);           ; too-old golden: refuse, exit
+        goto tail;
+```
+
+### 18.4 Cases 1 / 3 / default — log-only @6ddc–6e20
+
+| case | image type | fmt (abs) | action |
+|------|-----------|-----------|--------|
+| 1    | HWTE      | 0x1832 "image type is HWTE..." | log, tail |
+| 3    | debug     | 0x19BB "image type is debug..." | log, tail |
+| >3   | unknown   | 0x19F6 "image type is unknown..." | log, tail |
+
+### 18.5 Case 2 — LIVE image @6e24–73dc (the interesting path)
+
+```c
+    case 2:   // "live" image
+        if ([self+0x16C] > 1) goto reconfig_to_live;      ; attempt counter ≥2 → assume done
+        if (major == 2 && minor ∈ {0x3E, 0x3F})           ; already at golden target version!
+            goto reconfig_to_live @6f30;
+
+        // --- flash-update path @6e5c (live image NOT yet at 2.62/2.63) ---
+        name = getName();
+        IOLog(fmt@0x186C "image type is live... reconfiguring to golden for flash update", ...);
+        [self+0x170] = 1;                  ; arm ext-config blob flush (consumed next entry)
+        x0 = [self+0x1178];                ; commit object D
+        goto apply_and_engine_enable @7054;   ; → BAR0[+0x2004] = 0x00019000
+
+reconfig_to_live:                          // @6f30 — "update complete" path
+        w20 = (major==2 && minor==0x3E) ? 1 : (major==2 && minor==0x3F);   ; variant flag
+        name = getName();
+        if (!w20) goto give_up @70a0;      ; neither 2.62 nor 2.63 → give up
+        IOLog(fmt@0x18CF "image update is complete!", ...);
+        IOLog(fmt@0x190D "image type is live... reconfiguring to golden for pointer restore", ...);
+        [self+0x170] = 1;                  ; arm ext-config blob flush
+        x0 = [self+0x1188];                ; commit object E (different from D!)
+
+apply_and_engine_enable:                   // @7054 — shared by both live sub-paths
+        PAC-verify(x0, tag 0xcda1);
+        [obj_vt+0x1F0](obj, w1=0x3E8);     ; "commit" vcall, timeout = 1000 (ms)
+        [BAR0+0x2004] = 0x00019000;        ; engine re-enable word (pointer-restore variant)
+                                            ;   ([self+0x148]+4 — BAR0 base +0x2000 region,
+                                            ;    NOT the BAR1+0x2004=0x16 init enable)
+        goto tail;
+
+give_up:                                   // @70a0
+        IOLog(fmt@0x1656 "giving up on flash update. max attempts = %u", ..., [self+0x16C]);
+        [self+0x169] = 0;                  ; clear byte flag
+        if ([self+0x16A]) {                ; deferred power-ack pending?
+            IOLog(fmt@0x1973 "deferred ack for power state change", ...);
+            IOService::acknowledgeSetPowerState(self);   ; PLT 0xe9a4
+            [self+0x16A] = 0;
+        }
+        goto tail;
+```
+
+**flash_update_entry @6f48** (reached from case-0 golden when bit17/minor>0x18):
+
+```c
+    w20 = [self+0x16C];                    ; attempt counter
+    name = getName();
+    if (w20 < 2) goto third_phase @711c;   ; attempts remaining → do SPI work
+    IOLog(fmt@0x1656 "giving up on flash update. max attempts = %u", ..., [self+0x16C]);
+    [self+0x169] = 0;
+    if ([self+0x16A]) { ...acknowledgeSetPowerState... }   ; same as give_up
+    goto tail;
+```
+
+**third_phase @711c — the actual SPI flash update:**
+
+```c
+        w8 = [[self+0x138]+0xC];           ; fuse-user word
+        IOLog(fmt@0x16A8 "fuse user: 0x%08x", ..., w8);
+        w20 = (w8 >> 16) & 0xFF;           ; reconfig-state byte (bits[23:16])
+        if (w20 >= 2) {                    ; already updated / in progress
+            IOLog(fmt@0x16DE "unknown version %u. giving up on flash update", ..., w20);
+            goto tail;
+        }
+
+        // --- lazy bitfile load: SPI buffer objects not present yet? ---
+        if ((w8 & 3) == 0 && [self+0x1198] == NULL) {   ; primary SPI buffer object missing
+            zero buf[0x80];
+            snprintf(buf, 0x80, (w8&3)==3 ? fmt@0x1731 : fmt@0x1754, 2, w8==3?0x3E:0x3F, w20);
+                                            ; "live_2.6X_0x01_primary[_ec%02x].bin"
+            loadBitfile(self, buf, channel=1);          ; bl 0x8628 (OSKextRequestResource)
+            goto tail;
+        }
+        if ([self+0x11A0] == NULL) {       ; secondary SPI buffer object missing → same with
+                                            ;   fmt@0x1770/0x1795, channel=2 ("..._secondary...")
+        }
+
+        [self+0x16C]++;                    ; increment attempt counter (max 2)
+        IOLog(fmt@0x17B3 "changing pointer to golden...", ...);
+        change_pointer(self, w1=0);        ; bl 0x8580 — program BOTH SPI channels with static
+                                            ;   descriptor tables (see §18.7)
+        IOSleep(1000ms);                   ; PLT 0xe89c
+        spierase(self, size=0x1400000);    ; bl 0x809c — erase 20MB ("this can take 1-2 minutes")
+
+        // --- program channel 0 (primary) with the loaded image ---
+        src = [objA_vt+0x308](objA=[self+0x1198]);   ; "get source" vcall (PAC tag 0xf4f4)
+        dst = [objA_vt+0x300](objA);                  ; "get dest" vcall (PAC tag 0x98e1)
+        spiprogram(self, channel=0, size=0x1400000, src, dst, w5=1);   ; bl 0x821c
+
+        // --- program channel 1 (secondary) — identical with [self+0x11A0] ---
+        spiprogram(self, channel=1, size=0x1400000, srcB, dstB, w5=1);
+
+        IOLog(fmt@0x17F5 "reconfiguring to live...", ...);
+        [self+0x170] = 1;                  ; arm ext-config blob flush
+        x0 = [self+0x1178];                ; commit object D
+        PAC-verify(x0, tag 0xcda1);
+        [obj_vt+0x1F0](obj, w1=0x3E8);     ; commit vcall (timeout 1000)
+        [BAR0+0x2004] = 0x0001A000;        ; engine re-enable word — FLASH-UPDATE variant
+                                            ;   (0x9000 + 0x1000, vs 0x9000 for pointer restore)
+        goto tail;
+```
+
+**Bitfile naming** (snprintf fmts, abs offsets): `live_%u.%u_0x01_primary_ec%02x.bin` @0x1731,
+`live_%u.%u_0x01_primary.bin` @0x1754, `live_%u.%u_0x01_secondary_ec%02x.bin` @0x1770,
+`live_%u.%u_0x01_secondary.bin` @0x1795. Args: major=**2**, minor=**0x3E (62)** when
+`(fuse_user & 3)==3` else **0x3F (63)**, plus reconfig-state byte w20 for the `_ec%02x` variants.
+→ golden target versions are exactly **2.62 / 2.63**, matching the case-2 version gate.
+
+### 18.6 New AB fields discovered by this decode
+
+| offset | type | meaning (evidence) |
+|--------|------|--------------------|
+| +0x138 | u64 ptr | **Firmware status block** (never written from __text; read in start() ×4, reconfig_handler ×4, pointer_restore_handler ×3). Sub-fields: [+4]=board-revision word (image type = bits[23:16]: 0=golden, 1=HWTE, 2=live, 3=debug), [+8]=version word (major.u16 / minor.u16; golden targets 2.62/2.63), [+0xC]=fuse-user word (bits[23:16]=reconfig state ≥2 ⇒ done; bits[1:0] select bitfile variant) |
+| +0x150 | u64 ptr | **SPI controller object** (spierase@809c): [+0x10]=status word (bit5 = busy, polled with 1s sleeps), [+0x40]=op size, [+0x48]=marker (0xEEEE set/cleared around op), [+0x54]/[+0x58]=op flags |
+| +0x169 | u32 byte | reconfig sub-flag — cleared on give-up paths |
+| +0x16A | u32 byte | **deferred power-ack pending** — set elsewhere; when non-zero at give-up, `IOService::acknowledgeSetPowerState()` is called and it's cleared (log "deferred ack for power state change") |
+| +0x16C | u32 | **flash-update attempt counter** — incremented in third_phase @7168; ≥2 ⇒ skip SPI work / give up ("max attempts = %u") |
+| +0x170 | u32 byte | **ext-config blob pending flag** — set before every commit vcall; consumed at next entry (4KB flush to PCI ext config) |
+| +0x174 | 4KB buffer | reconfig blob written to PCI extended config space via `IOPCIDevice::extendedConfigWrite32` ×1024. **No __text writer found** — presumably firmware DMA-fills it during the commit vcall (open item) |
+| +0x1178 | u64 ptr | **commit object D** — vt+0x1F0(timeout=1000) "commit reconfig" vcall; used by live-flash-update path and third_phase |
+| +0x1188 | u64 ptr | **commit object E** — same vt+0x1F0 contract; used by pointer-restore ("update complete") path |
+| +0x1198 | u64 ptr | **primary SPI buffer object** — vt+0x308="get source", vt+0x300="get dest" (PAC tags 0xf4f4/0x98e1); NULL ⇒ lazy loadBitfile(channel=1) |
+| +0x11A0 | u64 ptr | **secondary SPI buffer object** — same vtable; NULL ⇒ lazy loadBitfile(channel=2) |
+
+All of these are set up outside __text (init-time object allocation / IOKit registration),
+consistent with every other AB object pointer.
+
+### 18.7 Helper functions decoded this session
+
+```c
+// @0x8580 — "change_pointer(uint32)" per §16 table: programs BOTH SPI channels
+void AB::change_pointer(u32 flag) {
+    spierase(self, size=0x13F0000);              ; ~32MB erase prep (w = 0x13F_FF40 - 0xF40)
+    const u8* descA = (flag==1) ? abs0x5F0 : abs0x670;   ; static SPI command descriptor tables
+    const u8* descB = (flag==1) ? abs0x630 : abs0x6B0;   ; (binary data, not strings)
+    spiprogram(self, ch=0, size=0x13F_FF40, src=descA, w4=0x40, w5=0);
+    spiprogram(self, ch=1, size=0x13F_FF40, src=descB, w4=0x40, w5=0);   ; tail call
+}
+
+// @0x809c — "spierase(uint32)" per §16: start erase on [self+0x150], wait for completion
+void AB::spierase(u32 size) {
+    IOLog(fmt@abs0x1389 "begin erasing flash", ...);
+    IOLog(fmt@abs0x13CA "erasing 0x%08x... (this can take 1-2 minutes)", ..., size);
+    obj = [self+0x150];
+    [obj+0x54]=1; [obj+0x58]=0; [obj+0x40]=size; [obj+0x48]=0xEEEE;
+    while ([obj+0x10] & (1<<5)) IOSleep(1000ms);   ; busy-poll status bit5, 1s granularity
+    [obj+0x4C]=0; [obj+0x54]=1→0 bookkeeping;      ; clear marker/flags on completion
+}
+
+// @0x8628 — "loadBitfile(const char*, uint32)" per §16: fetch bitfile from kext bundle
+void* AB::loadBitfile(const char* name, u32 channel) {
+    IOLog(fmt@abs0x1BE6 "requesting resource data from %s", ..., name);
+    void* res = fn@0xe7ec();                       ; getter → &global+0x10 (kext object ptr)
+    int r = OSKextRequestResource(res, name, &pac_data_ptr(abs0x87C8), self?, &out);  ; PLT 0xe8a8
+    if (!r) { IOLog(fmt@abs0x1C37 "OSKextRequestResource failed: %d", ..., r); return NULL; }
+    return out;                                    ; loaded bitfile data (→ SPI buffer objects)
+}
+
+// @0x74c4 — "reconfig_timer(IOTimerEventSource*)" per §16: tiny leaf, no stack frame
+void AB::reconfig_timer(IOTimerEventSource* src) {
+    obj = [self+0x1180];                           ; reconfig-status object (PAC tag 0xcda1)
+    [obj_vt+0x1F8](obj, 0, 0, 0);                  ; "poll/notify" vcall — all-zero args
+}
+```
+
+**spiprogram@0x821c signature (from both call sites):** `spiprogram(self, channel, size, src, dst_or_cmd, mode)` —
+change_pointer passes static descriptor tables + w4=0x40/w5=0; reconfig third_phase passes
+vt+0x308/vt+0x300 results (src/dst) + w5=1. Exact x4/w5 semantics: open item.
+
+### 18.8 Linux driver implications
+
+- The whole flash-update path is **one-shot board provisioning** (live→golden, max 2 attempts,
+  1–2 min erase). A fast decode driver does NOT need it — but the **BAR0[+0x2004] re-enable
+  words** (0x00019000 pointer-restore / 0x0001A000 flash-update) and the **PCI ext-config 4KB
+  blob flush** are the only parts that could matter for recovery after a firmware state change.
+- `reconfig_timer`'s `[self+0x1180] vt+0x1F8(0,0,0)` is the periodic reconfig-status poll —
+  if we ever implement live→golden migration on Linux, this is the completion-poll contract.
+- The **fuse-user word** ([AB+0x138]+0xC) encodes board provisioning state (bits[23:16] ≥ 2 ⇒
+  golden done; bits[1:0] = bitfile variant selector). Read it at probe to decide whether the
+  card is fully provisioned.
+
+### 18.9 Open items from this decode
+
+- Who fills **AB+0x174** (the 4KB ext-config blob)? No __text writer — presumed firmware DMA
+  during the vt+0x1F0 commit vcall.
+- Class/contract of **commit objects D/E** ([self+0x1178]/[self+0x1188]) and their vt+0x1F0
+  ("commit", timeout arg) — what does a non-zero return mean?
+- **vt+0x1F8** on [self+0x1180] (reconfig_timer poll) — status word layout.
+- spiprogram x4/w5 argument semantics across the two call styles.
+- fn@0xe7ec global (+0x10 of page 0x10000 object) — which kext/resource handle it is.
