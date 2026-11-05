@@ -411,52 +411,281 @@ object**: +4 = reset-signal, +8 = decoder status (bit0 = ready/ack), +0x14 = vol
 - Callers (full __text scan): `updateActiveTime` ← handleInterrupt @0x64c8;
   `updateIdleTime` ← submitDataGated @0x9b18.
 
-## 12. AB::handleInterrupt 🟡 (body 0x5aec–0x6a00, `tmp/dis_ab_handleInterrupt.txt`)
+## 12. AB::handleInterrupt ✅ (body 0x5aec–~0x69f8, `tmp/dis_ab_handleInterrupt.txt`)
 
-IRQ entry point (`(OSObject*, IOInterruptEventSource*, int)`). Decoded so far — the
-completion-event path around 0x64c8:
+IRQ entry point (`(OSObject*, IOInterruptEventSource*, int)`). **Full body decoded 2026-11-05.**
+Structure: prologue → bitfile section → thermal section → completion section (gated by AB+0x11B4)
+→ deferred re-submission chain → exit. All PLT targets resolved via `stub_map.json` + `imports_map.json`.
+
+### 12.0 Prologue @5aec
 ```
-kernel_debug(...); tbz w20,#0 → (other event type)
-[AB_vt+0x3a8](AB, 0)                    ; getName-style vcall (vt slot 151, tag 0xc9c)
-IOLog(str@0x2F8D)                       ; interrupt log line
-updateActiveTime()                      ; ← idle→active transition on IRQ!
-[obj+0x114] = 1                         ; byte flag on some channel object (x24)
-[AB+0x12DC] = w8                        ; status u32 (from [AB+0x158]->obj ? +0x10 : 0)
-[AB+0x12D0] = [AB+0x1308] + ((w8>>16)) + ([AB+0xD8]<<16)   ; computed stamp/mask
-[AB+0x12D8] = 0                         ; _numFrames cleared
+x19 = self; x24 = self + 0x11B4        ; completion-pending flag address (base reg for field group)
+w22 = 0x2B61FAC                          ; kernel_debug trace ID base (all traces in this fn use w22+N)
+x8  = [self+0x148]                       ; BAR0+0x2000 region (bitfile control block)
+w20 = [BAR0+0x2014]                      ; bitfile interrupt word
+if (!(w20 & 1)) → thermal section @6140  ; bit0 clear → skip bitfile handling entirely
 ```
-TODO: full body (event-type dispatch, BAR1 status reads, which register bits gate the
-updateActiveTime path).
+
+### 12.1 Bitfile section (bit0 of BAR0+0x2014 set)
+- IOLog("handleInterrupt" fmt@0x2cb3, name, w20); kernel_debug(0x2B61FAC, self, 1, w20, 0, 0) [trace #1]
+- w20 = **[BAR0+0x2010]** — bitfile status LIVE → IOLog("bitfile status live: 0x%08x" fmt@0x2cc3)
+- w21 = **[BAR0+0x2020]** — rising latched event word → IOLog("bitfile rising latched" fmt@0x2d03)
+- if ((w21 & 7) == 0) → falling check @60e0 (no rising events)
+- else: **[BAR0+0x2020] = w21 & 7** (ACK rising latch, masked to bits 0–2)
+  - **bit2 (PR programming error)**: [BAR0+0x2004] = 0 (engine disable); IOLog("PR programming error!" fmt@0x2d46)
+  - **bit1 (partial reconfig)**: [BAR0+0x2004] = 0; IOLog("partial FPGA reconfig event" fmt@0x1d81) → flash/bitfile walk @5d14
+
+### 12.2 Flash/bitfile directory walk @5d14 (only on PR bit1)
+```
+idx=0; [self+0x158]=NULL; w26=1
+loop:
+   word = [[self+0x128] + idx*4]          ; u32 table at AB+0x128 (directory base ptr)
+   IOLog("Section header: 0x%08x" fmt@0x1aca, name, word)
+   type = word & 0xFF
+   if (type == 1):                        ; decoder section!
+       [self+0x11D0] = 1                  ; decoder-found flag
+       [self+0x158] = table_base + idx    ; decoder section pointer
+   next_idx = ((word >> 14) & 0x3FFFC) + idx
+   if (type != 0) → loop with next_idx    ; type==0 = terminator
+```
+Matches Phase 3k live walk exactly (type=W&0xFF, next=O+((W>>14)&0x3FFFC)).
+
+**Decoder disable/enable cycle** (after walk):
+- IOLog("Decoder section header" fmt@0x1b05) with [decoder_section] word 0
+- **[decoder_section+4] = 0** (DECODER DISABLE — BAR0[hdr+4])
+- IOLog("Decoder Control Register ... (disabling)" fmt@0x1b48); verify-read + log
+- **IOSleep(1)** (PLT stub 0xe89c)
+- **[decoder_section+4] = 1** (DECODER RE-ENABLE)
+- Re-enable log: fmt@0x11DF if decoder found, else fmt@0x1B99. Note: kext references a mid-string pointer here (cosmetic logging bug in Apple's code).
+
+### 12.3 PR DMA reset @5ee0 (only if rising bits 1|2 were set)
+```
+if (!(w21 & 6)) → skip to flag clear @60dc
+   [PR event:]
+   x21 = [self+0x11C8]                    ; descDmaQ queue OBJECT ptr!
+   sub = [x21_vt+0x158](...)              ; get sub-object (DMA state)
+   ... multiple vtable calls to tear down DMA state ...
+   x20 = [self+0x11C0]                    ; dmaQ queue OBJECT ptr
+   ... more teardown vcalls ...
+60dc: [self+0x11B4] = 0                   ; clear completion-pending flag
+```
+**Correction:** AB+0x11C0/AB+0x11C8 are **OBJECT POINTERS** to the dmaQ/descDmaQ queue objects (not raw notify registers). The PR path tears down DMA state via vtable calls and nulls these pointers.
+
+### 12.4 Falling latched check @60e0
+- w20 = **[BAR0+0x2024]** — **bitfile falling-latched event word** (correction: NOT a completion status register; real completion is at BAR1+0x2044)
+- IOLog("bitfile falling latched" fmt@0x2dba)
+- if ((w20 & 7)): **[BAR0+0x2024] = w20 & 7** (ACK, masked to bits 0–2)
+
+### 12.5 Thermal section @6140 (BAR0+0x1000 region via [self+0x140])
+```
+w20 = [BAR0+0x1014]                       ; thermal interrupt word
+if (!(w20 & 1)) → completion section @639c
+   [thermal IRQ:]
+   IOLog("thermal interrupt" fmt@0x2dfe, name, w20)
+   w20 = [BAR0+0x1010]                    ; thermal status LIVE
+   IOLog("thermal status live" fmt@0x26a1, ...)
+   w20 = [BAR0+0x1020]                    ; rising latched (raw)
+   IOLog("thermal rising latched" fmt@0x2e3c, ...)
+   w21 = w20 & 0x7D                       ; mask to valid bits
+   if (w21):
+       if ([self+0x160] == 0) → IOLog("entering thermal distress state" fmt@0x2e7f)
+       [self+0x160] |= w21                ; accumulate rising bits into distress mask!
+       [BAR0+0x1020] = w21                ; ACK (masked value!)
+   w21 = [BAR0+0x1024]                    ; falling latched (raw)
+   IOLog("thermal falling latched" fmt@0xec4, ...)
+   w26 = w21 & 0x7D
+   if (w26):
+       [self+0x160] &= ~w26               ; clear falling bits from distress mask!
+       if ([self+0x160] == 0) → IOLog("exiting thermal distress state" fmt@0xf08)
+       [BAR0+0x1024] = w26                ; ACK (masked value!)
+kernel_debug(0x2B61FAC, self, 2, live_status, falling_raw, 0)   ; trace #2
+```
+**AB+0x160 = thermal distress bitmask** (NOT a counter): rising bits OR'd in, falling bits AND-NOT'd out. Non-zero → submitFrame drops frames (§13). First-event log only on 0→nonzero transition; recovery log only on nonzero→0 transition.
+
+### 12.6 Completion section @639c (gated by AB+0x11B4)
+```
+w8 = [self+0x11B4]                        ; completion-pending flag (byte)
+if (!flag) → decoder frame-done check @63f0
+   [flag set:]
+63a4: x8=[self+0x130]; w25=[BAR1+0x2044]; [BAR1+0x2018]=w25   ; read status + ACK #1!
+      x20 = w25 >> 1                       ; dispatch value (bit1 = channel selector)
+      kernel_debug(0x2B61FAC, self, 4, x20, 0, 0)             ; trace #4
+      if (x20 == 1) → single batch path @6554
+      if (x20 != 0) → shared entry @6668 with w26=0 (no data word)
+      [x20 == 0 — send channel:]
+        w26 = [BAR1+0x44]; wzr = [BAR1+0x48]    ; SEND data words!
+        → shared entry @6668
+
+; --- Decoder frame-done check (flag clear) @63f0 ---
+ptr = [self+0x158]                        ; decoder section pointer
+if (!ptr || !([ptr+0x14] & 0x1F)) → status read @63a4   ; no error → normal path
+   [frame-done bits set — DECODER ERROR:]
+   IOLog("Error from decoder" fmt@0x2f4c, name, w20)
+   kernel_debug(0x2B61FAC, self, 3, w20, 0, 0)             ; trace #3
+   if (!(w20 & 1)) → status read @63a4                     ; soft error → continue normally
+   [HARD ERROR (bit0 set):]
+   IOLog("HARD error from decoder" fmt@0x2f8d, name, w20)
+   updateActiveTime()                                   ; ← idle→active transition!
+   **[self+0x12C8] = 1**                                ; SET guard flag (enables overrun check)!
+   [self+0x12DC] = [decoder+0x10]                        ; save offending frame index
+   cursor = [self+0x1308] + ([decoder+0x10]>>16) + ([self+0xD8]<<16)
+   [self+0x12D0] = cursor                                ; set overrun limit!
+   [self+0x12D8] = 0                                     ; clear failure counter
+   IOLog("Offending frameNum" fmt@0x2fd3, name, cursor)
+   → EXIT @6958 (epilogue)
+```
+
+**BAR1+0x2044 format:** bit0 = valid indicator (per Phase 3i live decode), bit1 = channel selector (0=send/h2c completion with data @BAR1+0x44/0x48, 1=batch/c2h single completion). Dispatch uses status>>1: 0→send path, 1→single batch path, >1→shared entry without data word.
+
+**Guard flag AB+0x12C8 lifecycle (fully resolved):**
+- SET by queryCompletionGated@b7b4 (first timeout)
+- **SET on hard decoder error @64d0** (this function — enables overrun check for subsequent completions)
+- CLEARED by reset()@b0c0
+
+### 12.7 Single batch completion path @6554 (x20==1, ch==1)
+```
+ptr = [self+0x158]                        ; decoder section pointer
+w20 = ptr ? [ptr+0x10] : 0                ; frame index from decoder!
+kernel_debug(0x2B61FB4, self, w2=[AB+0x12E4], x3=?, w4=[AB+0xC0], ...)   ; trace #5 (w22+8)
+[AB+0x12E4]--                             ; expected count--
+[AB+0xC0]--                               ; _pendingData--
+notifier = [self+0x90]; PAC-verify vptr; [vt+0x208](notifier, self, 0)   ; NOTIFY (arg1=self!)
+if ([AB+0x12E4] != 0) → drain loop @67a4  ; more expected → continue draining
+```
+
+### 12.8 Shared queue entry + drain loop @6668
+```
+[BAR1+0x2014] = w25                       ; ACK #2 (always, before queue processing)
+sentinel_addr = self + ch*16 + 0x11F0     ; per-channel queue sentinel (ch0: AB+0x11F0, ch1: AB+0x1200)
+head = [sentinel_addr]                    ; head node ptr (== sentinel if empty)
+
+if (head == sentinel):                    ; EMPTY QUEUE
+    if (w26 & 1) → EXIT @6958             ; data bit set but no queue → exit
+    if (ch==1 && [AB+0x12E4]==0) → flag clear @685c
+    else → drain loop entry @67a4 with x21=&AB+0xC0, w23=0xFFFF
+
+[non-empty:]
+if (w26 & 1) → EXIT @6958                 ; data bit set → exit without processing!
+if (ch==1 && [AB+0x12E4]==0):             ; flag-set path @6760
+    **[self + ch + 0x11E4] = 1**          ; SET channel active flag!
+    if (head == sentinel) → node processing @68a4 with x21=NULL (invariant violation!)
+    else: pop node; → node processing @68a8
+
+[otherwise:] drain loop entry @669c with x21=&AB+0xC0, w23=0xFFFF
+
+; --- Drain loop @66a4–6758 ---
+loop:
+   ptr = [self+0x158]                     ; decoder section pointer
+   idx = ptr ? ([ptr+0x10] >> 16) : (w9 stale — in practice non-NULL here)
+   cursor = [self+0x1308] + idx + ([self+0xD8]<<16); [self+0x1270] = cursor
+   if (idx == 0xFFFF && cursor >= 1): [self+0xD8]++
+   kernel_debug(0x2B61FB4, self, w2=old_count, x3=?, w4=[AB+0xC0], 0)   ; trace #5
+   [self+0x12E4]--                        ; expected count--
+   [self+0xC0]--                          ; _pendingData--
+   notifier = [self+0x90]; PAC; [vt+0x208](notifier, x21, 0)            ; NOTIFY (arg1=x21!)
+   if ([self+0x12E4] != 0) → loop         ; more expected → drain again
+
+[drain complete — count==0:]
+head = [sentinel_addr]                    ; reload head
+**[self + ch + 0x11E4] = 1**              ; SET channel active flag! (new work coming!)
+if (head == sentinel) → node processing @68a4 with x21=NULL (invariant!)
+else: pop node; → node processing @68a8   ; RE-SUBMIT next deferred node!
+```
+
+**Notify semantics:** `[AB+0x90]->[vt+0x208](notifier, ctx, 0)` where ctx = self (single completion path) or &AB+0xC0 (drain loop). The notifier object's class is unknown — open item.
+
+### 12.9 Node processing / deferred re-submission @68a4–69c8
+```
+; --- SEND channel node (type==0) ---
+w9 = node[+0x10]; w8 = node[+0x14]        ; desc PA lo/hi (staging words!)
+w10 = node[+0x1C]                         ; type
+if (type == 1) → batch re-submission @6978
+if (type != 0) → free only @69c8
+   [type == 0 — SEND:]
+   x10 = BAR1 base
+   [BAR1+4] = 0                           ; clear send doorbell
+   [BAR1+0x4080] = w9                     ; stage desc PA lo
+   [BAR1+0x4084] = w8                     ; stage desc PA hi
+   [BAR1+0x4088] = node[+0x18]            ; stage local_val
+   [BAR1+4] = 0xFFE7F                     ; RING send doorbell!
+   → free @69c8
+
+; --- BATCH re-submission (type==1) @6978 ---
+[BAR1+0x1004] = 0                         ; clear batch doorbell
+[BAR1+0x5080] = node[+0x10]               ; stage desc PA lo
+[BAR1+0x5084] = node[+0x14]               ; stage desc PA hi
+[BAR1+0x5088] = node[+0x18]               ; stage local_val
+[BAR1+0x1004] = 0x80FFE7F                 ; RING batch doorbell!
+w2 = node[+0x3C]                          ; expected completion count from the node!
+[self+0x12E4] = w2                        ; SET expected count (batch!)
+kernel_debug(0x2B61FB0, self, 1, [AB+0xC0], ...)   ; trace #6 (w22+4)
+
+; --- Free + exit @69c8 ---
+mov x0, x21; mov w1, #0x48                ; kfree(node, size=72)!
+epilogue → b #0xe848                       ; tail-call to PLT stub 0xe848 (kfree!)
+```
+
+**Deferred submission node layout (72B, confirmed):**
+| offset | field | notes |
+|---|---|---|
+| +0x00 | next pointer | circular doubly-linked list |
+| +0x08 | prev pointer | |
+| +0x10 | desc PA lo | staging word 1 (BAR1+0x4080 or +0x5080) |
+| +0x14 | desc PA hi | staging word 2 |
+| +0x18 | local_val | staging word 3 (+0x4088 or +0x5088) |
+| +0x1C | type (u32) | 0=send channel, 1=batch channel |
+| +0x3C | expected completion count (u32) | batch only; written to AB+0x12E4 on re-submission |
+
+**Deferred submission architecture:** submitDataGated enqueues 72B nodes into the per-channel queue (sentinel at AB+0x11F0/AB+0x1200). On each completion IRQ, handleInterrupt pops the next node and re-stages it into BAR1 staging banks + rings doorbell. This is the actual DMA submission path — not direct from userland.
+
+### 12.10 Flag clear / exit @685c
+```
+[self + ch + 0x11E4] = 0                  ; CLEAR channel active flag (idle!)
+if (ch != 1) → EXIT @6958                 ; ch0 done
+   [ch==1:] epilogue; b #0xbe64           ; TAIL CALL updateActiveTime()!
+```
+
+### 12.11 kernel_debug trace IDs in handleInterrupt
+| ID | offset from w22 | location | meaning |
+|---|---|---|---|
+| 0x2B61FAC | +0 | prologue/thermal/completion entry | main IRQ trace (arg3 = event type: 1=bitfile, 2=thermal, 3=decoder error, 4=status read) |
+| 0x2B61FB0 | +4 | batch re-submission @69c0 | deferred node re-staged to batch channel |
+| 0x2B61FB4 | +8 | single path @65a8 / drain loop @66e4 | per-completion trace (arg3=old expected count, arg5=_pendingData) |
 
 ## 13. AB object layout (offsets from `this`) — accumulated ✅/🟡
 
 | offset | field | notes |
 |---|---|---|
-| +0x90   | engine object ptr | PAC-verified; vt+0x1E8 = wait-with-callback, vt+0x210 = poll-until-deadline |
-| +0xA0 / +0xA8 | notifier objects (dmaQ / descDmaQ) | vt+0x150(notifier, obj) on completion |
+| +0x90   | **engine object ptr** (firmware interface) | PAC-verified; vt+0x1E8 = wait-with-callback (§10.1), vt+0x210 = poll-until-deadline (submitDataGated/sleep_timer, frameID=2), **vt+0x208 = completion notify** — `[vt+0x208](engine, ctx, 0)` called by handleInterrupt drain loop (ctx=&AB+0xC0) and single path (ctx=self). Class unknown (§14 open item) |
+| +0xA0 / +0xA8 | notifier objects (dmaQ / descDmaQ) | vt+0x150(notifier, obj) on completion (§10/§15.1) — distinct from the +0x90 notifier |
 | +0xC0   | **_pendingData** (u32) — in-flight/pending frame counter | kext-maintained: `++` by submitDataGated after flow control; `--` by handleInterrupt as fw completes frames; cleared by reset(); returned to userland by cardStatus(). cleanUp log names it `_pendingData %u`. (Earlier "engine-maintained status word" note superseded.) |
 | +0xC8   | _frameNum (u64) — frame counter | used in done-verify `([C8] & ~[12D0]) == [12D8]`; saved to 0x1308 by reset(); cleanUp log names it `_frameNum %llu` |
 | +0xD8   | IRQ-stamp high component (u64) | `[AB+0xD8]<<16` in handleInterrupt stamp calc; cleared by reset() |
 | +0xE0 / +0xE8 | acc_E0 (active) / acc_E8 (idle) time accumulators | §11 |
 | +0xF8   | last-sample timeval | §11 |
 | +0x108  | scratch timeval (microtime target) | §11 |
+| +0x128  | **bitfile directory table base ptr** (u64) | u32 section-header array walked by handleInterrupt PR path (§12.2): entry = {type@bits[7:0], next_idx_delta@bits[29:14]}; type==1 → decoder section, type==0 → terminator |
+| +0x158  | **decoder section pointer** (u64) — points INTO BAR0 at the decoder section found by the §12.2 walk | Section layout: [+0]=header word (live: 0x000b0101), [+4]=enable/disable (0=disable, 1=enable; written by PR cycle + stop()), [+0x10]=frame index/status word (>>16 = completion idx in drain loop; saved to AB+0x12DC on hard error), [+0x14]=frame-done/error word (& 0x1F mask gates the §12.6 decoder-error check). NULL when no decoder section found |
+| +0x160  | **thermal distress bitmask** (u32) | §12.5: rising bits OR'd in, falling bits AND-NOT'd out; non-zero → submitFrame drops frames; "entering/exiting thermal distress state" logs on transitions |
+| +0x11B4 | **completion-pending flag** (byte) | SET=1 by AB::submitResource@8b74 (firmware resource submission); CLEARED at 60dc in handleInterrupt PR path; gates the §12.6 completion section (`ldrb w8,[self+0x11B4]`). x24 = self+0x11B4 is the base register for this field group in handleInterrupt |
+| +0x11C0 / +0x11C8 | **dmaQ / descDmaQ queue OBJECT pointers** (u64) | CORRECTION: object pointers, NOT raw notify registers. PR path (§12.3) tears down DMA state via vtable calls on these objects and nulls them; sub-object retrieved via [vt+0x158] |
+| +0x11D0 | decoder-found flag (byte) | set by §12.2 bitfile walk when a type==1 section is found; checked by AB::stop@0xc0a4 before disabling the decoder |
 | +0x11E4 / +0x11E5 | **channel active flags** (bytes, ch0/ch1) | addressed as `[self+ch+0x11E4]` — NO index shift (verified raw bytes @9a68/6760). Set by submitDataGated on first submission to a channel; re-set by handleInterrupt when completions leave pending work; cleared by handleInterrupt after the last node is processed. **NOT** the 0x12C8 guard flag (earlier misattribution corrected) |
 | +0x11F0 / +0x1200 | per-channel queue head slots (stride 0x10: qbase = self+ch·16) | `[qbase+0x11F0]` = head node ptr (self-ref sentinel when empty); `[qbase+0x11F8]` = tail. Nodes are **sDmaConfig structs (72B)** — pending-submission queue, not raw descriptor nodes: submitDataGated links cfg in on coalesce; handleInterrupt dequeues as fw completes; reset() frees leftovers |
 | +0x12C0 | IOLock* — space pool lock | §6 |
-| +0x12D0 | stamp/mask for done-verify | written by IRQ handler & stub first-timeout; = -1 after reset() |
-| +0x12D8 | _numFrames (u32) | failure counter; cleared on IRQ / first timeout / reset() |
-| +0x12DC | status u32 | written by handleInterrupt @0x64e0 |
+| +0x12D0 | **overrun limit cursor** (u64) | hard-error path (§12.6): = [AB+0x1308] + ([decoder+0x10]>>16) + ([AB+0xD8]<<16); used by done-verify `([C8] & ~[12D0]) == [12D8]`; also written by stub first-timeout; = -1 after reset() |
+| +0x12D8 | _numFrames (u32) — failure counter | cleared on hard decoder error (§12.6 @64f4), first timeout, and reset() |
+| +0x12DC | **offending frame index** (u32) | = [decoder+0x10] saved by hard-error path (§12.6 @64d8); logged via "Offending frameNum" fmt@0x2fd3 |
 | +0x12E0 | idle-flag byte | §11 |
-| +0x12C8 | **completion-wait guard flag** (byte) | SET only by queryCompletionGated@b7b4 on first timeout (also records expected stamp); CLEARED only by reset()@b0c0 (`strb wzr,[base,#0xe4]`, base=self+0x11E4). READ by submitDataGated (rejects 0xE000_02BC if set) and cleanUp. All four direct `#0x12c8` refs in __text are loads; writes use computed-base patterns |
+| +0x12C8 | **completion-wait guard flag** (byte) | SET by queryCompletionGated@b7b4 on first timeout (also records expected stamp); **SET on hard decoder error @64d0 (§12.6)** — enables overrun check for subsequent completions; CLEARED only by reset()@b0c0 (`strb wzr,[base,#0xe4]`, base=self+0x11E4). READ by submitDataGated (rejects 0xE000_02BC if set) and cleanUp. All four direct `#0x12c8` refs in __text are loads; writes use computed-base patterns |
 | +0x12E4 | batch counter mirror (u32) | written by submitDataGated ch1 path: `[self+0x12E4] = [cfg+0x3C]`; consumed by handleInterrupt IRQ completion loop |
 | +0x12E8 / +0x12F0 | space pool used / cap (u64) | §6 |
 | +0x1308 | IRQ-stamp base = saved [C8] at reset() time | handleInterrupt: `[12D0] = [1308] + ((w8>>16)) + ([D8]<<16)` |
-| +0x158  | **decoder control object** | +4 = reset-signal (write 1), +8 = decoder status (bit0=ready/ack; logged "Decoder status"), +0x14 = volatile status read at reset start |
 
 ## 14. Open items / next steps
 
 1. ✅ DONE this session: queryCompletion@0xb88c (§10), cardStatus@0xbd90, getPercent@0xbda0, unbindFrame@0xbf6c, bindFrame(desc)@0xbec, updateActiveTime@0xbe64, updateIdleTime@0x9be0 — all in §6
-2. 🟡 handleInterrupt full body (event-type dispatch + BAR1 status reads; completion path around 0x64c8 decoded, see §12)
+2. ✅ DONE: handleInterrupt full body — complete decode in §12 (bitfile walk, thermal distress, PR DMA reset, completion dispatch, drain loop, deferred re-submission, hard-error path); sleep_timer summary in §17
 3. ✅ DONE: AB::reset @0xaea8 (§10.3) — per-frame teardown sequence fully decoded
 4. 🟡 bindFrame slot-selection logic (dd9c..de8c): auto-assign vs explicit index via in[+0x18]; 0xFF cap meaning
 5. ✅ DONE: AB::cleanUp @0xb0ec (§15.1) + AB::submitDataGated @0x985c (§15.2) — submission core fully decoded; guard-flag lifecycle resolved (see §13); sContext queue layout mapped (§15.3)
@@ -466,6 +695,11 @@ updateActiveTime path).
 9. 🟡 UC+0x1900 field semantics; s_inputDataStruct +0x14/+0x18 fields
 10. ⬜ Engine callback table (§16): 62 entries decoded & demangled — identify which are actually dispatched by firmware (the three *Gated callbacks) vs dead/legacy; decode spiprogram/loadBitfile/submitResource if needed for the Linux driver
 11. 🟡 sContext queue PUSH side: who links 24B {next,prev,desc} nodes into the four §15.3 queues (handleInterrupt / submitFrame path) — only pop/drain decoded so far
+12. ⬜ Engine object class (AB+0x90): now 3 known vt slots — 0x1E8 wait-with-callback (§10.1), 0x208 completion notify (§12.7/§12.8, ctx = self or &AB+0xC0), 0x210 poll-until-deadline (frameID=2). Identify the class; needed to replicate notify semantics in the Linux driver
+13. ⬜ BAR1+0x2044 bit layout: bit0=valid confirmed live (Phase 3i); bit1=channel selector inferred from dispatch (@63d4 compares status>>1 against 0/1). Higher bits unverified — may carry completion count
+14. ⬜ [decoder+0x14] frame-done/error word: & 0x1F mask gates §12.6 decoder-error check; bit0=hard error (sets guard flag + overrun limit); bits 1–4 firmware-defined, meaning unknown
+15. ⬜ AB::submitResource @0x8a1c–0x8d50 full body: only the AB+0x11B4=1 write at 0x8b74 confirmed; what resources are submitted and in what order is still open
+16. ⬜ reconfig_handler @0x6b94: separate from handleInterrupt's PR path (§12.2); body not yet decoded — likely the "partial FPGA reconfig event" responder
 
 ## 15. Submission core deep dive — cleanUp + submitDataGated (2026-11-05)
 
@@ -736,3 +970,56 @@ Full demangled table (custom Python Itanium demangler; Apple 'y'=u64 extension):
 - Entries 39/37 = queryCompletionGated / submitResourceGated — the three "*Gated" callbacks are the firmware-facing gated variants (vs plain queryCompletion@0xb88c, submitData@0xa67c).
 - New methods not previously decoded: **spiprogram**@0x821c, **loadBitfile**@0x8628, **submitResource**@0x8af0, **resourceLoadCallback(Handler)**@0x87c8/0x888c, register accessors (read/write BAR0/DMA/Flash/Thermal/Version/Decode/Bitfile @0x55cc–0x809c), pointer_restore_handler/timer @0x7508/0x7c1c, change_pointer@0x8580.
 - Entries 1 & 5 point to data (0x10198, 0x141e0) — not functions; likely table metadata or vtable refs.
+
+## 17. AB::sleep_timer @0x6a00–0x6b90 ✅ (IOTimerEventSource callback — hang watchdog)
+
+Decoded from `tmp/dis_ab_handleInterrupt.txt` (dump covers 0x5aec–0x6b94; sleep_timer is the
+second function in that range, with its own prologue @6a00). PLT targets resolved via
+`static_re/stub_map.json` + `imports_map.json`.
+
+**Role:** periodic hang-watchdog. While frames are pending it polls the engine for a stuck
+frame (deadline-bounded); on detection it logs + calls AB::reset() and keeps polling until
+_pendingData drains to zero. On exit it performs reset bookkeeping (stamp-base save, high
+clear) and **disables the decoder**.
+
+```c
+void AB::sleep_timer(IOTimerEventSource* src) {   // x0 = self (IOService convention)
+    u32 pending = [self+0xC0];                    ; _pendingData (post-increment load; x20 now = &AB+0xC0)
+    const char* hang_str = 0x2C69;                ; "hang" log string
+    if (pending == 0) goto cleanup;
+
+loop:                                             // @6a38 — hang-check loop
+    u64 out = 0;                                  ; stack slot, passed by ref to engine poll
+    deadline = clock_interval_to_deadline(0x7D0, 0xF4240);   // PLT _clock_interval_to_deadline (idx 45)
+    r = [engine_vt+0x210](engine=[self+0x90], self, &out, /*frameID=*/2);   // poll-until-deadline!
+    if (r != 1) goto recheck;                     // no hang this round
+
+    // --- HANG DETECTED (r == 1) @6a9c ---
+    name = [self_vt+0x3A8](self, 0);              // getName-style vcall (vt slot 149)
+    IOLog(fmt@0x2367, name, _frameNum=[self+0xC8], last_cursor=[self+0x1270], r);
+    AB::reset();                                  // ← full reset on hang! (bl #0xaea8)
+
+recheck:                                          // @6afc
+    if ([self+0xC0] != 0) goto loop;              // keep polling while pending data remains
+
+cleanup:                                          // @6b04 — no pending, or drain complete
+    [self+0x1308] = [self+0xC8];                  // save _frameNum → IRQ-stamp base (same field reset() saves)
+    [self+0xD8]   = 0;                            // clear IRQ-stamp high component
+    if ([self+0x158])                             // decoder section present?
+        [decoder_section+4] = 0;                  // **DECODER DISABLE** on timer exit! (BAR0[hdr+4]=0)
+    name = [self_vt+0x3A8](self, 0);
+    dec_state = [decoder_section+4];              // read back enable state (0 if no section)
+    IOLog(fmt@0x1B48, name, self, hang_str, dec_state);   // final log with decoder state
+    IOService::acknowledgeSetPowerState(self);    // PLT idx 35 — power-management wake cleanup!
+}
+```
+
+**Key facts:**
+- Engine poll: `[AB+0x90]->[vt+0x210](engine, self, &out, frameID=2)` — same vt slot as submitDataGated's flow-control poll; **return 1 = hang detected**.
+- Hang response is a full `AB::reset()` (not just a log) — the watchdog can reset the card autonomously.
+- Loop condition: `[self+0xC0]` (_pendingData) non-zero → re-poll. The timer keeps firing until all pending frames are accounted for.
+- Cleanup path writes **the same fields as reset()**: AB+0x1308 (stamp base = saved _frameNum) and AB+0xD8 (=0). So even a no-hang timer expiry refreshes the stamp baseline.
+- **Decoder disable on exit** (`[decoder_section+4] = 0`) — third known write site for BAR0[hdr+4] alongside stop()@c0a4 and the PR re-enable cycle (§12.2). Confirms decoder-off is standard teardown state.
+- Ends with `IOService::acknowledgeSetPowerState()` — power-management bookkeeping (timer fired during a power-state transition).
+
+**Linux driver implications:** replicate as a periodic workqueue timer: if pending>0, poll engine status with deadline; on stuck frame → log + full reset path; on exit always refresh stamp base and ensure decoder disabled.
