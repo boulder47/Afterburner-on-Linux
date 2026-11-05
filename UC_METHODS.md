@@ -157,6 +157,7 @@ Common wrapper pattern in every body:
 - badarg (out==NULL) → **0xE000_02C2**.
 - Calls **`AB::cardStatus(u64*)`** @0xbd90 — args: x0=AB(this), x1=out. No sContext arg.
 - Returns AB result directly; non-zero → IOLog(fmt@0x347B, name@0x34A9).
+- *out semantics (decoded §6): trivial read of **AB+0xC0** — the engine-maintained status word.
 
 ### 4.5 checkForSpace ✅ — body 0xe36c–0xe4c0 (`tmp/dis_uc_checkForSpace.txt`)
 
@@ -183,6 +184,7 @@ Common wrapper pattern in every body:
 - badarg → **0xE000_02C2**.
 - Calls **`AB::getPercent(u64*)`** @0xbda0 — args: x0=AB(this), x1=out.
 - Returns AB result directly; non-zero → IOLog(fmt@0x350A, name@0x353D).
+- *out semantics (decoded §11): **idle-time fraction** since last call — NOT decode progress.
 
 ## 5. UC object layout (offsets from the `this` pointer) ✅/🟡
 
@@ -209,17 +211,22 @@ Common wrapper pattern in every body:
 
 ## 6. AB provider (`AppleAfterburner`) helpers
 
-Space model: **AB+0x12E8 = used/reserved bytes**, **AB+0x12F0 = cap** (total), lock at **AB+0x12C0**.
+**Space pool** — all under `IOLock* AB+0x12C0`; **used = AB+0x12E8**, **cap = AB+0x12F0**.
+Note: demangled signatures say `Py` (u64) but checkForSpace/freeSpace actually take a
+**pointer to u64 size** (`ldr x9,[arg]` deref verified).
 
 | fn | addr | signature | behavior | status |
 |---|---|---|---|---|
-| checkForSpace | 0xbfec | `(u64* size)` | under lock: if `used > cap` → **0xE000_02EC**; else `used += *size`; return 0 | ✅ (`tmp/dis_ab_checkForSpace.txt`) |
-| freeSpace | 0xc058 | `(u64* req)` | under lock: `used = max(0, used - *req)` (saturating); does NOT write back *out; return 0 | ✅ (`tmp/dis_ab_freeSpace.txt`) |
-| unbindFrame | 0xbf6c | `(IOMemoryDescriptor*)` | card-side unbind of one bound frame | 🟡 called from unbindAll; body TODO |
+| bindFrame(desc) | 0xbec | `(IOMemoryDescriptor*)` | `len=[desc_vt+0x1F0](desc)`; **commits** `used += len` FIRST, then if `used > cap` → return **0xE000_02EC** (pool left over-cap — caller must roll back via freeSpace); else 0 | ✅ (`tmp/dis_ab_space_fns.txt`) |
+| unbindFrame(desc) | 0xbf6c | `(IOMemoryDescriptor*)` | `len=[desc_vt+0x1F0](desc)`; `used = max(0, used - len)` (saturating); return 0. Called per-slot by UC::unbindAll/stop | ✅ (`tmp/dis_ab_space_fns.txt`) |
+| checkForSpace | 0xbfec | `(u64* size)` | if `used > cap` → **0xE000_02EC**; else `used += *size`; return 0 | ✅ (`tmp/dis_ab_checkForSpace.txt`) |
+| freeSpace | 0xc058 | `(u64* req)` | `used = max(0, used - *req)` (saturating); does NOT write back *out; return 0. Rollback path in UC::bindFrame + UC::stop | ✅ (`tmp/dis_ab_freeSpace.txt`) |
 | cleanUp | 0xb0ec | `(sContext*)` | card-side state reset (called first by unbindAll) | 🟡 body TODO |
-| queryCompletion | 0xb88c | `(sContext*, u64, u64*)` | frame completion query → *out; 0=success | ⬜ body TODO |
-| cardStatus | 0xbd90 | `(u64*)` | card status → *out; 0=success | ⬜ body TODO (reads BAR1 status regs per earlier notes) |
-| getPercent | 0xbda0 | `(u64*)` | decode progress % → *out; 0=success | ⬜ body TODO |
+| queryCompletion | 0xb88c–0xbd90 | `(sContext*, u64 frameID, u64* out)` | **NEVER writes *out** (x3 clobbered @0xb908; no store to it anywhere). Waits on engine via PAC'd stub, then drains 4 DMA completion queues. See §11 | ✅ (`tmp/dis_ab_queryCompletion.txt`) |
+| cardStatus | 0xbd90–0xbda0 | `(u64* out)` | **trivial**: `*out = [AB+0xC0]` (u32 status word); return 0. AB+0xC0 is the engine-maintained status field (stub passes &AB+0xC0 to engine poll) | ✅ (`tmp/dis_ab_cardStatus_getPercent.txt`) |
+| getPercent | 0xbda0–0xbe64 | `(u64* out)` | **idle-time fraction** since last call: `pct = acc_E8·100/(acc_E0+acc_E8)`, then resets both accumulators. See §12 | ✅ (`tmp/dis_ab_cardStatus_getPercent.txt`) |
+| updateActiveTime | 0xbe64–0xbec | `()` | idle→active transition: `[AB+0x12E0]=0`; flush elapsed interval to **acc_E8**; return 0. Called from handleInterrupt @0x64c8 | ✅ (`tmp/dis_ab_space_fns.txt`) |
+| updateIdleTime | 0x9be0–0x9c5c | `()` | active→idle transition: `[AB+0x12E0]=1`; flush elapsed interval to **acc_E0**; return 0. Called from submitDataGated @0x9b18 | ✅ (`tmp/dis_ab_updateIdleTime.txt`) |
 | submitFrame | 0xa9ac | `(sContext*, IOMemoryDescriptor* in, IOMemoryDescriptor* out, u64*, u32, u32, u32, sDescriptorLengthOffsetInfo)` | two-stage (input/output) frame submission; double-checked busy flag; `ctx->+0x160` = thermal distress code → frame drops when non-zero; exit paths: 0xacfc busy-under-lock, 0xad04 busy-unlocked, 0xad28 cfg==0→submitData branch | 🟡 head+mid decoded (`tmp/dis_ab_submitFrame_head.txt`, `_mid.txt`) |
 | submitData | 0xa67c | (vtable wrapper on self->+0xa0) | doorbell/staging commit: send=clear +4 / stage BAR1+0x4080..C / ring 0xFFE7F; batch=clear +0x1004 / stage +0x5080..C / ring 0x80FFE7F | ✅ (byte-verified vs Linux driver, FINDINGS §25) |
 | getSegments | 0xa28c | — | segment list for frame path: seg list self->+0x11d8 ({PA,len}×N), N=self->+0x11e0>>4 | ✅ (`tmp/dis_ab_getSegments.txt`) |
@@ -255,22 +262,151 @@ Strings live on two pages: `adrp #0x3000` and `adrp #0x2000`.
 | method | fmt | name/other |
 |---|---|---|
 | submitFrame (UC) | 0x31C9, 0x3206, 0x324F, 0x328E, 0x32D9, 0x3325 | name@0x2695 |
-| queryCompletion | **0x2C00** (page 0x2xxx!) | — |
+| queryCompletion | name@**0x2C00** (page 0x2xxx!) — leak fmts at 0x2BAB/0x2C10, see §9 note below | — |
 | bindFrame | badarg@0x339A · existing-slot err@0x33E9 · wire-fail@0x3429 · desc-fail@0x344F | name@0x3390 |
 | cardStatus | 0x347B | name@0x34A9 |
 | checkForSpace | 0x34B4 | name@0x34F2 |
 | unbindAll | in-use fmt@0x3500 | name@0x33E9 (shared with bindFrame) |
 | getPercent | 0x350A | name@0x353D |
 | AB::submitFrame | ab.sf fmt1@0x2638, fmt2@0x2695 | — |
+| queryCompletion (AB) | dmaQ-leak fmt@**0x2BAB** · descDmaQ-leak fmt@**0x2C10** | fn-name 'queryCompletion'@**0x2C00** (used as the `%s::%s` middle arg — earlier note had these swapped) |
+| engine-query stub (`queryCompletionGated`) | timeout fmt@**0x2B27**: `"AppleAfterburner Error: %s[%p]::%s: Query timed out (resetting), frameNum %llu, completionStamp %lld, _numFrames %u, status 0x%08x\n"` | fn-name 'queryCompletionGated'@**0x2B12** |
 
 kernel_debug trace id: **0x2B61FA4** (class arg 3/4/5 at various points).
 
-## 10. Open items / next steps
+## 10. AB::queryCompletion deep dive ✅ (body 0xb88c–0xbd90, `tmp/dis_ab_queryCompletion.txt`)
 
-1. ⬜ AB-level bodies the Linux driver must replicate: queryCompletion@0xb88c, cardStatus@0xbd90, getPercent@0xbda0, unbindFrame@0xbf6c, cleanUp@0xb0ec
-2. 🟡 bindFrame slot-selection logic (dd9c..de8c): auto-assign vs explicit index via in[+0x18]; 0xFF cap meaning
-3. 🟡 sContext layout at UC+0x18F8 (fields consumed by AB::submitFrame/cleanUp)
-4. 🟡 `[desc_vt+0x1F8](desc, 1)` semantics on submit success
-5. 🟡 IODirection enum mapping for withAddressRange dir=1/2
-6. ⬜ lifecycle overrides: start@0xd1e4 (🟡), willTerminate/didTerminate/terminate/finalize/clientClose/clientDied/getMetaClass/D1Ev/D0Ev — mostly boilerplate, decode any that touch HW/state
-7. 🟡 UC+0x1900 field semantics; s_inputDataStruct +0x14/+0x18 fields
+`u32 AB::queryCompletion(sContext* ctx, u64 frameID, u64* out)` — **never writes *out**
+(x3 is clobbered @0xb908 and no store to it exists in the body; userland gets completion
+state via side effects / other channels).
+
+### 10.1 Engine wait (the actual "wait for frame" mechanism)
+
+```c
+engine = [AB+0x90];                       // engine object (PAC-verified vptr, tag 0xcda1)
+ret = [engine_vt+0x1E8](engine, pacia(stub@0xB634, key=0xBD41), frameID, &u32_local(=2), 0, 0);
+if (ret != 0) return ret;                 // hard failure → propagate to UC wrapper
+```
+
+- `&u32_local` initialized to **2** — timeout/iteration bound passed by pointer.
+- The stub is a **deadline-bounded poll loop** (`tmp/dis_ab_engine_query_stub.txt`,
+  fn-name string 'queryCompletionGated'@0x2B12):
+
+```c
+// stub(AB* self, u64* prog, u32* fid) — always returns 0 except engine error:
+if ([self+0x12C8] && *prog >= [self+0x12D0]) {          // "done" fast path (flag set by IRQ/first timeout)
+    if (([self+0xC8] & ~[self+0x12D0]) != [self+0x12D8]) goto fail;   // status-word verify
+    IOLog(fmt@0x2B12-name, ...); AB::reset(self);       // @0xaea8 — engine reset AFTER each completed frame!
+    return 0;
+}
+if (*prog <= [self+0x1270]) return 0;                   // progress below completionStamp → "keep waiting"
+for (;;) {
+    clock_interval_to_deadline(0x7D0, 0x4240, &deadline);   // interval=2000, max=17008 (mach ticks)
+    r = [engine_vt+0x210](engine, &self->status@AB+0xC0, &deadline, *fid);  // poll w/ deadline
+    if (r == 1) {                                        // timeout tick:
+        first_time ? ([self+0x12C8]=1; [self+0x12D8]=0; x=[self+0x12D0]=*prog) : (x=[self+0x12D0]);
+        if (([self+0xC8] & ~x) != [self+0x12D8]) goto fail;
+        IOLog("Query timed out (resetting), frameNum %llu, completionStamp %lld, _numFrames %u, status 0x%08x");
+        AB::reset(self); return 0;
+    }
+    if (r != 0) return 0xE000_02BC;                      // engine error
+    if (*prog > [self+0x1270]) goto done_check;          // crossed stamp → re-run fast path
+    return 0;                                            // still waiting
+fail:
+    [self+0x12D8] += 1;                                  // _numFrames failure counter
+    IOLog(...); AB::reset(self); return 0;
+}
+```
+
+**AB completion-tracking fields:** +0xC0 = status word (engine-maintained; also what
+cardStatus() returns) · +0xC8 = second status/counter word · +0x1270 = **completionStamp**
+(expected progress value) · +0x12C8 = done-flag byte · +0x12D0 = stamp/mask for verify ·
++0x12D8 = **_numFrames** (u32; failure counter, cleared by IRQ handler & first timeout) ·
++0x12DC = status u32 written by handleInterrupt.
+
+### 10.2 Queue drain (after engine wait returns 0)
+
+Two queue types × two instances each (fixed i ∈ {0,1} — the "loop" is exactly 2 passes):
+
+| queue | head location | lock location |
+|---|---|---|
+| dmaQ[0]      | ctx+0x00 (self-ref sentinel when empty) | [ctx+0x40] |
+| dmaQ[1]      | ctx+0x10                                  | [ctx+0x48] |
+| descDmaQ[0]  | ctx+0x20                                  | [ctx+0x50] |
+| descDmaQ[1]  | ctx+0x30                                  | [ctx+0x58] |
+
+Per drained node (node = 24B `{next@0, pad@8, obj@0x10}`, freed via `IOFree(node, 24)`):
+```c
+obj = node->obj;                       // frame object, PAC-verified vptr
+comp = [obj_vt+0x158](obj);            // vt slot 67: get completion object (NULL → leak warning)
+if (!comp) { IOLog("No entry ... in dmaQ/descDmaQ - potential leak"); /* node NOT freed */ }
+else {
+    [obj_vt+0x150](obj, 1);            // vt slot 66: ack(obj, 1)
+    notifier = (dmaQ ? [AB+0xA0] : [AB+0xA8]);   // two distinct notifier objects!
+    [notifier_vt+0x150](notifier, obj);          // notify(notifier, obj)
+    IOFree(node, 24);
+    [comp_vt+0x220](comp, 0);          // vt slot 136: teardown(comp, 0)
+    [comp_vt+0x28](comp);              // release comp
+}
+```
+
+## 11. Time accounting (getPercent / updateActiveTime / updateIdleTime) ✅
+
+- **AB+0x12E0** = idle-flag byte: set by `updateIdleTime` (active→idle), cleared by
+  `updateActiveTime` (idle→active).
+- **AB+0xE0** = acc_E0 (u64, active-time accumulator) · **AB+0xE8** = acc_E8 (idle-time
+  accumulator) · **AB+0xF8** = last-sample timeval · **AB+0x108** = scratch timeval
+  (microtime target).
+- `getPercent`: elapsed = now − [F8]; flag set → acc_E8 += elapsed, else acc_E0 += elapsed;
+  `*out = acc_E8·100/(acc_E0+acc_E8)` (**fraction of time IDLE**); both accumulators reset
+  to 0 afterwards. So userland sees a *utilization complement*: low % = card busy decoding.
+- Callers (full __text scan): `updateActiveTime` ← handleInterrupt @0x64c8;
+  `updateIdleTime` ← submitDataGated @0x9b18.
+
+## 12. AB::handleInterrupt 🟡 (body 0x5aec–0x6a00, `tmp/dis_ab_handleInterrupt.txt`)
+
+IRQ entry point (`(OSObject*, IOInterruptEventSource*, int)`). Decoded so far — the
+completion-event path around 0x64c8:
+```
+kernel_debug(...); tbz w20,#0 → (other event type)
+[AB_vt+0x3a8](AB, 0)                    ; getName-style vcall (vt slot 151, tag 0xc9c)
+IOLog(str@0x2F8D)                       ; interrupt log line
+updateActiveTime()                      ; ← idle→active transition on IRQ!
+[obj+0x114] = 1                         ; byte flag on some channel object (x24)
+[AB+0x12DC] = w8                        ; status u32 (from [AB+0x158]->obj ? +0x10 : 0)
+[AB+0x12D0] = [AB+0x1308] + ((w8>>16)) + ([AB+0xD8]<<16)   ; computed stamp/mask
+[AB+0x12D8] = 0                         ; _numFrames cleared
+```
+TODO: full body (event-type dispatch, BAR1 status reads, which register bits gate the
+updateActiveTime path).
+
+## 13. AB object layout (offsets from `this`) — accumulated ✅/🟡
+
+| offset | field | notes |
+|---|---|---|
+| +0x90   | engine object ptr | PAC-verified; vt+0x1E8 = wait-with-callback, vt+0x210 = poll-until-deadline |
+| +0xA0 / +0xA8 | notifier objects (dmaQ / descDmaQ) | vt+0x150(notifier, obj) on completion |
+| +0xC0   | status word (u32) | engine-maintained; returned by cardStatus(); &passed to engine poll |
+| +0xC8   | second status/counter word | used in done-verify `([C8] & ~[12D0]) == [12D8]` |
+| +0xE0 / +0xE8 | acc_E0 (active) / acc_E8 (idle) time accumulators | §11 |
+| +0xF8   | last-sample timeval | §11 |
+| +0x108  | scratch timeval (microtime target) | §11 |
+| +0x12C0 | IOLock* — space pool lock | §6 |
+| +0x12D0 | stamp/mask for done-verify | written by IRQ handler & stub first-timeout |
+| +0x12D8 | _numFrames (u32) | failure counter; cleared on IRQ / first timeout |
+| +0x12DC | status u32 | written by handleInterrupt @0x64e0 |
+| +0x12E0 | idle-flag byte | §11 |
+| +0x12E8 / +0x12F0 | space pool used / cap (u64) | §6 |
+| +0x1308 | base for IRQ stamp computation | 🟡 semantics TODO |
+
+## 14. Open items / next steps
+
+1. ✅ DONE this session: queryCompletion@0xb88c (§10), cardStatus@0xbd90, getPercent@0xbda0, unbindFrame@0xbf6c, bindFrame(desc)@0xbec, updateActiveTime@0xbe64, updateIdleTime@0x9be0 — all in §6
+2. 🟡 handleInterrupt full body (event-type dispatch + BAR1 status reads; completion path around 0x64c8 decoded, see §12)
+3. ⬜ AB::reset @0xaea8 — called after EVERY completed frame by the query stub; likely clears BAR1 completion status (+0x2044) / re-arms engine — critical for Linux driver's per-frame teardown
+4. 🟡 bindFrame slot-selection logic (dd9c..de8c): auto-assign vs explicit index via in[+0x18]; 0xFF cap meaning
+5. 🟡 sContext layout at UC+0x18F8 (fields consumed by AB::submitFrame/cleanUp)
+6. 🟡 `[desc_vt+0x1F8](desc, 1)` semantics on submit success
+7. 🟡 IODirection enum mapping for withAddressRange dir=1/2
+8. ⬜ lifecycle overrides: start@0xd1e4 (🟡), willTerminate/didTerminate/terminate/finalize/clientClose/clientDied/getMetaClass/D1Ev/D0Ev — mostly boilerplate, decode any that touch HW/state
+9. 🟡 UC+0x1900 field semantics; s_inputDataStruct +0x14/+0x18 fields
