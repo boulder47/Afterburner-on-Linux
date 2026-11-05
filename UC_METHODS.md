@@ -222,6 +222,7 @@ Note: demangled signatures say `Py` (u64) but checkForSpace/freeSpace actually t
 | checkForSpace | 0xbfec | `(u64* size)` | if `used > cap` → **0xE000_02EC**; else `used += *size`; return 0 | ✅ (`tmp/dis_ab_checkForSpace.txt`) |
 | freeSpace | 0xc058 | `(u64* req)` | `used = max(0, used - *req)` (saturating); does NOT write back *out; return 0. Rollback path in UC::bindFrame + UC::stop | ✅ (`tmp/dis_ab_freeSpace.txt`) |
 | cleanUp | 0xb0ec | `(sContext*)` | card-side state reset (called first by unbindAll) | 🟡 body TODO |
+| **reset** | **0xaea8–0xb0ec** | `()` | **per-frame teardown**: clear both doorbells, wait for c2h/h2c status to drain, free 2 desc queues, fw handshake, reset all completion tracking. See §10.3 — CRITICAL for Linux driver | ✅ (`tmp/dis_ab_reset.txt`) |
 | queryCompletion | 0xb88c–0xbd90 | `(sContext*, u64 frameID, u64* out)` | **NEVER writes *out** (x3 clobbered @0xb908; no store to it anywhere). Waits on engine via PAC'd stub, then drains 4 DMA completion queues. See §11 | ✅ (`tmp/dis_ab_queryCompletion.txt`) |
 | cardStatus | 0xbd90–0xbda0 | `(u64* out)` | **trivial**: `*out = [AB+0xC0]` (u32 status word); return 0. AB+0xC0 is the engine-maintained status field (stub passes &AB+0xC0 to engine poll) | ✅ (`tmp/dis_ab_cardStatus_getPercent.txt`) |
 | getPercent | 0xbda0–0xbe64 | `(u64* out)` | **idle-time fraction** since last call: `pct = acc_E8·100/(acc_E0+acc_E8)`, then resets both accumulators. See §12 | ✅ (`tmp/dis_ab_cardStatus_getPercent.txt`) |
@@ -271,6 +272,7 @@ Strings live on two pages: `adrp #0x3000` and `adrp #0x2000`.
 | AB::submitFrame | ab.sf fmt1@0x2638, fmt2@0x2695 | — |
 | queryCompletion (AB) | dmaQ-leak fmt@**0x2BAB** · descDmaQ-leak fmt@**0x2C10** | fn-name 'queryCompletion'@**0x2C00** (used as the `%s::%s` middle arg — earlier note had these swapped) |
 | engine-query stub (`queryCompletionGated`) | timeout fmt@**0x2B27**: `"AppleAfterburner Error: %s[%p]::%s: Query timed out (resetting), frameNum %llu, completionStamp %lld, _numFrames %u, status 0x%08x\n"` | fn-name 'queryCompletionGated'@**0x2B12** |
+| reset | c2hStatus fmt@**0x2958** · h2cStatus fmt@**0x2994** · "Decoder status: 0x%08x"@**0x29CA** | — |
 
 kernel_debug trace id: **0x2B61FA4** (class arg 3/4/5 at various points).
 
@@ -350,6 +352,49 @@ else {
 }
 ```
 
+### 10.3 AB::reset() — per-frame teardown ✅ (body 0xaea8–0xb0ec, `tmp/dis_ab_reset.txt`)
+
+Called by the query stub after **every** completed frame (and on timeout/failure). This is
+the exact between-frame sequence the Linux driver must replicate:
+
+```c
+void AB::reset() {
+    // 1. volatile read of decoder status [AB+0x158]+0x14 (no-op store)
+    BAR1 = [self+0x130];                       // BAR1 base (confirms Phase-3q: ctx->+0x130)
+    [BAR1+4]     = 0;                          // clear h2c doorbell (ring 0xFFE7F)
+    [BAR1+0x1004]= 0;                          // clear c2h/batch doorbell (ring 0x80FFE7F)
+    if ([self+0x158]) [[self+0x158]+4] = 0;
+
+    // 2. wait for both channel status words to drain (bit0 = valid):
+    if ([BAR1+0x1044] & 1) { IOSleep(1000ms); if ([BAR1+0x1044]) IOLog("c2hStatus 0x%08x"); }   // fmt@0x2958
+    if ([BAR1+0x44]     & 1) { IOSleep(1000ms); if ([BAR1+0x44])     IOLog("h2cStatus 0x%08x"); }   // fmt@0x2994
+
+    // 3. free the two descriptor queues on AB itself (72-byte nodes, self-ref sentinel):
+    for (i = 0; i < 2; i++) {
+        head_loc = &self[i*0x10 + 0x11F0];     // queue heads at AB+0x11F0 and AB+0x1200
+        while ((node = *head_loc) != head_loc) { next = node[0]; *head_loc = next; IOFree(node, 72); }
+    }
+
+    // 4. firmware handshake: signal reset, wait for decoder ready (100ms sleep loop):
+    do { if ([self+0x158]) [[self+0x158]+4] = 1; else IOSleep(100ms); }
+    while (!([self+0x158] && ([[self+0x158]+8] & 1)));
+    IOLog("Decoder status: 0x%08x", [obj+8]);  // fmt@0x29CA
+
+    // 5. reset all completion tracking:
+    [self+0x1308] = [self+0xC8];               // save status word as IRQ-stamp base
+    [self+0x1270] = [self+0xC8] - 1;           // completionStamp = status-1 (next expected)
+    [self+0xC0]   = 0;                         // clear cardStatus word
+    [self+0xD8]   = 0;                         // clear IRQ-stamp high component
+    [self+0x12C8] = 0;                         // clear done-flag byte (via x20=self+0x11E4, strb +0xE4)
+    [self+0x12D0] = -1;                        // verify mask = all-ones
+    [self+0x12D8] = 0;                         // _numFrames = 0 (u64 zero store)
+}
+```
+
+**Naming confirmed by log strings:** BAR1+0x1044 = **c2hStatus** (card→host completion word),
+BAR1+0x44 = **h2cStatus** (host→card data/completion word). AB+0x158 = **decoder control
+object**: +4 = reset-signal, +8 = decoder status (bit0 = ready/ack), +0x14 = volatile status.
+
 ## 11. Time accounting (getPercent / updateActiveTime / updateIdleTime) ✅
 
 - **AB+0x12E0** = idle-flag byte: set by `updateIdleTime` (active→idle), cleared by
@@ -386,24 +431,27 @@ updateActiveTime path).
 |---|---|---|
 | +0x90   | engine object ptr | PAC-verified; vt+0x1E8 = wait-with-callback, vt+0x210 = poll-until-deadline |
 | +0xA0 / +0xA8 | notifier objects (dmaQ / descDmaQ) | vt+0x150(notifier, obj) on completion |
-| +0xC0   | status word (u32) | engine-maintained; returned by cardStatus(); &passed to engine poll |
-| +0xC8   | second status/counter word | used in done-verify `([C8] & ~[12D0]) == [12D8]` |
+| +0xC0   | status word (u32) | engine-maintained; returned by cardStatus(); &passed to engine poll; cleared by reset() |
+| +0xC8   | second status/counter word | used in done-verify `([C8] & ~[12D0]) == [12D8]`; saved to 0x1308 by reset() |
+| +0xD8   | IRQ-stamp high component (u64) | `[AB+0xD8]<<16` in handleInterrupt stamp calc; cleared by reset() |
 | +0xE0 / +0xE8 | acc_E0 (active) / acc_E8 (idle) time accumulators | §11 |
 | +0xF8   | last-sample timeval | §11 |
 | +0x108  | scratch timeval (microtime target) | §11 |
+| +0x11F0 / +0x1200 | desc-queue heads (72B nodes, self-ref sentinel) | freed by reset(); per-frame descriptor allocs |
 | +0x12C0 | IOLock* — space pool lock | §6 |
-| +0x12D0 | stamp/mask for done-verify | written by IRQ handler & stub first-timeout |
-| +0x12D8 | _numFrames (u32) | failure counter; cleared on IRQ / first timeout |
+| +0x12D0 | stamp/mask for done-verify | written by IRQ handler & stub first-timeout; = -1 after reset() |
+| +0x12D8 | _numFrames (u32) | failure counter; cleared on IRQ / first timeout / reset() |
 | +0x12DC | status u32 | written by handleInterrupt @0x64e0 |
 | +0x12E0 | idle-flag byte | §11 |
 | +0x12E8 / +0x12F0 | space pool used / cap (u64) | §6 |
-| +0x1308 | base for IRQ stamp computation | 🟡 semantics TODO |
+| +0x1308 | IRQ-stamp base = saved [C8] at reset() time | handleInterrupt: `[12D0] = [1308] + ((w8>>16)) + ([D8]<<16)` |
+| +0x158  | **decoder control object** | +4 = reset-signal (write 1), +8 = decoder status (bit0=ready/ack; logged "Decoder status"), +0x14 = volatile status read at reset start |
 
 ## 14. Open items / next steps
 
 1. ✅ DONE this session: queryCompletion@0xb88c (§10), cardStatus@0xbd90, getPercent@0xbda0, unbindFrame@0xbf6c, bindFrame(desc)@0xbec, updateActiveTime@0xbe64, updateIdleTime@0x9be0 — all in §6
 2. 🟡 handleInterrupt full body (event-type dispatch + BAR1 status reads; completion path around 0x64c8 decoded, see §12)
-3. ⬜ AB::reset @0xaea8 — called after EVERY completed frame by the query stub; likely clears BAR1 completion status (+0x2044) / re-arms engine — critical for Linux driver's per-frame teardown
+3. ✅ DONE: AB::reset @0xaea8 (§10.3) — per-frame teardown sequence fully decoded
 4. 🟡 bindFrame slot-selection logic (dd9c..de8c): auto-assign vs explicit index via in[+0x18]; 0xFF cap meaning
 5. 🟡 sContext layout at UC+0x18F8 (fields consumed by AB::submitFrame/cleanUp)
 6. 🟡 `[desc_vt+0x1F8](desc, 1)` semantics on submit success

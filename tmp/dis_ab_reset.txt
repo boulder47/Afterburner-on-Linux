@@ -1,0 +1,145 @@
+0000aea8: pacibsp 
+0000aeac: sub   sp, sp, #0x60
+0000aeb0: stp   x24, x23, [sp, #0x20]
+0000aeb4: stp   x22, x21, [sp, #0x30]
+0000aeb8: stp   x20, x19, [sp, #0x40]
+0000aebc: stp   x29, x30, [sp, #0x50]
+0000aec0: add   x29, sp, #0x50
+0000aec4: mov   x19, x0
+0000aec8: mov   w9, #0x11e4
+0000aecc: ldr   x10, [x0, #0x158]
+0000aed0: cbz   x10, #0xaedc
+0000aed4: ldr   w8, [x10, #0x14]
+0000aed8: str   w8, [x10, #0x14]
+0000aedc: ldr   x8, [x19, #0x130]
+0000aee0: str   wzr, [x8, #4]
+0000aee4: str   wzr, [x8, #0x1004]
+0000aee8: cbz   x10, #0xaef0
+0000aeec: str   wzr, [x10, #4]
+0000aef0: add   x20, x19, x9
+0000aef4: ldr   w9, [x8, #0x1044]
+0000aef8: adrp  x21, #0x2000
+0000aefc: add   x21, x21, #0x98e
+0000af00: tbz   w9, #0, #0xaf6c
+0000af04: mov   w0, #0x3e8
+0000af08: bl    #0xe89c   ; PLT->GOT[8] _IOSleep
+0000af0c: ldr   x8, [x19, #0x130]
+0000af10: ldr   w22, [x8, #0x1044]
+0000af14: cbz   w22, #0xaf6c
+0000af18: ldr   x16, [x19]
+0000af1c: mov   x17, x19
+0000af20: movk  x17, #0xcda1, lsl #48
+0000af24: autda x16, x17
+0000af28: mov   x17, x16
+0000af2c: xpacd x17
+0000af30: cmp   x16, x17
+0000af34: b.eq  #0xaf3c
+0000af38: brk   #0xc472
+0000af3c: add   x8, x16, #0x3a8
+0000af40: ldr   x9, [x16, #0x3a8]
+0000af44: movk  x8, #0xc9c, lsl #48
+0000af48: mov   x0, x19
+0000af4c: mov   x1, #0
+0000af50: blraa x9, x8
+0000af54: stp   x21, x22, [sp, #0x10]
+0000af58: stp   x0, x19, [sp]
+0000af5c: adrp  x0, #0x2000
+0000af60: add   x0, x0, #0x958
+0000af64: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000af68: ldr   x8, [x19, #0x130]
+0000af6c: ldr   w8, [x8, #0x44]
+0000af70: tbz   w8, #0, #0xafd8
+0000af74: mov   w0, #0x3e8
+0000af78: bl    #0xe89c   ; PLT->GOT[8] _IOSleep
+0000af7c: ldr   x8, [x19, #0x130]
+0000af80: ldr   w22, [x8, #0x44]
+0000af84: cbz   w22, #0xafd8
+0000af88: ldr   x16, [x19]
+0000af8c: mov   x17, x19
+0000af90: movk  x17, #0xcda1, lsl #48
+0000af94: autda x16, x17
+0000af98: mov   x17, x16
+0000af9c: xpacd x17
+0000afa0: cmp   x16, x17
+0000afa4: b.eq  #0xafac
+0000afa8: brk   #0xc472
+0000afac: add   x8, x16, #0x3a8
+0000afb0: ldr   x9, [x16, #0x3a8]
+0000afb4: movk  x8, #0xc9c, lsl #48
+0000afb8: mov   x0, x19
+0000afbc: mov   x1, #0
+0000afc0: blraa x9, x8
+0000afc4: stp   x21, x22, [sp, #0x10]
+0000afc8: stp   x0, x19, [sp]
+0000afcc: adrp  x0, #0x2000
+0000afd0: add   x0, x0, #0x994
+0000afd4: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000afd8: mov   x22, #0
+0000afdc: strh  wzr, [x20]
+0000afe0: mov   w23, #0x11f0
+0000afe4: add   x8, x19, x22, lsl #4
+0000afe8: add   x24, x8, x23
+0000afec: ldr   x0, [x8, #0x11f0]
+0000aff0: cmp   x24, x0
+0000aff4: b.eq  #0xb014
+0000aff8: ldr   x8, [x0]
+0000affc: str   x24, [x8, #8]
+0000b000: str   x8, [x24]
+0000b004: mov   w1, #0x48
+0000b008: bl    #0xe848   ; PLT->GOT[1] _IOFree
+0000b00c: ldr   x0, [x24]
+0000b010: b     #0xaff0
+0000b014: add   x22, x22, #1
+0000b018: cmp   x22, #2
+0000b01c: b.ne  #0xafe4
+0000b020: ldr   x8, [x19, #0x158]
+0000b024: cbz   x8, #0xb034
+0000b028: mov   w9, #1
+0000b02c: str   w9, [x8, #4]
+0000b030: b     #0xb044
+0000b034: mov   w0, #0x64
+0000b038: bl    #0xe89c   ; PLT->GOT[8] _IOSleep
+0000b03c: ldr   x8, [x19, #0x158]
+0000b040: cbz   x8, #0xb048
+0000b044: ldr   w8, [x8, #8]
+0000b048: tbz   w8, #0, #0xb034
+0000b04c: ldr   x16, [x19]
+0000b050: mov   x17, x19
+0000b054: movk  x17, #0xcda1, lsl #48
+0000b058: autda x16, x17
+0000b05c: mov   x17, x16
+0000b060: xpacd x17
+0000b064: cmp   x16, x17
+0000b068: b.eq  #0xb070
+0000b06c: brk   #0xc472
+0000b070: add   x8, x16, #0x3a8
+0000b074: ldr   x9, [x16, #0x3a8]
+0000b078: movk  x8, #0xc9c, lsl #48
+0000b07c: mov   x0, x19
+0000b080: mov   x1, #0
+0000b084: blraa x9, x8
+0000b088: ldr   x8, [x19, #0x158]
+0000b08c: cbz   x8, #0xb094
+0000b090: ldr   w8, [x8, #8]
+0000b094: stp   x21, x8, [sp, #0x10]
+0000b098: stp   x0, x19, [sp]
+0000b09c: adrp  x0, #0x2000
+0000b0a0: add   x0, x0, #0x9ca
+0000b0a4: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000b0a8: ldr   x8, [x19, #0xc8]
+0000b0ac: str   x8, [x19, #0x1308]
+0000b0b0: sub   x8, x8, #1
+0000b0b4: str   x8, [x19, #0x1270]
+0000b0b8: str   wzr, [x19, #0xc0]
+0000b0bc: str   wzr, [x19, #0xd8]
+0000b0c0: strb  wzr, [x20, #0xe4]
+0000b0c4: mov   x8, #-1
+0000b0c8: str   x8, [x19, #0x12d0]
+0000b0cc: movi  v0.2d, #0000000000000000
+0000b0d0: str   d0, [x19, #0x12d8]
+0000b0d4: ldp   x29, x30, [sp, #0x50]
+0000b0d8: ldp   x20, x19, [sp, #0x40]
+0000b0dc: ldp   x22, x21, [sp, #0x30]
+0000b0e0: ldp   x24, x23, [sp, #0x20]
+0000b0e4: add   sp, sp, #0x60
+0000b0e8: retab 
