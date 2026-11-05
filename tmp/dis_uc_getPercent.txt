@@ -1,0 +1,50 @@
+0000e6a4: pacibsp 
+0000e6a8: sub   sp, sp, #0x50
+0000e6ac: stp   x22, x21, [sp, #0x20]
+0000e6b0: stp   x20, x19, [sp, #0x30]
+0000e6b4: stp   x29, x30, [sp, #0x40]
+0000e6b8: add   x29, sp, #0x40
+0000e6bc: mov   w19, #0x2d9
+0000e6c0: movk  w19, #0xe000, lsl #16
+0000e6c4: ldr   x8, [x0, #0xd8]
+0000e6c8: cbz   x8, #0xe754
+0000e6cc: mov   x21, x1
+0000e6d0: mov   x20, x0
+0000e6d4: bl    #0xe9d4   ; PLT->GOT[39] __ZNK9IOService10isInactiveEv
+0000e6d8: tbnz  w0, #0, #0xe754
+0000e6dc: cbz   x21, #0xe750
+0000e6e0: ldr   x0, [x20, #0xd8]
+0000e6e4: mov   x1, x21
+0000e6e8: bl    #0xbda0   ; __ZN16AppleAfterburner10getPercentEPy
+0000e6ec: mov   x19, x0
+0000e6f0: cbz   w0, #0xe754
+0000e6f4: ldr   x16, [x20]
+0000e6f8: mov   x17, x20
+0000e6fc: movk  x17, #0xcda1, lsl #48
+0000e700: autda x16, x17
+0000e704: mov   x17, x16
+0000e708: xpacd x17
+0000e70c: cmp   x16, x17
+0000e710: b.eq  #0xe718
+0000e714: brk   #0xc472
+0000e718: add   x8, x16, #0x3a8
+0000e71c: ldr   x9, [x16, #0x3a8]
+0000e720: movk  x8, #0xc9c, lsl #48
+0000e724: mov   x0, x20
+0000e728: mov   x1, #0
+0000e72c: blraa x9, x8
+0000e730: adrp  x8, #0x3000
+0000e734: add   x8, x8, #0x53d
+0000e738: stp   x20, x8, [sp, #8]
+0000e73c: str   x0, [sp]
+0000e740: adrp  x0, #0x3000
+0000e744: add   x0, x0, #0x50a
+0000e748: bl    #0xe884   ; PLT->GOT[6] _IOLog
+0000e74c: b     #0xe754
+0000e750: sub   w19, w19, #0x17
+0000e754: mov   x0, x19
+0000e758: ldp   x29, x30, [sp, #0x40]
+0000e75c: ldp   x20, x19, [sp, #0x30]
+0000e760: ldp   x22, x21, [sp, #0x20]
+0000e764: add   sp, sp, #0x50
+0000e768: retab 

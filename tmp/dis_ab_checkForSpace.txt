@@ -1,0 +1,27 @@
+0000bfec: pacibsp 
+0000bff0: stp   x22, x21, [sp, #-0x30]!
+0000bff4: stp   x20, x19, [sp, #0x10]
+0000bff8: stp   x29, x30, [sp, #0x20]
+0000bffc: add   x29, sp, #0x20
+0000c000: mov   x21, x1
+0000c004: mov   x19, x0
+0000c008: ldr   x0, [x0, #0x12c0]
+0000c00c: bl    #0xe86c   ; PLT->GOT[4] _IOLockLock
+0000c010: ldr   x8, [x19, #0x12e8]
+0000c014: ldr   x9, [x19, #0x12f0]
+0000c018: cmp   x8, x9
+0000c01c: b.ls  #0xc02c
+0000c020: mov   w20, #0x2ec
+0000c024: movk  w20, #0xe000, lsl #16
+0000c028: b     #0xc03c
+0000c02c: mov   w20, #0
+0000c030: ldr   x9, [x21]
+0000c034: add   x8, x9, x8
+0000c038: str   x8, [x19, #0x12e8]
+0000c03c: ldr   x0, [x19, #0x12c0]
+0000c040: bl    #0xe878   ; PLT->GOT[5] _IOLockUnlock
+0000c044: mov   x0, x20
+0000c048: ldp   x29, x30, [sp, #0x20]
+0000c04c: ldp   x20, x19, [sp, #0x10]
+0000c050: ldp   x22, x21, [sp], #0x30
+0000c054: retab 
