@@ -2982,3 +2982,29 @@ t=3990.653, killing the card until re-insmod (which works without a power cycle)
 - `aer_root_reset` has no direct call sites in .text — it is passed as a function pointer to
   pcie_do_recovery's reset phase; its "link has been reset" string ref sits at 0xffffffff81251214
   (cold path).
+
+## 29. Kext power/restore handlers decoded — UC_METHODS §20 (batch 2, 2026-11-07) [static]
+
+Full byte-exact decodes now live in `UC_METHODS.md` §20; driver-relevant summary:
+
+### 29.1 pointer_restore_handler @0x7508–0x7C1B (PAC callback, registered via IOInterruptEventSource in start())
+- Prologue flushes the **4 KB PCI extended-config blob** back to firmware (`extendedConfigWrite32` loop — PLT[0xe8cc]; the read stub 0xe8c0 has exactly one caller, `start()` @0x52CC), then reads image-type + version words from firmware status and switches on the **upper nibble of image type**.
+- Jump table @abs0x7C0C (base PC 0x7648): golden=0x7654 · HWTE=0x77D8 · live=0x7820 · debug=0x7838.
+- **golden**: `change_pointer(self,1)` → `[self+0x170]=1` → commit object E `[self+0x1188]` vt+0x1F0 (key 0x246e) → `[BAR0+0x2004]=0x0001A000` (flash-update re-enable word, cf. §18.5).
+- **live**: version gate (fast path 2.62 / slow path 2.63), decoder walk loop over the BAR0+0x8000 channel blocks (byte-offset index; stride 0x2C per §21), disable/enable cycle, init writer `fn@0x5A3C` (= `configureInterrupts` demangled — same fn the Linux driver's bring-up replicates), give_up @0x7AC8. Deferred-ack tail is **live-case only**: give_up jumps straight to shared tail B (no re-disable); tail A re-disables `[sec+4]=0` before acking.
+- `pointer_restore_timer @0x7C1C–0x7C5F`: tail-calls `[self+0x1190]->vt[63](obj,0,0,0)` (PAC 0xcda1 / key 0xa28c) — new field AB+0x1190.
+
+### 29.2 setPowerState @0x7C60–0x821B (AB vtable slot 259)
+- state==1: sec=`[self+0x158]`; if `[sec+0]&0xFF == 1` → `[sec+4]=1` (**decoder enable**) + log "(enabling)" → common tail; else disable path (`[sec+4]=0`). Reconfig flag `[self+0x169]` set → skip HW, log "flash update in progress" (fmt@abs0x1136) → tail.
+- state==0: reconfig flag set → **defer**: log + `[self+0x16A]=1`, return `0x11E1A300` (tagged, not a standard IOReturn). Normal: wake-gate byte `[self+0x12F8]`=1, commit object F `[self+0x1300]` vt+0x1F0 timeout 0x3E8 → return `0x4C4B40`.
+- Common tail (all non-deferred paths): thermal-distress u32 `[self+0x160]` — if set, log "Resetting thermal distress condition 0x%08x" then clear; **`configureInterrupts(self)`** (`bl #0x5a3c`); `[self+0x16A]=0`; engine object B `[self+0x98]` vt+0x180 (key 0x8bec) — a second engine object beyond AB+0x90; if wake-gate set, consume via `[self+0x90]->vt+0x208(&[self+0x12F8])` (key 0xf36c); return 0.
+- Every IOLog is preceded by `name=[self_vt+0x3A8](self,0)` — the getName-style log helper (slot 117, key 0xc9c), same pattern as §25's commit path.
+
+### 29.3 change_pointer @0x8580 verified (§20.5; corrects §18.7)
+- `spierase(self, **0x13FF000**)` (mov/movk/sub — §18.7's "0x13F0000" was a typo), then both SPI channels programmed at flash offset **0x13FFF40** with 64-byte blocks from four static **SPI command descriptor tables** (magic `0xa956xxxx`, sentinel-terminated): ch0 ← abs0x5F0 (LIVE) / abs0x670 (GOLDEN); ch1 ← abs0x630 (LIVE) / abs0x6B0 (GOLDEN). LIVE/GOLDEN differ only at dword[3] and (ch0) dword[13]. An earlier draft's "[addr, SENT] pointer list" contents were a misremembering — no such pattern exists in the binary.
+- spiprogram is @**0x821C**; loadBitfile @0x8628 acquires its resource via `OSKextRequestResource` (PAC handle ptr@abs0x87C8, key 0x5e7e).
+
+### 29.4 Driver implications
+- The kext's power-on path enables the decoder by writing `[sec+4]=1` on the BAR0+0x8000 channel block whose header type byte is 1 — consistent with our live bring-up (enable persists across rmmod/insmod, §26). Our Linux driver already replicates this; no change needed.
+- `setPowerState(0)` defers power-off while a flash update is in progress (`[self+0x16A]` deferred-ack flag) — relevant if we ever implement firmware flashing from the Linux side: mirror the same gate before touching SPI.
+- The 4 KB ext-config flush + image-type switch explains how the kext recovers PCI config after a link event; our driver's equivalent is the FLR/re-bringup path (§26). No new register writes to adopt — all BAR0/BAR1 values match what we already write (init writer `fn@0x5A3C` = configureInterrupts, byte-identical sequence per §21.6).

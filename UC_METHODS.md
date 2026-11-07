@@ -35,19 +35,19 @@ offset +i·8). 17 LOCAL (tag 0x80) overrides:
 
 | raw slot | offset | addr | demangled signature | status |
 |---|---|---|---|---|
-| 2   | +0x10  | 0xcbe0 | `~AppleAfterburnerUserClient() [D1Ev]`            | ⬜ |
-| 3   | +0x18  | 0xcbe4 | `~AppleAfterburnerUserClient() [D0Ev]` (deleting) | ⬜ |
-| 9   | +0x48  | 0xcc14 | `getMetaClass()`                                   | ⬜ |
-| 134 | +0x430 | 0xd54c | `willTerminate(IOService*, u32)`                   | ⬜ |
-| 135 | +0x438 | 0xd60c | `didTerminate(IOService*, u32, bool*)`             | ⬜ |
-| 192 | +0x600 | 0xd1e4 | `start(IOService*)`                                | 🟡 |
-| 193 | +0x608 | 0xd25c | `stop(IOService*)`                                 | ✅ (slot-release loop; writes UC+0x1968 @0xd2f0) |
-| 200 | +0x640 | 0xd6d8 | `terminate(u32)`                                   | ⬜ |
-| 201 | +0x648 | 0xd6f0 | `finalize(u32)`                                    | ⬜ |
+| 2   | +0x10  | 0xcbe0 | `~AppleAfterburnerUserClient() [D1Ev]`            | ✅ §19.1 (tail-call base D2; no local cleanup) |
+| 3   | +0x18  | 0xcbe4 | `~AppleAfterburnerUserClient() [D0Ev]` (deleting) | ✅ §19.1 (base D2 + `operator delete(this, 0x1970)`) |
+| 9   | +0x48  | 0xcc14 | `getMetaClass()`                                   | ✅ §19.1 (returns &0x101C0) |
+| 134 | +0x430 | 0xd54c | `willTerminate(IOService*, u32)`                   | ✅ §19.5 (log + tail-call base slot 134) |
+| 135 | +0x438 | 0xd60c | `didTerminate(IOService*, u32, bool*)`             | ✅ §19.5 (log; **\*relinq=false**; tail-call base slot 135) |
+| 192 | +0x600 | 0xd1e4 | `start(IOService*)`                                | ✅ §19.2 (safeMetaCast → UC+0xD8; no HW work) |
+| 193 | +0x608 | 0xd25c | `stop(IOService*)`                                 | ✅ §19.3 (cleanUp + slot-release loop + freeSpace + 5×IOLockFree; writes UC+0x1968 @0xd2f0) |
+| 200 | +0x640 | 0xd6d8 | `terminate(u32)`                                   | ✅ §19.5 (pure tail-call base slot 200) |
+| 201 | +0x648 | 0xd6f0 | `finalize(u32)`                                    | ✅ §19.5 (pure tail-call base slot 201) |
 | 274 | +0x890 | 0xcfc8 | `externalMethod(...)` — dispatch tail              | ✅ (`tmp/dis_uc_externalMethod.txt`) |
 | 292 | +0x920 | 0xd004 | `initWithTask(task*, void*, u32, OSDictionary*)`   | ✅ (`tmp/dis_uc_initWithTask.txt`) |
-| 294 | +0x930 | 0xd3f8 | `clientClose()`                                    | ⬜ |
-| 295 | +0x938 | 0xd534 | `clientDied()`                                     | ⬜ |
+| 294 | +0x930 | 0xd3f8 | `clientClose()`                                    | ✅ §19.4 (no-provider → 0xE000_02D9; base handleClose hook) |
+| 295 | +0x938 | 0xd534 | `clientDied()`                                     | ✅ §19.4 (pure tail-call base slot 295) |
 | 308 | +0x990 | 0xd708 | `submitFrame(s_inputDataStruct*, u64*)`            | ✅ §4.1 |
 | 309 | +0x998 | 0xdcc4 | `queryCompletion(u64, u64*)`                       | ✅ §4.2 |
 | 310 | +0x9a0 | 0xdd9c | `bindFrame(s_bindDataStruct*, u64*)`               | ✅ §4.3 |
@@ -56,8 +56,12 @@ offset +i·8). 17 LOCAL (tag 0x80) overrides:
 | 313 | +0x9b8 | 0xe4c0 | `unbindAll()`                                      | ✅ §4.6 |
 | 314 | +0x9c0 | 0xe6a4 | `getPercent(u64*)`                                 | ✅ §4.7 |
 
-Slots 306/307 = inherited IOKit virtuals (KSYM tag 0xC0). Slot 119 (+0x3a8) =
+Slots 306/307 = inherited IOKit virtuals (KSYM tag 0xC0). Slot 117 (+0x3a8) =
 IORegistryEntry::getName — used by every error-log path as `getName(UC, 0)`.
+All base-class tail calls go through **GOT[28] = pointer to the base IOUserClient
+vtable** (verified: [GOT28+0x430/0x438/0x600/0x608/0x630/0x640/0x648] resolve to
+base slots 134/135/192/193/198/200/201; slot 198 = `IOService::handleClose`,
+KSYM undef[127]). GOT[57] = &AB gMetaClass data pointer (safeMetaCast in start()).
 
 ## 3. sMethods table @0x15680 ✅ (the ioctl ABI contract)
 
@@ -693,18 +697,18 @@ if (ch != 1) → EXIT @6958                 ; ch0 done
 5. ✅ DONE: AB::cleanUp @0xb0ec (§15.1) + AB::submitDataGated @0x985c (§15.2) — submission core fully decoded; guard-flag lifecycle resolved (see §13); sContext queue layout mapped (§15.3)
 6. 🟡 `[desc_vt+0x1F8](desc, 1)` semantics on submit success (note: cleanUp calls vt+0x1F8(rec, 0) on dmaQ completion records — same slot offset, different receiver; see §15.1)
 7. 🟡 IODirection enum mapping for withAddressRange dir=1/2
-8. ⬜ lifecycle overrides: start@0xd1e4 (🟡), willTerminate/didTerminate/terminate/finalize/clientClose/clientDied/getMetaClass/D1Ev/D0Ev — mostly boilerplate, decode any that touch HW/state
+8. ✅ DONE: lifecycle overrides — full decode in §19 (start/stop/clientClose/clientDied/willTerminate/didTerminate/terminate/finalize/getMetaClass/D1Ev/D0Ev); none touch HW directly; stop() is the teardown template for the Linux driver
 9. 🟡 UC+0x1900 field semantics; s_inputDataStruct +0x14/+0x18 fields
 10. ⬜ Engine callback table (§16): 62 entries decoded & demangled — identify which are actually dispatched by firmware (the three *Gated callbacks) vs dead/legacy; spiprogram@821c + loadBitfile@8628 now decoded (§18.7), submitResource still open
 11. 🟡 sContext queue PUSH side: who links 24B {next,prev,desc} nodes into the four §15.3 queues (handleInterrupt / submitFrame path) — only pop/drain decoded so far
-12. ⬜ Engine object class (AB+0x90): now 3 known vt slots — 0x1E8 wait-with-callback (§10.1), 0x208 completion notify (§12.7/§12.8, ctx = self or &AB+0xC0), 0x210 poll-until-deadline (frameID=2). Identify the class; needed to replicate notify semantics in the Linux driver
+12. ⬜ Engine object class (AB+0x90): now 4 known vt slots — 0x1E8 wait-with-callback (§10.1), 0x208 completion notify (§12.7/§12.8, ctx = self or &AB+0xC0; also &AB+0x12F8 wake-gate address from setPowerState tail §20.3), 0x210 poll-until-deadline (frameID=2). **Second engine object at AB+0x98** with vt+0x180(eng) key 0x8bec (§20.3). Identify the class(es); needed to replicate notify semantics in the Linux driver
 13. ⬜ BAR1+0x2044 bit layout: bit0=valid confirmed live (Phase 3i); bit1=channel selector inferred from dispatch (@63d4 compares status>>1 against 0/1). Higher bits unverified — may carry completion count
 14. ⬜ [decoder+0x14] frame-done/error word: & 0x1F mask gates §12.6 decoder-error check; bit0=hard error (sets guard flag + overrun limit); bits 1–4 firmware-defined, meaning unknown
 15. ⬜ AB::submitResource @0x8a1c–0x8d50 full body: only the AB+0x11B4=1 write at 0x8b74 confirmed; what resources are submitted and in what order is still open
 16. ✅ DONE: reconfig_handler @0x6b94 — full decode in §18 (firmware image-type state machine: golden/HWTE/live/debug/unknown; SPI flash update path with 2×20MB channel programming, attempt counter, lazy bitfile load `live_2.6X_0x01_{primary,secondary}[_ecXX].bin`; commit vcall vt+0x1F0 + BAR0[+0x2004] re-enable words 0x00019000/0x0001A000; PCI ext-config 4KB blob flush). Helpers decoded: change_pointer@8580, spierase@809c, loadBitfile@8628, reconfig_timer@74c4
 17. ⬜ Who fills AB+0x174 (4KB ext-config blob)? No __text writer — presumed firmware DMA during the vt+0x1F0 commit vcall (§18.9)
-18. ⬜ Commit objects D/E ([self+0x1178]/[self+0x1188]) class + vt+0x1F0("commit", timeout) contract; vt+0x1F8 on [self+0x1180] (reconfig_timer poll) status layout
-19. ⬜ spiprogram@821c x4/w5 argument semantics across the two call styles (static descriptors w4=0x40/w5=0 vs src/dst ptrs w5=1)
+18. ⬜ Commit objects D/E/F ([self+0x1178]/[self+0x1188]/**[self+0x1300]**) class + vt+0x1F0("commit", timeout=0x3E8, key 0x246e) contract — F added by setPowerState(0) power-down path (§20.3/§20.4); vt+0x1F8 on [self+0x1180] (reconfig_timer poll) and **[self+0x1190]** (pointer_restore_timer, key 0xa28c §20.1) status layout
+19. 🟡 spiprogram@821c x4/w5 argument semantics — both call sites now fully documented (§20.5): change_pointer = (ch, off=0x13FFF40, src=64B static SPI command table, w4=0x40, w5=0); reconfig third_phase = (ch, size=0x1400000, src=image data from vt+0x308, dst=vt+0x300, w5=1). Internal interpretation of x4/w5 still open
 
 ## 15. Submission core deep dive — cleanUp + submitDataGated (2026-11-05)
 
@@ -1225,7 +1229,7 @@ consistent with every other AB object pointer.
 ```c
 // @0x8580 — "change_pointer(uint32)" per §16 table: programs BOTH SPI channels
 void AB::change_pointer(u32 flag) {
-    spierase(self, size=0x13F0000);              ; ~32MB erase prep (w = 0x13F_FF40 - 0xF40)
+    spierase(self, size=0x13FF000);              ; ~32MB erase prep (w = 0x13F_FF40 - 0xF40) — verified §20.5
     const u8* descA = (flag==1) ? abs0x5F0 : abs0x670;   ; static SPI command descriptor tables
     const u8* descB = (flag==1) ? abs0x630 : abs0x6B0;   ; (binary data, not strings)
     spiprogram(self, ch=0, size=0x13F_FF40, src=descA, w4=0x40, w5=0);
@@ -1283,3 +1287,316 @@ vt+0x308/vt+0x300 results (src/dst) + w5=1. Exact x4/w5 semantics: open item.
 - **vt+0x1F8** on [self+0x1180] (reconfig_timer poll) — status word layout.
 - spiprogram x4/w5 argument semantics across the two call styles.
 - fn@0xe7ec global (+0x10 of page 0x10000 object) — which kext/resource handle it is.
+
+## 19. UC lifecycle overrides — full decode (2026-11-06) ✅ (`tmp/dis_uc_lifecycle.txt`)
+
+All remaining ⬜/🟡 local overrides from §2 are now decoded. **None touch HW
+directly** — every state change goes through an AB helper (§6). The UC object is
+pure bookkeeping: slot table + sContext + space counter.
+
+### 19.1 Destructors / metaclass / allocator
+
+| fn | addr | behavior |
+|---|---|---|
+| `D1Ev` (complete-object dtor) | 0xcbe0 | Pure tail-call to `IOUserClient::D2`. **No local cleanup** — all teardown lives in stop() |
+| `D0Ev` (deleting dtor) | 0xcbe4 | Calls base D2, then `operator delete(this, 0x1970)` via OSObject::dl. **UC instance size = 0x1970 bytes** |
+| `getMetaClass()` | 0xcc14 | Returns &0x101C0 (the UC OSMetaClass object; zero-init in binary, built at load) |
+| gMetaClass ctor | 0xcc20 | `OSMetaClass::C2("AppleAfterburnerUserClient"@0x309F, super=*GOT[18], size=0x1970)`; vptr = PAC(UC_META vt @0x15578 + 0x10) |
+| instance allocator | 0xcc68 | `OSObject::nw(0x1970)` → `IOUserClient::C2(this, &gMetaClass@0x101C0)` → vptr=PAC(UC_vt+0x10) → `instanceConstructed(&gMetaClass)` (mirrors AB allocator @0x4140) |
+| in-place ctor variants | 0xcccc / 0xcd24 | Same C2 sequence on a pre-allocated x0, no allocation (OSObject::new(buffer) path) |
+
+### 19.2 start() — provider capture only
+
+```c
+bool UC::start(IOService* provider) {          // @0xd1e4
+    AB = OSMetaClassBase::safeMetaCast(provider, *GOT[57]);   // GOT[57] = &AB gMetaClass data ptr
+    [this+0xD8] = AB;                          // UC+0xD8 (§5)
+    if (!AB) return false;
+    return IOUserClient::start(provider);      // tail-call base vt slot 192, PAC 0x3c68
+}
+```
+
+No HW work. (GOT[28] = base IOUserClient vtable — see §2 note.)
+
+### 19.3 stop() — full teardown (the function the Linux driver must mirror)
+
+```c
+void UC::stop(IOService* provider) {           // @0xd25c
+    AB = [this+0xD8];                          // no NULL check (start() failure ⇒ IOKit won't call stop)
+    AB::cleanUp(AB, &UC+0x18F8);               // §15.1 — queue finalization + engine wait(timeout=0)
+
+    for (i = 0; i < 192; i++) {                // slot table @UC+0xF0, stride 0x18
+        desc = [slot_i.desc];
+        if (!desc) continue;
+        AB::unbindFrame(AB, desc);             // space pool: used -= len (saturating)
+        len  = [desc_vt+0x1F0](desc);          // getLength
+        UC_counter@UC+0x1968 -= len;           // reserved-space counter (§5)
+        [desc_vt+0x220](desc, 0);              // teardown/detach
+        [desc_vt+0x28](desc);                  // release (refcount--)
+        slot_i.desc = slot_i.buf_offset@+0x8 = slot_i.size@+0x10 = 0;   // zero released slot fields
+    }
+
+    if ([UC+0x1968] > 0) AB::freeSpace(AB, &UC+0x1968);   // release leftover reservation (saturating used -= counter)
+
+    IOLockFree([UC+0x1938]);                   // sContext qA[0] lock (ctx+0x40)
+    IOLockFree([UC+0x1948]);                   // sContext qB[0] lock (ctx+0x50)
+    IOLockFree([UC+0x1940]);                   // sContext qA[1] lock (ctx+0x48)
+    IOLockFree([UC+0x1950]);                   // sContext qB[1] lock (ctx+0x58)
+    IOLockFree([UC+0x1960]);                   // trampoline IOLock (§5)
+
+    IOUserClient::stop(provider);              // tail-call base vt slot 193, PAC 0xb085
+}
+```
+
+New facts:
+- **sContext's four queue locks** sit at UC+0x1938/0x1940/0x1948/0x1950 = ctx+0x40/+0x48/+0x50/+0x58 (ctx = &UC+0x18F8) — allocated in initWithTask, freed here.
+- stop() does **not** reset the slot-count high-water mark [UC+0x18F0] (only unbindAll/initWithTask do; §5). Irrelevant in practice: the UC object is destroyed after stop().
+- Loop recomputes `slot_base = UC + i·0x18 − 0x1800` each iteration (byte-verified @0xd298–0xd378) — no stale-pointer bug.
+
+### 19.4 clientClose / clientDied
+
+```c
+u32 UC::clientClose(void) {                    // @0xd3f8
+    u32 ret = 0;
+    AB = [this+0xD8];
+    if (!AB) { IOLog("...returning kIOReturnNotAttached.\n"); ret = 0xE000_02D9; }
+    r = IOService::handleClose(this, 0);       // vcall slot 198 (KSYM undef[127]) — base close hook
+    if (!(r & 1)) IOLog("...terminate() failed.\n");   // logged when bit0 of return is clear
+    return ret;                                // kIOReturnSuccess(0) or 0xE000_02D9
+}
+
+void UC::clientDied(void) {                    // @0xd534 — pure tail-call to base slot 295 (PAC 0xea14), boilerplate
+```
+
+No slot release in clientClose — teardown happens only in stop(). Error **0xE000_02D9** = "not attached" variant of the kIOReturnNotAttached family (§8: base 0xE000_02C2, no-space 0x2D8).
+
+### 19.5 willTerminate / didTerminate / terminate / finalize
+
+```c
+bool UC::willTerminate(IOService** provider, u32 options) {   // @0xd54c — slot 134
+    IOLog("%s[%p]::%s(%p, %u)\n", this, "willTerminate", getName(), provider, options);
+    return IOUserClient::willTerminate(provider, options);    // tail-call base vt slot 134, PAC 0xa51b
+}
+
+void UC::didTerminate(IOService* provider, u32 options, bool* relinq) {   // @0xd60c — slot 135
+    IOLog("%s[%p]::%s(%p, %u, %p)\n", this, "didTerminate", getName(), provider, options, relinq);
+    *relinq = false;                              // strb wzr — do NOT relinquish secondary claim (single-client model)
+    IOUserClient::didTerminate(provider, options, relinq);   // tail-call base vt slot 135, PAC 0x4577
+}
+
+void UC::terminate(u32 options) {                 // @0xd6d8 — slot 200: pure tail-call to base (PAC 0x5ec5), no local work
+void UC::finalize(u32 options) {                  // @0xd6f0 — slot 201: pure tail-call to base (PAC 0x5219), no local work
+```
+
+### 19.6 Linux driver implications
+
+- **On client disconnect** (fd close / process death): mirror stop() exactly — cleanUp(sContext) → release all bound slots (unbindFrame + counter decrement + zero slot fields) → freeSpace(leftover counter) → destroy the four queue locks + trampoline lock.
+- `didTerminate` sets *relinquishSecondary=false ⇒ **single-client model**: never hand the device to another client on termination.
+- No lifecycle override writes HW directly; all BAR1 space-pool state changes go through AB::cleanUp/unbindFrame/freeSpace (§6).
+
+## 20. pointer_restore_handler @0x7508 + setPowerState @0x7C60 — full decode (batch 2, 2026-11-06) ✅
+
+### 20.1 Identity & registration
+| fn | Role | Registration |
+|---|---|---|
+| @0x7508–0x7C1B | `pointer_restore_handler(IOInterruptEventSource*, int)` — PCI ext-config restore + image-type state machine (golden/HWTE/live/debug) | PAC-authenticated callback; registered in start() via PLT[0xe950]=IOInterruptEventSource::interruptEventSource. Not a vtable method, no direct bl callers (§16 entry 45) |
+| @0x7C1C–0x7C5F | `pointer_restore_timer(IOTimerEventSource*)` — tail-calls `[self+0x1190]->vt[63](obj, 0, 0, 0)` (PAC tag 0xcda1, key 0xa28c) | timer callback; new field AB+0x1190 (§20.4). §16 entry 44 |
+| @0x7C60–0x821B | `setPowerState(u32 state, IOService*)` — decoder enable/disable + deferred power-ack + commit vcall | AB vtable slot 259 (§16 row 13) |
+
+### 20.2 pointer_restore_handler @0x7508 — full body (byte-exact)
+```c
+void AB::pointer_restore_handler(IOInterruptEventSource* src, int type) {   // x0=self, PAC-authenticated entry
+    // Phase 1: PCI ext-config flush (identical to reconfig_handler §18.2)
+    if ([self+0x170]) {                                   ; ext-config pending flag
+        for (i = 0; i < 0x400; i += 4)                    ; 256 dwords = 4KB
+            extendedConfigWrite32([self+0x88], i, [self+0x174+i]);   // PLT[0xe8cc]=imports[13] (write stub @0xe8cc; read stub @0xe8c0 called only from start() @0x52cc)
+        [self+0x170] = 0;
+    }
+    // Phase 2: firmware status block ([self+0x138]; layout §18.6)
+    w = [[self+0x138]+4];                                 ; "board revision" word — image-type enum in bits[19:16]
+    IOLog(fmt@abs0x979  "board revision: 0x%08x", ...);   ; PAGE-0 string (adrp #0)
+    v = [[self+0x138]+8];                                 ; image revision word
+    IOLog(fmt@abs0x9B4  "image revision: 0x%08x (%u.%u)", ..., v, v>>16, v&0xFFFF);   ; PAGE-0 string
+    // Phase 3: switch ((w >> 16) & 0xF) — jump table @0x7C0C (4×s32 data words placed at fn tail inside __text after retab; base PC = 0x7648 via ADR):
+    //          [0]=+0xC→golden@0x7654, [1]=+0x190→HWTE@0x77D8, [2]=+0x1D8→live@0x7820, [3]=+0x1F0→debug@0x7838; index >3 → default @0x7790
+}
+```
+
+**case 0 (GOLDEN) @0x7654–0x778C:**
+1. IOLog "image type is golden" (fmt@abs0x161D, page-0x1000+0x61D)
+2. IOLog "changing pointer to live..." (fmt@abs0x1A4C)
+3. `change_pointer(self, flag=1)` → bl 0x8580: programs the **LIVE** pointer table into flash (§20.5)
+4. IOLog "reconfiguring to live..." (fmt@abs0x17F5)
+5. `[self+0x170] = 1` — arms ext-config flush for next entry
+6. Commit vcall: `[[self+0x1188]->vt+0x1F0](obj, w1=0x3E8)` — **commit object E** (same as reconfig pointer-restore path §18.5), timeout 1000ms, PAC key 0x246e
+7. `[BAR0+0x2004] = 0x0001A000` — engine re-enable word, **flash-update variant** (mov w9,#0xa000; movk #1,lsl#16 → str [self+0x148]+4)
+8. `b #0x7880` → bare epilogue (retab @0x7898). **No deferred-ack check on this path.**
+
+**case 1 (HWTE) @0x77D8–0x781B:** getName + save args, x0 = fmt@abs0x1832 "image type is HWTE..." → `b #0x787c` (shared IOLog call + full epilogue).
+**case 3 (DEBUG) @0x7838–0x789B:** physically interleaved between the two halves of case-2's version gate; getName, x0 = fmt@abs0x19BB "image type is debug..." → falls through to the same shared IOLog @0x787c + epilogue.
+**default @0x7790–0x77D4:** IOLog **Error** fmt@abs0x19F6 "image type is unknown..." → `b #0x787c`.
+
+**case 2 (LIVE / flash complete) @0x7820 — decoder bring-up:**
+```c
+// version gate: w24 = major, w23 = minor (from [[self+0x138]+8])
+if (major==2 && minor==0x3E) variant = 1;                 ; fast path @0x7820–0x7834 (2.62)
+else { cset/cset/and: variant = (major==2) & (minor==0x3F); }   ; slow path @0x789C–0x78AC (2.63)
+getName();                                                ; shared @0x78B0
+if (!variant) goto give_up;                               ; cbz w20,#0x7ac8 @0x78E4 — neither 2.62 nor 2.63
+IOLog("flash update is complete!");                       ; fmt@abs0x1A8C
+[self+0x158] = NULL;                                      ; clear decoder pointer before walk
+dir = [self+0x128];  i = 0;                               ; BAR0 directory base (§13); i = BYTE offset
+loop:                                                     ; @0x7918
+    entry = dir[i];                                       ; ldr w26,[x9, w8, uxtw]
+    IOLog Info("Section header: 0x%08x", entry);          ; fmt@abs0x1ACA — logs EVERY section visited
+    if ((entry & 0xFF) == 1) { [self+0x11D0] = 1;         ; decoder found (walk CONTINUES to terminator!)
+                              [self+0x158] = dir + i; }   ; pointer to the section header word
+    i += (entry >> 14) & 0x3FFFC;                         ; stride in BYTES
+    if ((entry & 0xFF) != 0) goto loop;                   ; type 0 = terminator
+if ([self+0x158]) {                                       ; decoder found:
+    IOLog("Decoder section header: 0x%08x", [sec+0]);     ; fmt@abs0x1B05 (readback of hdr word 0)
+    if (sec) [sec+4] = 0;                                 ; DISABLE
+    IOLog("Decoder Control Register: 0x%08x (disabling)", readback);   ; fmt@abs0x1B48
+    IOSleep(1);                                           ; bl PLT[0xe89c]=_IOSleep, w0=1 — mandatory 1s settle delay!
+    if (sec) [sec+4] = 1;                                 ; ENABLE
+    IOLog("Decoder Control Register: 0x%08x (enabling)", readback);   ; fmt@abs0x11DF
+    configureInterrupts(self);                            ; bl 0x5A3C — INIT WRITER (§20.6)
+} else {
+    IOLog Error("Could not find decoder register section!");          ; fmt@abs0x1B99 (no trailing \n in string)
+}
+goto tail_A;                                              ; @0x7AC4 / fall-through @0x7B34
+
+give_up:                                                  ; @0x7AC8 — version mismatch only
+    IOLog Error("giving up on flash update. max attempts = %u", [self+0x16C]);   ; fmt@abs0x1656 (attempt counter)
+    [self+0x169] = 0;                                     ; clear reconfig sub-flag
+    if ([self+0x16A]) {                                   ; power ack was deferred during reconfig:
+        IOLog("deferred ack for power state change");     ; fmt@abs0x1973
+        goto tail_B;                                      ; b #0x7BF8 — NO decoder re-disable here
+    }
+    goto epilogue;                                        ; bare retab
+
+tail_A:                                                   ; @0x7B48 — bring-up success AND no-decoder paths
+    [self+0x169] = 0;
+    if ([self+0x16A]) {                                   ; deferred ack pending:
+        IOLog("deferred ack for power state change");     ; fmt@abs0x1973
+        if (sec) [sec+4] = 0;                             ; **re-DISABLE decoder** before acking
+        IOLog("Decoder Control Register: 0x%08x (disabling)", readback);   ; fmt@abs0x1B48
+    }
+tail_B:                                                   ; @0x7BF8 — shared by both deferred-ack blocks
+    IOService::acknowledgeSetPowerState(self);            ; bl PLT[0xe9a4 — delivers the deferred ack to IOKit
+    [self+0x16A] = 0;                                     ; clear deferred-ack flag
+epilogue:                                                 ; @0x7880–0x7898 — register restore + retab (shared by ALL cases)
+```
+
+The walk is byte-exact identical to §12.2 (handleInterrupt bitfile section) and matches Phase-3k's live BAR0 walk (terminator at +0x802C on the lab card). The deferred-ack tail exists **only in case-2 paths** — golden/HWTE/debug/default exit directly through the bare epilogue.
+
+### 20.3 setPowerState @0x7C60–0x821B — full body (byte-exact)
+```c
+IOReturn AB::setPowerState(u32 state, IOService* provider) {   // vtable slot 259; x21 = self+0x11D0 (field-group base reg)
+    // NOTE: every IOLog below is preceded by name=[self_vt+0x3A8](self, 0) — getName-style log helper (key 0xc9c), standard kext pattern (§15.2)
+    IOLog("requested power state: %lu", state);                 ; fmt@abs0x1090 (Info; funcname string "setPowerState" @abs0x10CF)
+    switch (state) {
+    case 1:                                                     // POWER ON — enable decoder → common tail
+        sec = [self+0x158];
+        if (!sec) {                                             ; cbz @0x7d5c
+            if ([self+0x169]) { IOLog Error("flash update in progress"); goto tail; }   ; fmt@abs0x1136 — reconfig: skip, no disable
+            goto disable_path;
+        }
+        if ([self+0x169]) {                                     ; cbnz @0x7d68 — decoder present but reconfig in progress:
+            IOLog Error("flash update in progress");            ; fmt@abs0x1136 — skip enable (decoder stays as bring-up left it)
+            goto tail;
+        }
+        if ((hdr=[sec+0]) & 0xFF != 1) goto disable_path;       ; b.ne @0x7d74 — not a type-1 section
+        [sec+4] = hdr & 0xFF;                                   ; = 1 (enable)
+        IOLog("Decoder Control Register: 0x%08x (enabling)", readback);   ; fmt@abs0x11DF
+        goto tail;
+    case 0:                                                     // POWER OFF — wake gate + commit, EARLY RETURN (no common tail!)
+        if ([self+0x169]) {                                     ; reconfig in progress: DEFER the ack
+            IOLog Error("flash update in progress. deferring power state ack");   ; fmt@abs0x10DD
+            [self+0x16A] = 1;                                   ; arm deferred-ack flag (consumed by §20.2 tail_A/tail_B)
+            return 0x11E1A300;                                  ; non-zero IOReturn = "will ack later" (b #0x7FFC epilogue)
+        }
+        [self+0x12F8] = 1;                                      ; arm WAKE GATE (gates pre-submit Wake call, §15.2) — strb w8,[x21+#0x128] @0x7E24
+        obj = [self+0x1300]; PAC-verify(obj);                   ; commit object F — NEW field (§20.4), tag 0xcda1
+        [obj->vt+0x1F0](obj, w1=0x3E8);                         ; commit vcall (key 0x246e), timeout 1000ms @0x7E5C–0x7E60
+        return 0x4C4B40;                                        ; non-zero IOReturn on power-down path! (mov w0,#0x4b40; movk #0x4c,lsl#16)
+    default:
+        IOLog Error("Unexpected requested power state %lu", state);   ; fmt@abs0x127F
+        return 5;                                               ; @0x7E18 (mov w0,#5)
+    }
+disable_path:                                                   // @0x7EC0 — decoder lost / not configured
+    [self+0x11D0] = 0;                                          ; clear decoder-found flag (strb wzr,[x21])
+    [self+0x158] = NULL;                                        ; clear decoder pointer
+    IOLog Error("lost decoder configuration. driver support for PR has been deprecated");   ; fmt@abs0x1174
+tail:                                                           // common exit (state==1 paths only)
+    if ([self+0x160]) {                                         ; thermal-distress bitmask
+        IOLog Info("Resetting thermal distress condition 0x%08x", [self+0x160]);   ; fmt@abs0x122F
+        [self+0x160] = 0;
+    }
+    configureInterrupts(self);                                  ; bl 0x5A3C — INIT WRITER, re-applied on every power-ON exit (§20.6)
+    [self+0x16A] = 0;                                           ; clear deferred-ack flag
+    eng = [self+0x98]; PAC-verify(eng);                         ; second engine object (class still open, §14 item 12)
+    [eng->vt+0x180](eng);                                       ; NEW slot — key 0x8bec @0x7FA8; no args beyond self
+    if ([self+0x12F8]) {                                        ; wake gate armed by a prior power-OFF:
+        x1 = &AB+0x12F8;                                        ; wake-gate ADDRESS passed as ctx arg! (add x1,x21,#0x128)
+        [self+0x12F8] = 0;                                      ; clear it @0x7FB8
+        eng2 = [self+0x90]; PAC-verify(eng2);                   ; completion-notify engine object (§15.2/§17)
+        [eng2->vt+0x208](eng2, &AB+0x12F8, w2=0);               ; key 0xf36c @0x7FF4
+    }
+    return 0;                                                   ; @0x7FF8 (mov w0,#0)
+}
+```
+
+**Key semantics:**
+- **Deferred power-ack protocol**: setPowerState(0) during reconfig does NOT disable the decoder — it arms [self+0x16A] and returns non-zero (0x11E1A300). pointer_restore_handler's tail_A/tail_B later calls acknowledgeSetPowerState() to deliver the ack. This is why the kext never disables the decoder mid-flash-update.
+- **Wake-gate lifecycle**: power-OFF arms [self+0x12F8] + commits via object F; the NEXT power-ON exit consumes it (clears gate, notifies eng2=[self+0x90] via vt+0x208 with &gate as ctx). The pre-submit Wake call (§15.2) is gated on this same byte.
+- **Init writer runs on every power-ON exit** — BAR1 +0x2004=0x16 etc. are re-applied after any power transition (explains why the Linux driver must re-run init after FLR/power events).
+- Non-zero IOReturns 0x11E1A300 / 0x4C4B40 are not standard kIOReturn values — tagged/encoded returns; in the deferred case IOKit treats non-zero as "handled, ack pending".
+
+### 20.4 New AB fields (add to §13 table)
+| Offset | Meaning | Evidence |
+|---|---|---|
+| +0x1300 | **commit object F** — same vt+0x1F0("commit", timeout=0x3E8) contract as D/E (§18.6); used by setPowerState(0) power-down path; PAC key 0x246e, tag 0xcda1 | fn@0x7C60 @0x7E28–0x7E60 |
+| +0x1190 | **pointer_restore_timer target object** — vt+0x1F8(obj, 0, 0, 0), key 0xa28c (same slot offset as dmaQ completion-record cleanUp §15.1) | fn@0x7C1C @0x7C44–0x7C5C |
+| +0x98 | **second engine object** — vt+0x180(eng), key 0x8bec, called from setPowerState tail (distinct from completion-notify object at +0x90) | fn@0x7C60 @0x7F84–0x7FA8 |
+
+### 20.5 change_pointer @0x8580 — verified (corrects §18.7)
+```asm
+w1 = 0x13FFF40 - 0xF40 = **0x13FF000**          ; spierase size (mov/movk/sub @0x8598–0x85A0) — §18.7's "0x13F0000" was a typo
+bl  spierase(self, 0x13FF000)                   ; ~20MB erase prep
+csel x3,  abs0x5F0, abs0x670, (flag==1)         ; ch0 source table @0x85BC
+csel x19, abs0x630, abs0x6B0, (flag==1)         ; ch1 source table @0x85D0
+bl  spiprogram(self, ch=0, off=0x13FFF40, src=x3, w4=0x40, w5=0)   ; @0x85EC
+b   spiprogram(self, ch=1, off=0x13FFF40, src=x19, w4=0x40, w5=0)  ; tail call @0x8624 (after epilogue PAC check)
+```
+Both SPI channels get a **64-byte block** programmed at flash offset **0x13FFF40**. The sources are four static **SPI command descriptor tables** in the kext binary (page-0 region, 16 dwords each, sentinel-terminated), verified from `rework/arm64e.bin`:
+
+| Table | Used by | Contents (16×u32 LE) |
+|---|---|---|
+| @abs0x5F0 | ch0, flag=1 (LIVE) | `a9560000 00000201 01ff0201 20000000 101ccf5 1010000 10003 10009 0 0 0 0 1 0 0 FFFFFFFF` |
+| @abs0x670 | ch0, flag=0 (GOLDEN) | `a9560000 00000201 01ff0201 00000000 101ccf5 1010000 10003 10009 0 0 0 0 1 f0000 0 FFFFFFFF` |
+| @abs0x630 | ch1, flag=1 (LIVE) | `a9562000 20003020 40ff3000 8002000 3020343e 30c00400 30800001 30800000 20002000×5 20003080 2000 20002000 FFFFFFFF` |
+| @abs0x6B0 | ch1, flag=0 (GOLDEN) | `a9562000 20003020 40ff3000 102000 3020343e 30c00400 30800001 30800000 20002000×5 20003080 2000 20002000 FFFFFFFF` |
+
+Family A (ch0, magic `0xa9560000`) differs between LIVE/GOLDEN only at dword[3] (`0x20000000` vs `0`) and dword[13] (`0` vs `0xF0000`); family B (ch1, magic `0xa9562000`) differs only at dword[3] (`0x8002000` vs `0x102000`). These are firmware-side SPI command sequences — the differing dwords select which golden/live entry pointer set gets written. (Earlier draft's "[addr, SENT] pointer list" contents were a misremembering — no such pattern exists anywhere in the binary; corrected here.)
+
+spiprogram itself is at **@0x821C** — its internals (how w4/w5 drive the SPI write) remain open item §14-19. The function immediately following change_pointer, **loadBitfile @0x8628** (§14 item 10), acquires the bitfile resource via `OSKextRequestResource` with a PAC-authenticated IOReg handle (ptr@abs0x87C8, key 0x5e7e) and brackets it with `[self->vt+0x3A8](self, 0)` (key 0xc9c).
+
+### 20.6 fn@0x5A3C = `configureInterrupts` (§16 entry 32) — the "init writer"
+Call sites now confirmed in **three** places: reconfig_handler success path (§18), pointer_restore_handler case-2 bring-up (@0x7AC0), setPowerState common tail. Closes the Phase-3k "who calls it" question: re-applied on every power-state transition and after decoder bring-up (BAR1 +0x90/+0x1090=0xFFFFFE, +0x2010=3, +0x2004=0x16, BAR0 magic region).
+
+### 20.7 PLT resolutions (batch 2)
+| Stub | Import idx | Symbol | Call sites in __text |
+|---|---|---|---|
+| 0xe8c0 | 12 | IOPCIDevice::extendedConfigRead32 | start() @0x52cc only |
+| 0xe8cc | 13 | IOPCIDevice::extendedConfigWrite32 | reconfig_handler @0x6be4, pointer_restore_handler @0x7548 (ext-config flush loops) |
+| 0xe89c | 8 | _IOSleep | pointer_restore_handler case-2 disable/enable settle delay @0x7A58; setPowerState tail region @0x8194 |
+| 0xe83c | 0 | _IODelay | flash-write helper (batch 1) |
+| 0xea1c | 51 | _snprintf | batch 1 |
+
+### 20.8 Implications for the Linux driver
+1. **Decoder bring-up sequence is now fully known** and matches what our mode=4/5 live tests did manually: disable [sec+4]=0 → wait ≥1s (IOSleep(1) — mandatory!) → enable [sec+4]=1 → configureInterrupts init writer. The kext does this on every power-on after a flash update.
+2. **Image-type enum** (bits[19:16] of [status+4]): golden=0, HWTE=1, live=2, debug=3 — matches §18's flow: flash update runs from a GOLDEN image; on completion the handler switches pointers to LIVE and re-enables with 0x0001A000.
+3. **Commit object F ([self+0x1300])** is a fourth commit-object instance (D/E/F + [self+0x1180] poll target) — all sharing the vt+0x1F0 contract; class still open (§14 items 12/18).
+4. **Deferred power-ack** has no Linux analog (no IOKit power management), but it explains why the kext never disables the decoder mid-flash-update and why [self+0x16A] must be checked before any decoder teardown.
+5. The give_up path does NOT re-disable the decoder; only tail_A's deferred-ack block does ([sec+4]=0 + "(disabling)" log) — mirror this asymmetry if we ever implement flash-update recovery on Linux.
