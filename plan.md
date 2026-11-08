@@ -341,6 +341,10 @@ served its purpose and is now a liability: `submit2.c` is ~1600 lines of mode sw
 proved that running long sequences inside `.probe` can kill the card. This phase replaces the pile
 with one production module built directly from the decoded protocol.
 
+**Status (2026-11-08):** 3u.1 code complete — `linux-driver/afterburner/` builds clean against
+7.2.11; probe correctly refuses a dead card at the fw gate (kext-exact). **Live acceptance blocked:
+card has been dead since run 14b (FINDINGS §31) — needs a real power cycle before any insmod test.**
+
 ### 8.1 Scope — v1 in / out
 
 **In:** full bring-up (fw gate → dir walk → decoder enable → init writer), single-shot + chain

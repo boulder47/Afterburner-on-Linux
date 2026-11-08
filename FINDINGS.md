@@ -3057,3 +3057,14 @@ No direct BL callers — the kext loader invokes these via this table at load/un
 
 ### 30.6 Driver implications
 None new — no register writes, no protocol changes. The batch matters for the RE record: the class map is now complete and self-consistent (allocators at MC vf#21 in both classes cross-check each other; sMethods dispatch keys match table mids), so future static analysis can trust slot arithmetic with the virtual/raw mapping above.
+
+## 31. Operational state — card dead since run 14b (2026-11-08) [live]
+
+The card has been **dead (all-BARs-read-0xFFFFFFFF) since run 14b killed it on 2026-11-03** (§28). Evidence chain:
+
+1. Run 14b AER fatal MalfTLP at t≈3910; recovery blocked ~80 s by the in-probe test sequence; `aer_root_reset` link reset at t=3990.653 (dmesg, §28).
+2. **t=4930 (~16 min later): submit2 re-probed with mode=15 — its log (`/tmp/submit2_result.txt`, O_TRUNC per probe) shows EVERY BAR read already 0xFFFFFFFF at PRE-STATE: BAR1+0x0 (the static ID word, cold-boot value 0x1FC08006), all doorbells/staging/completion regs, and BAR0+0x8 fw gate. GATE FAIL, clean exit.** The "power cycle" after run 14b was evidently not a real power cut (or the card did not recover from it) — an OS-level rmmod/insmod or link reset does not re-power the FPGA fabric.
+3. No AER events from 0f:00.0 in dmesg between t=4930 and now; config space still answers (lspci works, D0, Mem+) but all MMIO returns UR-style all-ones — `DevSta` latches `CorrErr+ UnsupReq+`.
+4. 2026-11-08: new production module (`linux-driver/afterburner/`, Phase 3u.1) probed the card: same signature (BAR0+0x0, BAR0+0x8, BAR1+0x0 all 0xFFFFFFFF), fw gate correctly refused to bind — kext-exact behavior on a dead card.
+
+**Consequence:** no live work of any kind is possible until a **real power cycle** (unplug/reseat the card or cut PSU power; an OS reboot may not de-power the slot). Phase 3u.1's acceptance test (insmod/rmmod ×5) and all V-matrix items are blocked on this. The device does NOT advertise FLR (`FLReset-`), so no software reset path exists — consistent with §28's "dead until power cycle".
