@@ -3008,3 +3008,52 @@ Full byte-exact decodes now live in `UC_METHODS.md` §20; driver-relevant summar
 - The kext's power-on path enables the decoder by writing `[sec+4]=1` on the BAR0+0x8000 channel block whose header type byte is 1 — consistent with our live bring-up (enable persists across rmmod/insmod, §26). Our Linux driver already replicates this; no change needed.
 - `setPowerState(0)` defers power-off while a flash update is in progress (`[self+0x16A]` deferred-ack flag) — relevant if we ever implement firmware flashing from the Linux side: mirror the same gate before touching SPI.
 - The 4 KB ext-config flush + image-type switch explains how the kext recovers PCI config after a link event; our driver's equivalent is the FLR/re-bringup path (§26). No new register writes to adopt — all BAR0/BAR1 values match what we already write (init writer `fn@0x5A3C` = configureInterrupts, byte-identical sequence per §21.6).
+
+## 30. Vtable architecture + static init table — batch 3 (2026-11-08) [static]
+
+Full map in `UC_METHODS.md` §21; driver-relevant summary + corrections below. No new HW behavior — this batch is pure class-machinery archaeology, but it closes several open items and corrects three earlier errors.
+
+### 30.1 ADRP encoding resolved (closes the "20-bit immhi" question)
+Raw word-level decode cross-checked against Keystone ground truth: **332/332 ADRPs in __text match Capstone** (`tmp/adrp_verify_final.py`, authoritative). Encoding: [31]=1, [30:29]=immlo, [28]=1, [27:24]=`0000`, [23:5]=immhi (**19 bits**, mask 0x7FFFF), [4:0]=Rd; target = page(pc) + sext21((immhi<<2)|immlo)·0x1000. Opcode check must be `(w & 0x9F000000) == 0x90000000` — the earlier `(w>>24)&0xF0==0x90` wrongly required immlo=0 (top byte ∈ {0x90,0xB0,0xD0,0xF0}). The "immhi is 20 bits" hypothesis was a false alarm; **all previously documented ADRP targets stand**.
+
+### 30.2 Four vtables — final boundaries
+All objects are constructed in place in BSS; allocators store PAC-authenticated pointers (key **0xcda1**) as the object's vptr, skipping two zeroed pre-virtual qwords:
+
+| table | file start | live vptr (=D1) | virtual fns | end marker |
+|---|---|---|---|---|
+| AB instance `__ZTV17AppleAfterburner` | 0x141E8 (zeros ×2) | **0x141F8** | #0–#269 (270) | sentinel @0x14A70 {tag 0xc041, idx 0x37}; zero @0x14A78 |
+| AB metaclass object | 0x14A80 (zeros ×2) | **0x14A90** | #0–#28 (29) | sentinel @0x14B78 {tag 0xc021, idx 0x13a}; zero @0x14B80 |
+| UC instance `__ZTV26AppleAfterburnerUserClient` | 0x14B98 (zeros ×2) | **0x14BA8** | #0–#312 (313) | **no sentinel** — last = getPercent @0x15568; zero @0x15570 |
+| UC metaclass object | 0x15578 (zeros ×2) | **0x15588** | #0–#28 (29) | sentinel @0x15670 {tag 0xc021, idx 0x13a}; zero @0x15678; sMethods table starts at 0x15680 |
+
+Numbering: UC_METHODS §2's "raw slot i" = file offset 0x14B98+i·8 → **virtual #v = raw slot v+2** (e.g. externalMethod fn@0xcfc8 = raw slot 274 @0x15428 = virtual #272).
+
+Entry encoding `{u16 tag[63:48], u16 mid[47:32], u32 low}` — full census in §21.1. Key verified fact: **mid = the PAC key used to authenticate dispatch** (sSubmitFrame trampoline loads [vptr+0x990] = raw slot 308 `{mid=0xcd42, low=0xd708}` and authenticates with `movk #0xcd42,lsl#48` before `braa`).
+
+### 30.3 Static-init table @0x141B8–0x141DF + metaclass ctors
+```
+@0x141B8: fnref → fn@0xcacc   AB metaclass ctor
+@0x141C0: fnref → fn@0xe770   UC metaclass ctor
+@0x141C8: fnref → fn@0xcb1c   AB metaclass dtor (x0=&BSS[0x10198]; tail b #e8e4)
+@0x141D0: fnref → fn@0xe7c0   UC metaclass dtor (x0=&BSS[0x101C0]; tail b #e8e4 — byte-verified @0xe7c0–0xe7c8)
+@0x141D8: dataref → BSS[0x10198]  AB gMetaClass object (in place)
+@0x141E0: {tag 0x4030, low=0x22}  class-descriptor terminator (AB)
+```
+No direct BL callers — the kext loader invokes these via this table at load/unload. **fn@0xcacc**: `OSMetaClassC2(this=BSS[0x10198], "AppleAfterburner"@abs0x6F0, parent=GOT[34]=IOService::gMetaClass, size=0x1310)` then vptr=pacda(0x14A90,this,0xcda1). **fn@0xe770** (byte-exact): `OSMetaClassC2(this=BSS[0x101C0], "AppleAfterburnerUserClient"@abs0x309F, parent=GOT[18] ([GOT+0x90]), size=0x1970)` then vptr=pacda(0x15588,this,0xcda1).
+
+**Instance allocators sit at metaclass vf#21 in both classes**: AB MC #21 = fn@0x4140 (`e998(0x1310)` → IOService C++ ctor e9b0(&BSS[0x10198]) → vptr=pacda(0x141F8) → e9c8); UC MC #21 = fn@0xcc68 (`e998(0x1970)` → e8fc(&BSS[0x101C0]) → vptr=pacda(0x14BA8) → e9c8).
+
+### 30.4 Class-descriptor records
+- AB: @0x141D8/0x141E0 = {&BSS[0x10198], {tag 0x4030, **0x22**}} — tail of the static-init table.
+- UC: @0x14B88/0x14B90 = {&BSS[0x101C0], {tag 0x4030, **0x12**}} — between AB MC sentinel and UC instance pre-virtual zeros.
+- The integers (34 / 18) are unexplained — open item.
+
+### 30.5 Corrections to earlier claims
+1. **fn@0xcfc8 (externalMethod) IS in the UC instance vtable** — raw slot 274 @0x15428 = virtual #272 from live vptr 0x14BA8. The "not in any vtable" claim was a scan error; Phase 3r's "slot 307" and Phase 3q's "vtable[+0x150]" were both raw-vs-virtual indexing errors.
+2. **BSS[0x10198]/BSS[0x101C0] are in-place metaclass objects** (the `this` of OSMetaClassC2), not "qwords holding pointers". getMetaClass returns their addresses: AB fn@0x40ec = `adrp/add x0,#0x198; ret`; UC fn@0xcc14 → &BSS[0x101C0].
+3. **UC instance table has no sentinel** — ends at raw slot 314 @0x15568 (getPercent, tag 0x8041), zero @0x15570; 313 virtual fns total.
+4. **Destructors are [D1, D0] order** (inverse of Itanium's [D0,D1]): vf#0 = complete-object (AB instance forwards to e9bc=IOService::~IOService; UC instance → e908), vf#1 = deleting (calls base then `OSObject::operator delete(this, own size)` via e98c — AB 0x1310 @fn@0x40bc, UC 0x1970 @fn@cbe4). Metaclass tables: both vf#0 and vf#1 are one-instruction forwarders to OSMetaClass::D2Ev (e8e4) — AB MC fn@0x4048/fn@0xcac8, UC MC fn@0xcb70/fn@0xe76c.
+5. **AB instance: 13 local slots = 7 genuine overrides + 6 forwarders.** Genuine: D0 #1 @0x40bc, getMetaClass #7 @0x40ec, init #77 @0xc8c0, probe #189 @0xc998, start #190 @0x4254, stop #191 @0xc0a4, setPowerState #259 @0x7c60. Forwarders: D1 #0 @0x40b8 (`b #e9bc`), plus PAC-authenticated indirections to specific IOService vtable slots via GOT[0x148]=__ZTV9IOService: #22→base+0xC0 (key 0xedc5), #132→+0x430 (0xa51b), #133→+0x438 (0x4577), #198→+0x640 (0x5ec5), #199→+0x648 (0x5219). Phase 3p's "8 genuine incl. D1" was off by one — vf#0 is a stub.
+
+### 30.6 Driver implications
+None new — no register writes, no protocol changes. The batch matters for the RE record: the class map is now complete and self-consistent (allocators at MC vf#21 in both classes cross-check each other; sMethods dispatch keys match table mids), so future static analysis can trust slot arithmetic with the virtual/raw mapping above.

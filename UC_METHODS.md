@@ -28,10 +28,12 @@ userland IOUserClient::method(selector, args...)
   sCardStatus@0xceb0 · sCheckForSpace@0xcee8 · sUnbindAll@0xcf20 · sGetPercent@0xcf90.
   (disasm: `tmp/dis_uc_trampolines.txt`)
 
-## 2. UC vtable — all LOCAL overrides ✅
+## 2. UC vtable — all LOCAL overrides ✅ (batch-3 boundaries)
 
-`__ZTV26AppleAfterburnerUserClient` @ **0x14b98** (pre-virtual at +0/+8; raw slot i =
-offset +i·8). 17 LOCAL (tag 0x80) overrides:
+`__ZTV26AppleAfterburnerUserClient` @ **0x14b98** (pre-virtual zeros at +0/+8; raw slot i =
+offset +i·8). **Live vptr = 0x14BA8** (= raw slot 2, the D1 slot) → **virtual #v = raw slot v+2**.
+Table ends at raw slot 314 @0x15568 (getPercent) + zero @0x15570 — **no sentinel**; 313 virtual fns.
+**20 LOCAL entries**: D1/D0 destructors, getMetaClass, 17 method overrides:
 
 | raw slot | offset | addr | demangled signature | status |
 |---|---|---|---|---|
@@ -1600,3 +1602,83 @@ Call sites now confirmed in **three** places: reconfig_handler success path (§1
 3. **Commit object F ([self+0x1300])** is a fourth commit-object instance (D/E/F + [self+0x1180] poll target) — all sharing the vt+0x1F0 contract; class still open (§14 items 12/18).
 4. **Deferred power-ack** has no Linux analog (no IOKit power management), but it explains why the kext never disables the decoder mid-flash-update and why [self+0x16A] must be checked before any decoder teardown.
 5. The give_up path does NOT re-disable the decoder; only tail_A's deferred-ack block does ([sec+4]=0 + "(disabling)" log) — mirror this asymmetry if we ever implement flash-update recovery on Linux.
+
+## 21. Vtable architecture — all four tables + static init (batch 3, 2026-11-08) ✅
+
+### 21.1 Entry encoding & tag census
+Every qword in a table is `{ u16 tag @ [63:48]; u16 mid @ [47:32]; u32 low }`:
+
+| tag | meaning | `low` = | notes |
+|---|---|---|---|
+| 0x8011 | local fn (kext __text) | vmaddr of the function | **mid = PAC key** used to authenticate dispatch — verified on sSubmitFrame: trampoline loads [vptr+0x990] = raw slot 308 `{mid=0xcd42, low=0xd708}` and authenticates with `movk x16,#0xcd42,lsl#48` before `braa` |
+| 0xc011 | kernel symbol (imported) | index into the 368-entry undef list (`imports_map.json`) | resolved by kext loader at load time; e.g. raw UC slots 305–307 = idx 0x14e/0x14d/0x14c immediately before the sMethods body block |
+| 0x8030 | GOT reference | — | |
+| 0x8041 | sMethods trampoline slot | body fn (getPercent @0xe6a4) | dispatched via the `s*` trampolines, not directly |
+| 0x0010 | raw pointer entry | address as-is | static-init table + class descriptors only |
+| 0x4030 | class-descriptor terminator | small int (AB: 0x22, UC: 0x12) | meaning unknown — open item |
+| 0xc021 | metaclass-object sentinel | kernel sym idx 0x13a | ends both MC tables |
+| 0xc041 | AB instance sentinel | kernel sym idx 0x37 @0x14A70 | only the AB instance table has one |
+| 0x4010 / 0xc010 | loader metadata (GOT page) | sequential indices 0x2C–0x36 @0x14160–0x14B0 | not part of any vtable |
+
+### 21.2 The four tables
+All objects are constructed **in place in BSS**; allocators store a PAC-authenticated pointer (key **0xcda1**) as the object's vptr, skipping two zeroed pre-virtual qwords:
+
+| table | file start (zeros ×2) | live vptr (=D1 slot) | virtual fns | end marker |
+|---|---|---|---|---|
+| AB instance `__ZTV17AppleAfterburner` | 0x141E8/0x141F0 | **0x141F8** | #0–#269 (270) | sentinel @0x14A70 {0xc041, idx 0x37}; zero @0x14A78 |
+| AB metaclass object | 0x14A80/0x14A88 | **0x14A90** | #0–#28 (29) | sentinel @0x14B78 {0xc021, idx 0x13a}; zero @0x14B80 |
+| UC instance `__ZTV26AppleAfterburnerUserClient` | 0x14B98/0x14BA0 | **0x14BA8** | #0–#312 (313) | **no sentinel** — last = getPercent @0x15568; zero @0x15570 |
+| UC metaclass object | 0x15578/0x15580 | **0x15588** | #0–#28 (29) | sentinel @0x15670 {0xc021, idx 0x13a}; zero @0x15678; sMethods table starts at 0x15680 |
+
+Numbering note: §2's "raw slot i" counts from file start (incl. pre-virtual) → **virtual #v = raw slot v+2**. E.g. externalMethod fn@0xcfc8 = raw slot 274 @0x15428 = virtual #272; sSubmitFrame's [vptr+0x990] = virtual #306 = raw slot 308 @0x15538.
+
+### 21.3 Local slots per table
+**AB instance — 13 local = 7 genuine overrides + 6 forwarders:**
+
+| vf# | addr | identity |
+|---|---|---|
+| #0 | 0x40b8 | D1 complete-object — `b #e9bc` (forwards to IOService::~IOService) |
+| #1 | 0x40bc | **D0 deleting** — calls e9bc then `OSObject::operator delete(this, 0x1310)` via e98c |
+| #7 | 0x40ec | getMetaClass → returns &BSS[0x10198] (`adrp/add x0,#0x198; ret`) |
+| #22 | 0xc984 | forwarder → [GOT[0x148]=__ZTV9IOService + 0xC0], key 0xedc5 |
+| #77 | 0xc8c0 | init (genuine) |
+| #132 | 0xca68 | forwarder → base+0x430, key 0xa51b (loads slot value AND its address as extra arg) |
+| #133 | 0xca80 | forwarder → base+0x438, key 0x4577 |
+| #189 | 0xc998 | probe (genuine) |
+| #190 | 0x4254 | start (genuine) |
+| #191 | 0xc0a4 | stop (genuine — §26: only HW write is BAR0[hdr+4]=0 decoder disable, gated by +0x11d0) |
+| #198 | 0xca98 | forwarder → base+0x640, key 0x5ec5 |
+| #199 | 0xcab0 | forwarder → base+0x648, key 0x5219 |
+| #259 | 0x7c60 | setPowerState (genuine — §20) |
+
+**AB metaclass object — 3 local:** vf#0 @0x4048 = `b #e8e4` (OSMetaClass::D2Ev); vf#1 @0xcac8 = `b #e8e4`; **vf#21 @0x4140 = AB instance allocator**: `e998(0x1310)` → x19; IOService C++ ctor e9b0(x?, &BSS[0x10198]); vptr = pacda(0x141F8, obj, 0xcda1) stored at [obj]; then e9c8(&BSS[0x10198]).
+
+**UC instance — 20 local:** see §2 table (raw slots 2–314). D1 @0xcbe0 = `b #e908` (base complete-object); D0 @0xcbe4 = e908 + `operator delete(this, 0x1970)`.
+
+**UC metaclass object — 3 local:** vf#0 @0xcb70 = `b #e8e4`; vf#1 @0xe76c = `b #e8e4` (both forward to OSMetaClass::D2Ev); **vf#21 @0xcc68 = UC instance allocator**: `e998(0x1970)` → x19; e8fc(x?, &BSS[0x101C0]); vptr = pacda(0x14BA8, obj, 0xcda1); then e9c8(&BSS[0x101C0]).
+
+### 21.4 Static-init table @0x141B8–0x141DF
+```
+@0x141B8: fnref → fn@0xcacc   AB metaclass ctor
+@0x141C0: fnref → fn@0xe770   UC metaclass ctor
+@0x141C8: fnref → fn@0xcb1c   AB metaclass dtor (x0=&BSS[0x10198]; tail b #e8e4)
+@0x141D0: fnref → fn@0xe7c0   UC metaclass dtor (x0=&BSS[0x101C0]; tail b #e8e4 — byte-verified @0xe7c0–0xe7c8)
+@0x141D8: dataref → BSS[0x10198]  AB gMetaClass object (in place)
+@0x141E0: {tag 0x4030, low=0x22}  class-descriptor terminator (AB)
+```
+No direct BL callers to fn@0xcacc/fn@0xe770 — the kext loader invokes these via this table at load/unload.
+
+**fn@0xcacc (AB metaclass ctor):** `OSMetaClassC2(this=BSS[0x10198], name="AppleAfterburner"@abs0x6F0, parent=GOT[34]=IOService::gMetaClass, size=0x1310)`; then vptr = pacda(0x14A90, this, 0xcda1) stored at [BSS+0x198].
+**fn@0xe770 (UC metaclass ctor), byte-exact:** `OSMetaClassC2(this=BSS[0x101C0], name="AppleAfterburnerUserClient"@abs0x309F, parent=[GOT+0x90]=GOT[18], size=0x1970)` (bl #e8d8); then `x16 = 0x15588` (adrp 0x15000 + 0x578 + 0x10), `pacda x16, this|0xcda1<<48`, `str [this]`.
+
+### 21.5 Class-descriptor records
+- AB: @0x141D8/0x141E0 = {&BSS[0x10198], {tag 0x4030, **0x22**}} — embedded at the tail of the static-init table.
+- UC: @0x14B88/0x14B90 = {&BSS[0x101C0], {tag 0x4030, **0x12**}} — sits between the AB MC sentinel and the UC instance pre-virtual zeros.
+- The integers (34 / 18) are unexplained — open item.
+
+### 21.6 Corrections to earlier claims (batch 3)
+1. **fn@0xcfc8 (externalMethod) IS in the UC instance vtable** — raw slot 274 @0x15428 = virtual #272 from live vptr 0x14BA8. The "not in any vtable" claim was a scan error; Phase 3r's "slot 307" and Phase 3q's "vtable[+0x150]" were both raw-vs-virtual indexing errors.
+2. **BSS[0x10198]/BSS[0x101C0] are in-place metaclass objects** (the `this` of OSMetaClassC2), not "qwords holding pointers". getMetaClass returns their addresses: AB fn@0x40ec = `adrp/add x0,#0x198; ret`; UC fn@0xcc14 → &BSS[0x101C0].
+3. **UC instance table has no sentinel** — ends at raw slot 314 @0x15568 (getPercent, tag 0x8041), zero @0x15570; 313 virtual fns total.
+4. **Destructors are [D1, D0] order** (inverse of Itanium's [D0,D1]): vf#0 = complete-object (AB instance forwards to e9bc=IOService::~IOService; UC instance → e908), vf#1 = deleting (calls base then `OSObject::operator delete(this, own size)` via e98c — AB 0x1310 @fn@0x40bc, UC 0x1970 @fn@cbe4). Metaclass tables: both vf#0 and vf#1 are one-instruction forwarders to OSMetaClass::D2Ev (e8e4) — AB MC fn@0x4048/fn@0xcac8, UC MC fn@0xcb70/fn@0xe76c.
+5. **AB instance: 13 local slots = 7 genuine overrides + 6 forwarders.** Genuine: D0 #1 @0x40bc, getMetaClass #7 @0x40ec, init #77 @0xc8c0, probe #189 @0xc998, start #190 @0x4254, stop #191 @0xc0a4, setPowerState #259 @0x7c60. Forwarders: D1 #0 @0x40b8 (`b #e9bc`), plus PAC-authenticated indirections to specific IOService vtable slots via GOT[0x148]=__ZTV9IOService: #22→base+0xC0 (key 0xedc5), #132→+0x430 (0xa51b), #133→+0x438 (0x4577), #198→+0x640 (0x5ec5), #199→+0x648 (0x5219). Phase 3p's "8 genuine incl. D1" was off by one — vf#0 is a stub.

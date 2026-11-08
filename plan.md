@@ -254,14 +254,18 @@ afterburner/
 ## 7. Handoff — where things stand (updated Oct 30)
 
 **Live driver state:** `afterburner_submit2.ko` is the active test module (`linux-driver/`).
-⚠️ **Card at `0f:00.0` is DEAD AGAIN (2026-11-02, run #2)** — this time NOT our bug: mode=13 with
-`out_seg=131072` completed end-to-end (both stages done, c2h DMA out, `=== done ===`) but the card died
-~9 s later with an ASYNCHRONOUS AER fatal MalfTLP (device-initiated malformed MEM WR). Same all-F-BARs
-death signature; needs a full power cut / reboot. Root-cause hypothesis + the kext's actual stop command:
-**FINDINGS.md §26**. Key finding: kext `IOService::stop()` override (fn@0xc0a4, vtable slot 191) writes
-exactly ONE register on teardown — **BAR0[hdr+4] = 0 (decoder channel disable)**; BAR1+0x2004 engine-enable
-is never cleared anywhere in the kext. Our driver leaves decoder enabled + idle after completion — a state
-that never occurs on macOS (VT feeds frames continuously or disables via stop()).
+⚠️ **Card at `0f:00.0` is DEAD AGAIN (2026-11-03, run 14b)** — AER fatal MalfTLP during mode=14b's OWN
+bring-up phase (~9 s after insmod, mid-decode), NOT post-completion idle as first assumed: the trigger is
+the **full-size 33 MB receive-chain configuration itself** (both large-chain runs crashed regardless of the
+disable write). MalfTLP = 64-byte MEM WR to 0x3CCCFFF0 = our desc-buffer base + 0x7FF0 (tail of the 32 KB
+chain alloc) — see **FINDINGS.md §27.4**. Same all-F-BARs death signature; needs a full power cut / reboot.
+Liveness checks MUST include dmesg/AER, not just register polling (registers read "alive" even post-fatal-AER).
+Root-cause hypothesis + the kext's actual stop command: **FINDINGS.md §26**; kext DMA staging internals
+(IODMACommand, maxSegmentSize ≈ 16 MB → ~3 descriptors for a 33 MB frame): **§27**. Key finding: kext
+`IOService::stop()` override (fn@0xc0a4, vtable slot 191) writes exactly ONE register on teardown —
+**BAR0[hdr+4] = 0 (decoder channel disable)**; BAR1+0x2004 engine-enable is never cleared anywhere in the
+kext. Our driver leaves decoder enabled + idle after completion — a state that never occurs on macOS (VT
+feeds frames continuously or disables via stop()).
 Working submit path = **batch/receive channel**: stage descriptor (or chain head) PA into
 BAR1+0x5080..C, ring BAR1+0x1004 with 0x80FFE7F; completion at +0x2044 (bit0 valid, [31:1] count),
 data words +0x44/+0x48 (count==0) or +0x1044/+0x1048 (count≥1, batch index in BAR0[hdr+0x10]),
@@ -269,12 +273,14 @@ ack via write-back to +0x2018 (+0x2014). Send channel (+0x4080 / doorbell +4 = 0
 complete for chain submits — unresolved.
 
 **Next actions (in order):**
-0. **LIVE TEST — stop-command hypothesis (FINDINGS §26.5), after power cycle:** add to mode=13 (or new
-   mode=14): after both stages complete, write `BAR0[hdr+4] = 0`, read back, idle ≥60 s, then check
-   dmesg/AER and re-probe with the map driver. Control: one run WITHOUT the disable to confirm it still
-   crashes ~9 s later. If the card survives → hypothesis confirmed; next step is multi-frame batching
-   (8 channels) per the original goal. Also reconcile output pix_fmt: card emits interleaved YUV422 8-bit
-   (`yuv422p`), not planar p10le (§26.2).
+0. **LIVE TEST — after power cycle (FINDINGS §27.5 + §26.5), two runs:**
+   a. `mode=14 out_seg=4194304` (8 receive descriptors, one per 4 MB chunk; no code change needed).
+      Discriminates H1 (descriptor-count cap ~126 → full frame decodes) vs H2 (~16 MiB/submission byte
+      cap → only first ~4 chunks decode). Mode 14 includes the stop-command block (BAR0[hdr+4]=0 post-
+      completion, readback, idle_s=75); check dmesg/AER + map-driver re-probe at the end. If it survives
+      AND decodes fully → both mysteries closed; move to multi-frame batching across 8 channels.
+   b. Control: `mode=15 out_seg=4194304` (no disable write) — does a short-chain run still die ~9 s later?
+      Isolates the stop-command effect from the long-chain trigger.
 1. ~~Phase 3q (static): disassemble the vtable[+0x150] method...~~ → **RESOLVED (2026-11-02, FINDINGS.md §25):**
    premise was wrong — vtable[+0x150] is IOKit return-to-pool. Real commit chain: UC trampoline @0xd708
    → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified (channel cmd[+0x1c] from
@@ -314,3 +320,15 @@ vtable slots 308–314 (Itanium +2 offset — earlier "slot 306" was an indexing
 full control flow incl. per-slot model (N=UC->+0x18f0, slotObj@UC+0xf0+i·0x18, DMA pair@+0xf8),
 error codes (base 0xE000_02C2; no-space 0xE000_02D8); provider engine symbol map + log-string
 behavior (hang watchdog, thermal frame drops, h2c/c2h DMA health). All 43 PLT stubs resolved.
+
+**Phase 3t (2026-11-08) — Vtable architecture + static-init table closed out (batch 3):**
+FINDINGS.md §30 + UC_METHODS.md §21. ADRP encoding settled via Keystone ground truth
+(332/332 cross-check; immhi is 19 bits, mask 0x7FFFF — the "20-bit" alarm was false). All four
+vtables bounded with live-vptr bases (AB inst 0x141F8 / AB MC 0x14A90 / UC inst **0x14BA8** /
+UC MC 0x15588; two zeroed pre-virtual qwords each; virtual #v = raw slot v+2). Corrections:
+fn@0xcfc8 IS in the UC instance table (raw slot 274 @0x15428 = virtual #272); BSS[0x10198]/
+BSS[0x101C0] are in-place metaclass objects built by fn@0xcacc/fn@0xe770 via the static-init
+table @0x141B8–0x141DF (loader-invoked, no BL callers); UC instance table has NO sentinel;
+destructors are [D1,D0] order; AB instance = 7 genuine overrides + 6 PAC forwarders. Table `mid`
+field verified as the dispatch PAC key. Remaining static open items: u32 array @0x1806c, x86_64
+NULLs/−2 slot shift, class-descriptor integers (0x22/0x12). No driver changes — pure RE record.
