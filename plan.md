@@ -273,14 +273,11 @@ ack via write-back to +0x2018 (+0x2014). Send channel (+0x4080 / doorbell +4 = 0
 complete for chain submits — unresolved.
 
 **Next actions (in order):**
-0. **LIVE TEST — after power cycle (FINDINGS §27.5 + §26.5), two runs:**
-   a. `mode=14 out_seg=4194304` (8 receive descriptors, one per 4 MB chunk; no code change needed).
-      Discriminates H1 (descriptor-count cap ~126 → full frame decodes) vs H2 (~16 MiB/submission byte
-      cap → only first ~4 chunks decode). Mode 14 includes the stop-command block (BAR0[hdr+4]=0 post-
-      completion, readback, idle_s=75); check dmesg/AER + map-driver re-probe at the end. If it survives
-      AND decodes fully → both mysteries closed; move to multi-frame batching across 8 channels.
-   b. Control: `mode=15 out_seg=4194304` (no disable write) — does a short-chain run still die ~9 s later?
-      Isolates the stop-command effect from the long-chain trigger.
+0. **PHASE 3U — driver rewrite from decoded protocol (§8, plan of record).** Static RE is complete;
+   one production module replaces the test-module pile, built byte-exact from FINDINGS §21–§30 +
+   UC_METHODS §1–§21. The pending mode-14/15 live tests move into the rewrite's validation matrix
+   (§8.5 V3/V6) and run via ioctl outside `.probe` — do NOT re-run them from submit2.ko's probe path
+   (§28: long sequences in probe delayed AER recovery ~80 s and killed the card).
 1. ~~Phase 3q (static): disassemble the vtable[+0x150] method...~~ → **RESOLVED (2026-11-02, FINDINGS.md §25):**
    premise was wrong — vtable[+0x150] is IOKit return-to-pool. Real commit chain: UC trampoline @0xd708
    → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified (channel cmd[+0x1c] from
@@ -298,7 +295,8 @@ complete for chain submits — unresolved.
    confirmation still pending (item 3 below).
 3. **Live:** re-run mode=9 R9-1 with a longer poll + BAR0 channel-block snapshot before/after to
    catch decode-side activity; try count≥1 batch completions deliberately (multiple submits in one
-   rung) to exercise the +0x1044 path and BAR0[hdr+0x10] index.
+   rung) to exercise the +0x1044 path and BAR0[hdr+0x10] index. → **folded into §8.5 V4** (runs via
+   ioctl after the rewrite, not from submit2.ko's probe).
 4. **Static open items** (FINDINGS.md §22 "UNRESOLVED"): u32 array @0x1806c, MetaClass vtable
    reconciliation, ~~dispatch table @0x15680 named list~~ — **RESOLVED 2026-11-01**: it is the UC's
    `sMethods` external-method dispatch table (7×24B records: submitFrame/queryCompletion/bindFrame/
@@ -332,3 +330,115 @@ table @0x141B8–0x141DF (loader-invoked, no BL callers); UC instance table has 
 destructors are [D1,D0] order; AB instance = 7 genuine overrides + 6 PAC forwarders. Table `mid`
 field verified as the dispatch PAC key. Remaining static open items: u32 array @0x1806c, x86_64
 NULLs/−2 slot shift, class-descriptor integers (0x22/0x12). No driver changes — pure RE record.
+
+---
+
+## 8. Phase 3u — Driver rewrite from decoded protocol (plan of record, 2026-11-08)
+
+Static RE is complete (batches 1–3; FINDINGS §21–§30 + UC_METHODS §1–§21). Every method the driver
+needs is byte-verified. The incremental test-module approach (`afterburner_*.ko`, modes 0–15) has
+served its purpose and is now a liability: `submit2.c` is ~1600 lines of mode switches, and §28
+proved that running long sequences inside `.probe` can kill the card. This phase replaces the pile
+with one production module built directly from the decoded protocol.
+
+### 8.1 Scope — v1 in / out
+
+**In:** full bring-up (fw gate → dir walk → decoder enable → init writer), single-shot + chain
+submit on the batch/receive channel, completion poll/ack, c2h output into user buffers, per-frame
+reset, stop command on teardown, `.err_handler`, chardev + ioctls mirroring the UC ABI, sysfs,
+userspace client.
+
+**Out (deferred):** send-channel semantics (live-dead for chains — modes 10/11; implement the
+kext-exact path but default to batch/receive), `pointer_restore_handler` port (§29.1 — link-event
+recovery), flash/SPI update (Phase 5, opt-in, last), MSI completion IRQ (poll first — the kext
+itself polls in several paths).
+
+### 8.2 Architecture
+
+Single module `afterburner.ko` under `linux-driver/afterburner/` (plan §5 layout):
+
+| file | responsibility | decoded source |
+|---|---|---|
+| `ab_pci.c` | probe/remove/err_handler, BAR0+BAR1 map, MSI alloc. **Probe stays short** — no test sequences (§28) | start() @0x4254 |
+| `ab_regs.h/.c` | named constants + readl/writel accessors for every decoded offset | FINDINGS §7–§9, §21; UC_METHODS §13 |
+| `ab_engine.c` | bring-up: fw gate (BAR0+0x8 ∈ {0x0002003E, 0x0002003F}), dir walk from BAR0+0x0 (type=W&0xFF, next=O+((W>>14)&0x3FFFC), stride 0x2C), decoder enable/disable (BAR0[hdr+4]), ready poll (+0x8008 bit0), init writer fn@0x5A3C byte-identical, stop command (fn@0xc0a4: BAR0[hdr+4]=0), re-bringup recovery | §21.6, §29.1–§29.2, §26 |
+| `ab_dma.c` | chain builder (byte-exact @0xa0f0–0xa164), staging banks +0x5080..C / +0x4080..C, doorbells 0x80FFE7F@+0x1004 / 0xFFE7F@+4 (fn@0x6800), completion poll/ack (+0x2044 → write-back +0x2018/+0x2014), pre-submit write BAR0[hdr+0x18]=0x1F (@0xa714), per-frame reset (UC_METHODS §10.3) | §25, UC_METHODS §15, FINDINGS §21.10 |
+| `ab_chardev.c` | /dev/afterburner0 ioctls (UC ABI mirror) + sysfs attrs | UC_METHODS §3–§6, §8 |
+| `userspace/abctl.c` | test client: bind buffer → submit fixture frame → poll completion → dump output | — |
+
+**ioctl set** (mirrors sMethods @0x15680, UC_METHODS §3): SUBMIT_FRAME, QUERY_COMPLETION,
+BIND_FRAME, UNBIND_ALL, CHECK_SPACE, CARD_STATUS, GET_PERCENT + driver-specific BRINGUP / STOP /
+RECOVER. Per-slot model: N slots (kext count from UC->+0x18f0), slot i owns input PA/len + output
+buffer pair — same shape as the kext's per-slot DMA qword pairs (@UC+0xf8+i·0x18). Error codes map
+to the kext table (base 0xE000_02C2, no-space 0xE000_02D8; UC_METHODS §8) so userspace behavior is
+identical.
+
+**sysfs:** board rev, S/N, image rev/type, thermal ADCs (4 sensors), decoder ready bit, engine
+state words (+0x2010/+0x2044 read-only views).
+
+### 8.3 Hard constraints (live-verified — non-negotiable)
+
+1. **≤126 output descriptors per chain** (fw cap; 257 → deterministic MalfTLP, §28.1). Chain
+   builder hard-errors above the cap; default `out_seg=4MB` keeps a 33 MB frame at 8 descs.
+2. **Never run long sequences inside `.probe`** (§28.2 — one card kill). All test/decode work is
+   ioctl-triggered in process context, interruptible, with bounded poll windows.
+3. **Engine-owned registers:** +0x2018/+0x2014 writes are ignored (readback ≠ write) — never try to
+   clear them; recovery = decoder re-bringup cycle or FLR (§26/§3n).
+4. **Decoder enable persists across rmmod/insmod** → bring-up must be idempotent and handle the
+   already-enabled state (ready bit may already be set on a warm card).
+5. **BAR0+0x202C is not writable** — kext writes it, readback stays 7; write-and-ignore with a
+   comment (§3k live run).
+6. **Liveness checks include dmesg/AER**, not just register polling (registers read "alive" even
+   post-fatal-AER, §28).
+7. PAs fit in 32 bits on this box (observed 0x3a400000–0x46xxxxxx; kext numAddressBits=0→32) —
+   keep ring + buffers below the 4 GiB PA boundary or use a 32-bit DMA mask.
+
+### 8.4 Phases and acceptance criteria
+
+**3u.1 — Core skeleton.** ab_pci (short probe, err_handler that logs), ab_regs, ab_engine
+(bring-up + stop command on remove). No submit path yet.
+*Accept:* insmod/rmmod ×5 clean; dmesg silent (no AER); decoder ready readback correct after
+bring-up; BAR0[hdr+4]=0 verified after rmmod (stop command ran).
+
+**3u.2 — Submit path via ioctl.** ab_dma: single-shot len=64 → real-frame chain on batch/receive;
+completion poll + ack; per-frame reset; RECOVER ioctl (re-bringup cycle first, FLR fallback).
+*Accept:* len=64 consumed + status VALID (regression vs §3i); 320×180 fixture chain completes with
+sane data words (§3o R9-1 parity); **H1/H2 test** — full frame `out_seg=4MB` (8 descs) + stop
+command + ≥75 s idle, AER-checked, run outside probe (the pending mode-14/15 question, now safe).
+
+**3u.3 — Userspace.** chardev + sysfs + abctl client.
+*Accept:* userspace round-trip of the fixture frame; decoded output buffer matches an FFmpeg decode
+of `testdata/prores_320x180_frame0.bin` (first real end-to-end decode verification).
+
+**3u.4 — Hardening.** Hang watchdog per sleep_timer decode (UC_METHODS §17: deadline poll + reset
+on hang + decoder disable on exit); multi-frame batching across the 8 channel blocks; count≥1 batch
+completions (+0x1044 path, BAR0[hdr+0x10] index — plan §7 item 3); long idle soak.
+*Accept:* no wedge after N consecutive frames; watchdog fires + recovers on an induced stall; the
+destructive control run (no stop command) goes LAST in the suite per mode-15 design.
+
+**Phase 5** (flash/bitfile port, RE done §20/§29.3) stays last and opt-in.
+
+### 8.5 Validation matrix (live runs after rewrite; destructive LAST)
+
+| # | test | purpose |
+|---|---|---|
+| V1 | len=64 single-shot + VALID ack | regression baseline (§3i) |
+| V2 | fixture frame chain, batch/receive | §3o R9-1 parity via the new code path |
+| V3 | full 4K ProRes frame (§24), `out_seg=4MB` (8 descs), stop cmd, ≥75 s idle + AER check | **H1 vs H2** (§27.5) — mode-14 equivalent |
+| V4 | multi-frame ×N across channels; count≥1 batch completion (+0x1044 path) | plan §7 item 3 |
+| V5 | induced stall → watchdog reset/re-bringup | UC_METHODS §17 port check |
+| V6 (destructive, last) | full frame, NO stop command, ≥75 s idle + AER watch | mode-15 control — expected to die; confirms stop-command necessity |
+
+### 8.6 Risks & mitigations (updated)
+
+| risk | mitigation |
+|---|---|
+| AER during a long ioctl test | no dev->mutex held across the work (process context); err_handler implemented; bounded poll windows; V3/V6 run with a parallel dmesg watcher |
+| fw 126-desc cap hit by user input | chain builder hard-errors above cap; out_seg clamped so descs ≤ 126 for any frame size |
+| wedged engine mid-test | RECOVER ioctl: re-bringup cycle first (rung A, §3n), FLR second; power-cycle documented as last resort |
+| decoder already enabled from a prior session | idempotent bring-up (ready-bit check before the enable cycle) |
+| output layout mismatch | card outputs interleaved YUV422 **8-bit** (`yuv422p` packed), NOT planar p10le (§26.2); abctl verifies against an FFmpeg reference decode in V2/V3 |
+
+### 8.7 Housekeeping
+- Commit the uncommitted modes-14/15 diff in `afterburner_submit2.c` (test-design record; superseded by V3/V6).
+- Old test modules stay in-tree as history but get a deprecated header note once 3u.1 lands.
