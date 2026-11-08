@@ -148,10 +148,18 @@ static const char *out_path = "/tmp/submit2_result.txt";
  *       M12-B: batch bank, N=5 seg=4096 -> expect wordB=5 (reproducibility)
  *       M12-C: send bank (+0x4080, ring 0xFFE7F @+4), N=5 seg=4096
  *              -> measure clean send-bank latency (mode-11's A/B were confounded
- *                 by desc_buf reuse while A was in flight) */
+ *                 by desc_buf reuse while A was in flight)
+ * 14 = STOP-COMMAND SURVIVAL TEST: mode-13 flow, then after completion handling
+ *     write the kext stop command BAR0[hdr+4] = 0 (fn@0xc0a4), read back, and
+ *     idle idle_s seconds with a 1 s liveness poll. If the card is still alive
+ *     afterwards, the enabled-and-idle watchdog hypothesis (FINDINGS §26.5) is
+ *     confirmed.
+ * 15 = CONTROL: identical to mode-14 but WITHOUT the disable — decoder left
+ *     enabled-and-idle; expect the ~9 s AER fatal MalfTLP from run #2, caught
+ *     live by the liveness poll (all-F reads). DESTRUCTIVE: kills the card. */
 static int mode = 1;
 module_param(mode, int, 0444);
-MODULE_PARM_DESC(mode, "0=snapshot, 1=init+submit, 2=submit-only, 3=dual-variant, 4=bring-up, 5=bring-up+submit, 6=bring-up+real-frame, 7=length-sweep, 8=recovery-matrix, 9=chain-ladder, 10=kext-exact-chain-completion, 11=instrumented-dual-chain, 12=batch-bank-chain, 13=kext-exact-two-stage");
+MODULE_PARM_DESC(mode, "0=snapshot, 1=init+submit, 2=submit-only, 3=dual-variant, 4=bring-up, 5=bring-up+submit, 6=bring-up+real-frame, 7=length-sweep, 8=recovery-matrix, 9=chain-ladder, 10=kext-exact-chain-completion, 11=instrumented-dual-chain, 12=batch-bank-chain, 13=kext-exact-two-stage, 14=two-stage+stop-cmd+idle, 15=two-stage+no-stop+idle(control)");
 
 /* mode 7: sweep sizes (last = the real frame size that timed out in mode 6) */
 static const u32 sweep_sizes[] = { 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 20138 };
@@ -224,6 +232,12 @@ MODULE_PARM_DESC(out_size, "mode 13: stage B receive chain size in bytes (defaul
 static u32 out_seg = 65536;
 module_param(out_seg, uint, 0444);
 MODULE_PARM_DESC(out_seg, "mode 13: stage B receive chain segment size in bytes");
+
+/* modes 14/15: post-completion idle duration in seconds (plan §7 item 0 asks
+ * for >=60 s; the run-#2 watchdog fired ~9 s after completion). */
+static int idle_s = 75;
+module_param(idle_s, int, 0444);
+MODULE_PARM_DESC(idle_s, "modes 14/15: post-completion idle seconds (default 75)");
 
 static void log_line(const char *fmt, ...)
 {
@@ -1015,7 +1029,7 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	/* ---- Phase 3k: full decoder bring-up (modes 4, 5, 6, 8, 9 and 10) ---- */
 	u32 hdr_off = 0;
 	int ready = 0;
-	if (mode == 4 || mode == 5 || mode == 6 || mode == 8 || mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13) {
+	if (mode == 4 || mode == 5 || mode == 6 || mode == 8 || mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13 || mode == 14 || mode == 15) {
 		if (!bar0) { log_line("BAR0 map missing — cannot bring up\n"); goto done; }
 
 		if (!fw_version_gate(bar0)) goto done;
@@ -1045,10 +1059,10 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (mode == 7)
 		payload_len = SWEEP_MAX;	/* one allocation covers the whole sweep */
-	else if ((mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13) && !frame_path[0])
+	else if ((mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13 || mode == 14 || mode == 15) && !frame_path[0])
 		payload_len = SWEEP_MAX;	/* pattern fallback sized like the real frame */
 
-	if ((mode == 6 || mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13) && frame_path[0]) {
+	if ((mode == 6 || mode == 9 || mode == 10 || mode == 11 || mode == 12 || mode == 13 || mode == 14 || mode == 15) && frame_path[0]) {
 		struct file *f = filp_open(frame_path, O_RDONLY, 0);
 
 		if (!IS_ERR(f)) {
@@ -1104,7 +1118,7 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	/* mode 13 stage B: fresh c2h output buffer + descriptor chain (the kext
 	 * points the BATCH doorbell at a per-slot pre-allocated receive descriptor) */
-	int do_stage_b = two_stage && mode == 13;
+	int do_stage_b = two_stage && (mode == 13 || mode == 14 || mode == 15);
 	u32 out_len = do_stage_b ? (out_size ? out_size : data_size) : 0;
 
 	if (do_stage_b) {
@@ -1398,7 +1412,7 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		else
 			log_line("M12-C (N=5 send): not complete in window — check next run's drain for delayed completion\n");
 	}
-	} else if (mode == 13) {
+	} else if (mode == 13 || mode == 14 || mode == 15) {
 	/* ---- Phase 3s: KEXT-EXACT two-stage frame submit (fn@0x985c) ---- */
 	if (!ready) {
 		log_line("\n--- MODE-13: submit SKIPPED — decoder not ready after bring-up ---\n");
@@ -1509,6 +1523,44 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 				if (!rebring(bar1, bar0, hdr_off))
 					log_line("decoder NOT ready after re-bring-up\n");
 			}
+
+		/* ---- Phase 3t: stop-command survival test (modes 14/15) ---- */
+		if ((mode == 14 || mode == 15) && ready) {
+			int do_disable = (mode == 14);
+
+			log_line("\n--- MODE-%d POST-COMPLETION PHASE ---\n", mode);
+			log_line("%s\n", do_disable ?
+				"writing kext stop command BAR0[hdr+4]=0, then idle" :
+				"CONTROL: no disable — decoder left enabled-and-idle");
+			if (do_disable) {
+				u32 before = readl(bar0 + hdr_off + 4);
+
+				writel(0, bar0 + hdr_off + 4);
+				log_line("stop cmd: BAR0+0x%05x (hdr+4): 0x%08x -> wrote 0 (rb 0x%08x)\n",
+					 hdr_off + 4, before, readl(bar0 + hdr_off + 4));
+			}
+			log_line("idling %d s — liveness poll every 1 s\n", idle_s);
+			for (int t = 1; t <= idle_s; t++) {
+				u32 a, b, c;
+
+				msleep(1000);
+				a = readl(bar0 + hdr_off + 4);
+				b = readl(bar0 + hdr_off + 8);
+				c = readl(bar1 + 0x2044);
+				if (a == 0xFFFFFFFFu && b == 0xFFFFFFFFu && c == 0xFFFFFFFFu) {
+					log_line("!!! CARD DEAD at t=%d s — all reads 0xFFFFFFFF; AER expected in dmesg\n", t);
+					break;
+				}
+				if (t % 10 == 0 || t == idle_s)
+					log_line("idle t=%3d s: hdr+4=0x%08x ready(+8)=0x%08x status(+0x2044)=0x%08x\n",
+						 t, a, b, c);
+			}
+			if (readl(bar0 + hdr_off + 4) == 0xFFFFFFFFu)
+				log_line("MODE-%d VERDICT: card DEAD after idle\n", mode);
+			else
+				log_line("MODE-%d VERDICT: card ALIVE after %d s idle (%s)\n",
+					 mode, idle_s, do_disable ? "decoder disabled" : "decoder ENABLED — control failed to reproduce?");
+		}
 		}
 	}
 	}
