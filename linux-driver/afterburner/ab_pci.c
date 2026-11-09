@@ -25,6 +25,7 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (!ab)
 		return -ENOMEM;
 	ab->pdev = pdev;
+	mutex_init(&ab->dma.lock);
 
 	ret = pci_enable_device(pdev);
 	if (ret) {
@@ -54,6 +55,14 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	pci_set_drvdata(pdev, ab);
+
+	/* 3u.2 — /dev/afterburner0 (ioctl-triggered decode; short-probe design) */
+	ret = ab_chardev_register(ab);
+	if (ret) {
+		dev_err(&pdev->dev, "chardev registration failed (%d)\n", ret);
+		ab_stop(ab);	/* decoder was brought up — stop before unmap */
+		goto out_unmap;
+	}
 	return 0;
 
 out_unmap:
@@ -72,6 +81,12 @@ static void ab_remove(struct pci_dev *pdev)
 	struct ab_device *ab = pci_get_drvdata(pdev);
 
 	if (ab) {
+		/* Drop /dev node first so no new ioctl can start. */
+		ab_chardev_unregister(ab);
+		/* Free persistent chains + bound DMA regions (waits for any
+		 * in-flight submit holding dm->lock). Must precede iounmap:
+		 * dma_free_coherent may program the device's IOMMU/ATU state. */
+		ab_dma_release(ab, true);
 		/* kext stop() — decoder disable before we unmap (§8.4 3u.1
 		 * acceptance: BAR0[hdr+4]=0 verified after rmmod). */
 		ab_stop(ab);
@@ -85,7 +100,7 @@ static void ab_remove(struct pci_dev *pdev)
 static pci_ers_result_t ab_error_detected(struct pci_dev *pdev,
 					  pci_channel_state_t state)
 {
-	dev_warn(&pdev->dev, "AER error detected (state=%d); 3u.1: log only — recovery lands in 3u.2\n",
+	dev_warn(&pdev->dev, "AER error detected (state=%d); log only — slot-reset recovery not implemented\n",
 		 state);
 	return PCI_ERS_RESULT_CAN_RECOVER;
 }

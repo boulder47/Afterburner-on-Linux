@@ -55,6 +55,9 @@ to port — that simplifies Phase 3 and means we should not look for encode regi
 | 3o — Chain-submit ladder (multi-segment frames) | ✅ **DONE** (live: R9-1 SUCCESS, send channel dead) | mode=9/10/11 live runs with the real ProRes frame. **R9-1 (chain → batch bank +0x5080, doorbell 0x80FFE7F): engine consumed the full 5-desc chain and completed** (status VALID, count=0, data(+0x44)=6, wordB=5). mode=10 (chain → send bank +0x4080, 0xFFE7F) and mode=11 (N=5/4K + N=10/2K via send doorbell): **no completion in 30 s each**. Conclusion: batch/receive channel is the working submit path — likely kext-exact; send channel needs different setup or serves another purpose. See FINDINGS.md §21.10. |
 | 3p — Static RE of kext binary (vtables/class map) | ✅ **DONE** (core), open items listed | Four vtables mapped + fully named-decoded (`rework/static_re/vtable_named.txt`); probe()=fn@0xc998, start()=fn@0x4254, externalMethod=fn@0xcfc8; import mechanism = LC_DYSYMTAB @0x520 + 368-name strtab @0x1862c (NO chained fixups); symtabs parsed (arm64e 510 / x86_64 503, 16-B nlist); sources = Athena.cpp + AthenaUserClient.cpp. Open: u32 array @0x1806c purpose, MetaClass vtable reconciliation, dispatch table @0x15680 named list, x86_64 NULLs/−2 slot shift. See FINDINGS.md §22. |
 | 3q — Confirm kext frame-commit path (static) | ✅ **DONE** (2026-11-02, FINDINGS.md §25) | Premise was wrong: vtable[+0x150] is IOKit return-to-pool. Real commit = UC trampoline @0xd708 → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified: channel cmd[+0x1c] (userland scalar via `mov x4,x21` @0xdb14), send = clear +4 / stage +0x4080..C / ring 0xFFE7F, batch = clear +0x1004 / stage +0x5080..C / ring 0x80FFE7F — **byte-exact match with our Linux driver**. BAR1 base = ctx->+0x130 (NOT +0x148 = BAR0+0x2000). Completion handler fn@0x985c: gated by +0x12f8, polls *(ctx->+0x90) vtable[+0x200/+0x210], send-completion writes BAR0[hdr+0xC]. |
+| 3r/3s — UC ABI decode + stop command (static) | ✅ **DONE** | sMethods dispatch table, trampoline ABI, submitFrame slot model; `stop()` = AB vtable slot 191, only HW write is decoder disable. See FINDINGS.md §26 + UC_METHODS.md §18/§21. |
+| 3t — Static RE batch 3 (ADRPs, metaclasses, resourceLoadCallback) | ✅ **DONE** (`29e03b0`) | ADRP encoding resolved via Keystone ground truth; three vtables corrected; installResource path decoded. See FINDINGS.md §30. |
+| 3u — Driver rewrite from decoded protocol (production module `linux-driver/afterburner/`) | 🟡 **IN PROGRESS** | **3u.1 ✅ PASSED** (insmod/rmmod ×5 clean, FINDINGS §31.1). **3u.2 🟡**: submit path via ioctl WORKS — 4× identical fixture frames decode correctly vs FFmpeg reference (luma 100% within ±1; chroma half-vertical, even rows only); root cause of multi-frame garbage = missing per-frame reset + cmd_word delta semantics (FINDINGS §32). V-matrix (§8.5) pending: V3/V4-rest/V5/V6. |
 | 4 — Userspace interface | ⬜ | |
 | 5 — Flash / bitfile mgmt | 🟡 **RE complete** (port pending) | Kext-side path fully decoded: descriptor chain, version selection by fuse word, two-phase update, SPI erase/program at flash addr `0x1400000`, pointer tables. See FINDINGS.md §20. Linux port still high-risk / last. |
 
@@ -405,16 +408,25 @@ state words (+0x2010/+0x2044 read-only views).
 (bring-up + stop command on remove). No submit path yet.
 *Accept:* insmod/rmmod ×5 clean; dmesg silent (no AER); decoder ready readback correct after
 bring-up; BAR0[hdr+4]=0 verified after rmmod (stop command ran).
+**✅ PASSED 2026-11-09** — FINDINGS §31.1 (6 probes / 5 cycles, zero AER, warm=0 every probe).
 
 **3u.2 — Submit path via ioctl.** ab_dma: single-shot len=64 → real-frame chain on batch/receive;
 completion poll + ack; per-frame reset; RECOVER ioctl (re-bringup cycle first, FLR fallback).
 *Accept:* len=64 consumed + status VALID (regression vs §3i); 320×180 fixture chain completes with
 sane data words (§3o R9-1 parity); **H1/H2 test** — full frame `out_seg=4MB` (8 descs) + stop
 command + ≥75 s idle, AER-checked, run outside probe (the pending mode-14/15 question, now safe).
+**🟡 IN PROGRESS 2026-11-09:** fixture chain via batch/receive WORKS — 4× identical frames, all
+complete with status=0x1/data=0x6, output verified against FFmpeg reference decode (luma 100%
+within ±1; chroma = half-vertical even rows only, deterministic — FINDINGS §32.5). Multi-frame
+garbage root-caused + fixed: per-frame `AB::reset()` parity + cmd_word delta semantics (§32.3/§32.4).
+Remaining: len=64 regression re-run on the production module (V1), H1/H2 4K test (V3), RECOVER ioctl.
 
 **3u.3 — Userspace.** chardev + sysfs + abctl client.
 *Accept:* userspace round-trip of the fixture frame; decoded output buffer matches an FFmpeg decode
 of `testdata/prores_320x180_frame0.bin` (first real end-to-end decode verification).
+**🟡 IN PROGRESS:** chardev + mmap (UC, No-Snoop-safe) live and exercised by `tests/abtest`; the
+FFmpeg-reference match above was done against abtest's per-frame dumps — first real end-to-end
+decode verification achieved. Remaining: sysfs surface, abctl client proper.
 
 **3u.4 — Hardening.** Hang watchdog per sleep_timer decode (UC_METHODS §17: deadline poll + reset
 on hang + decoder disable on exit); multi-frame batching across the 8 channel blocks; count≥1 batch
@@ -426,14 +438,14 @@ destructive control run (no stop command) goes LAST in the suite per mode-15 des
 
 ### 8.5 Validation matrix (live runs after rewrite; destructive LAST)
 
-| # | test | purpose |
-|---|---|---|
-| V1 | len=64 single-shot + VALID ack | regression baseline (§3i) |
-| V2 | fixture frame chain, batch/receive | §3o R9-1 parity via the new code path |
-| V3 | full 4K ProRes frame (§24), `out_seg=4MB` (8 descs), stop cmd, ≥75 s idle + AER check | **H1 vs H2** (§27.5) — mode-14 equivalent |
-| V4 | multi-frame ×N across channels; count≥1 batch completion (+0x1044 path) | plan §7 item 3 |
-| V5 | induced stall → watchdog reset/re-bringup | UC_METHODS §17 port check |
-| V6 (destructive, last) | full frame, NO stop command, ≥75 s idle + AER watch | mode-15 control — expected to die; confirms stop-command necessity |
+| # | test | purpose | status (2026-11-09) |
+|---|---|---|---|
+| V1 | len=64 single-shot + VALID ack | regression baseline (§3i) | ⬜ pending on production module |
+| V2 | fixture frame chain, batch/receive | §3o R9-1 parity via the new code path | ✅ **DONE** — 4× identical frames complete (status=0x1/data=0x6), output verified vs FFmpeg reference (FINDINGS §32.5) |
+| V3 | full 4K ProRes frame (§24), `out_seg=4MB` (8 descs), stop cmd, ≥75 s idle + AER check | **H1 vs H2** (§27.5) — mode-14 equivalent | ⬜ pending |
+| V4 | multi-frame ×N across channels; count≥1 batch completion (+0x1044 path) | plan §7 item 3 | 🟡 partial — sequential multi-frame ×4 verified (FINDINGS §32); cross-channel + count≥1 paths remain |
+| V5 | induced stall → watchdog reset/re-bringup | UC_METHODS §17 port check | ⬜ pending (3u.4) |
+| V6 (destructive, last) | full frame, NO stop command, ≥75 s idle + AER watch | mode-15 control — expected to die; confirms stop-command necessity | ⬜ pending (LAST) |
 
 ### 8.6 Risks & mitigations (updated)
 

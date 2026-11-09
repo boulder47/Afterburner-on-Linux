@@ -3090,3 +3090,88 @@ stop: BAR0+0x8004=0 (rb 0x00000000)                        ; ×5, one per rmmod
 Zero AER events across the whole test window; only dmesg noise is the expected unsigned-module
 taint. The short-probe design (§28 lesson) held: ~40 s of repeated probe/stop with no wedge,
 no MalfTLP, card stable throughout. **3u.1 closed — 3u.2 (submit via ioctl) unblocked.**
+
+## 32. Multi-frame decode — root cause + fix (Phase 3u.2, live) [2026-11-09]
+
+### 32.1 Symptom history
+
+With the Phase 3u.1/3u.2 production module (`linux-driver/afterburner/`), submitting the same
+ProRes frame (testdata/prores_320x180_frame0.bin, 20138 B) repeatedly:
+
+- **Frame 0 always decoded correctly** (luma verified vs FFmpeg reference).
+- **Frames 1+ were garbage**: different content every run (non-deterministic), with exactly one
+  contiguous 512 B "hole" per frame (zero-fill runs → zeros; sentinel runs → 0x5A) whose position
+  advanced **+8192 B per submit** — matching the BAR0 sequence number. Pre-hole region was fresh
+  garbage, not stale previous-frame data (Model A/B both refuted).
+
+### 32.2 E1 hypothesis — REFUTED
+
+Hypothesis: per-submit descriptor alloc/free left stale descriptors visible to firmware. Fix:
+persistent chains built once per (pa,len), reused for every submit (`ab_chain` in `include/ab.h`,
+`ab_dma_release()` teardown). Live test with byte-identical chain heads across all 4 submits
+(dmesg: same in_head/out_head, "[chains built]" only on frame 0): **frames 1–3 still garbage**.
+E1 refuted — descriptor churn was not the cause. (Kept anyway: kext parity.)
+
+### 32.3 Root cause — two protocol divergences from the kext
+
+**(a) Missing per-frame reset.** The kext calls `AB::reset()` (@0xaea8, UC_METHODS §10.3) after
+**every completed frame** (query stub) and on timeout/hang (sleep_timer). Sequence: clear both
+doorbells → decoder disable (`BAR0[hdr+4]=0`) → wait for c2h/h2c status drain (+0x1044/+0x44 bit0,
+IOSleep(1s) if stuck) → decoder re-enable until ready bit ([hdr+8]&1, IOSleep(100ms) loop) → reset
+completion tracking (`[self+0x1308] = [self+0xC8]`). Without it the firmware's internal decode /
+c2h source position keeps advancing between submits — exactly matching the +8 KB hole walk.
+
+**(b) cmd_word sequence semantics.** `BAR0[hdr+0xC]` high 16 bits = `(C8 − stampBase)` where:
+- `_frameNum` ([self+0xC8]) increments **only on receive/batch submissions** (§21.2: cmp w20,#1
+  @0xa988) — i.e. once per frame, at the batch ring;
+- `stampBase` ([self+0x1308]) is re-based to C8 by reset() after every frame.
+
+⇒ For sequential single-frame submits the kext writes **0x0000_0000 pre-submit** (delta 0) and
+**0x0001_0000 on completion** (fn@0x985c, §25.4 — delta 1 because C8 already includes this frame's
+batch-ring increment). The driver was writing a monotonically growing global counter (0,1,2,3…) —
+diverging from the kext from frame 1 on. Firmware evidently uses this value as an internal buffer
+slot index; slot N+1 output lands 8 KB further into its decode ring while c2h reads from a fixed
+base → garbage + walking hole. (Also explains why adding reset() alone made frames 1–3 *time out*:
+after re-enable only the re-based state is valid, and my growing counter pointed at an invalid slot.)
+
+### 32.4 Fix (ab_dma.c)
+
+- `ab_frame_reset()` — kext-exact §10.3 sequence; called after every completed submit AND on the
+  timeout path (kext sleep_timer parity). Also implements the §28 AER mitigation: decoder is never
+  left running between frames.
+- Pre-submit cmd_word → `((seq − done_seq) << 16)` = always 0 for sequential submits; completion-side
+  write in `ab_handle_completion()` → same delta (always 1); `done_seq` re-based by reset() only
+  (removed the old per-completion increment).
+
+### 32.5 Result — multi-frame decode WORKS [live, t≈33239–33256]
+
+4 submits of identical input via ioctl (`tests/abtest`, poll 3 s):
+
+```
+frame N: status=0x00000001 data=0x00000006 output=115200/115200 nonzero (100.0%)   ×4
+all 4 frames byte-identical to each other
+zero-runs ≥32B: none; 0x5A-runs ≥64B: none        ; hole pattern GONE
+reset: decoder status=0x3e0fd001 after 0 ms       ; re-enable instant, every frame
+no AER events from 0f:00.0 (only pre-existing correctable noise from 03:00.0)
+```
+
+**Correctness vs FFmpeg reference decode** (`decode_ref.c` → ref320.yuv, same input):
+
+- **Luma: correct.** 92.2 % exact / **100 % within ±1**, MAD 0.078, max diff 1 — pure
+  10→8-bit rounding (card does its own rounding/dither). All 180 rows.
+- **Chroma: half-vertical resolution.** Rows 0–89 match reference chroma rows **0,2,4,…,178**
+  (MAD ≈0.15 — rounding only); rows 90–179 carry no valid chroma (garbage). Deterministic across
+  frames and runs. The card outputs full-height luma with even-row-only chroma packed into the top
+  half of the frame buffer. Open: firmware output-format choice vs register config — not blocking;
+  a consumer remaps chroma row y→2y for y<90 (bottom-half chroma undefined).
+
+**Output format (confirmed):** interleaved `[U, Y0, V, Y1]` × 160 groups per row, 640 B/row ×
+180 rows = 115200 B. (Matches decode_ref.c's writer; the earlier "luma at odd positions" analysis
+is consistent: luma at bytes 1,3 of each group.)
+
+### 32.6 State
+
+- Multi-frame deterministic ProRes decode via short ioctl probes: **WORKING**.
+- Card stable across repeated submits with per-frame decoder disable/enable; no wedge, no MalfTLP.
+- Next (plan §8 / V-matrix): larger frames (4K), multi-segment input chains, different resolutions,
+  sustained throughput run, then the deferred mode-14/15 items as V3/V6.
