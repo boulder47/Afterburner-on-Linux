@@ -341,9 +341,11 @@ served its purpose and is now a liability: `submit2.c` is ~1600 lines of mode sw
 proved that running long sequences inside `.probe` can kill the card. This phase replaces the pile
 with one production module built directly from the decoded protocol.
 
-**Status (2026-11-08):** 3u.1 code complete — `linux-driver/afterburner/` builds clean against
-7.2.11; probe correctly refuses a dead card at the fw gate (kext-exact). **Live acceptance blocked:
-card has been dead since run 14b (FINDINGS §31) — needs a real power cycle before any insmod test.**
+**Status (2026-11-09):** **3u.1 CLOSED — acceptance PASSED.** Card revived by full cold boot
+(FINDINGS §31.1); 6 probes / 5 rmmod cycles all clean: fw gate `0x0002003e`, decoder header at
+BAR0+0x8000, ready bit `0x3e0fd001` every time, stop verified on each remove, zero AER events.
+Next: **3u.2 — submit via ioctl** (`ab_dma.c`: chain builder + doorbell + completion poll;
+`ab_chardev.c`: /dev/afterburnerN mirroring the UC sMethods ABI).
 
 ### 8.1 Scope — v1 in / out
 

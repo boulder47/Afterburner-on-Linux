@@ -3068,3 +3068,25 @@ The card has been **dead (all-BARs-read-0xFFFFFFFF) since run 14b killed it on 2
 4. 2026-11-08: new production module (`linux-driver/afterburner/`, Phase 3u.1) probed the card: same signature (BAR0+0x0, BAR0+0x8, BAR1+0x0 all 0xFFFFFFFF), fw gate correctly refused to bind — kext-exact behavior on a dead card.
 
 **Consequence:** no live work of any kind is possible until a **real power cycle** (unplug/reseat the card or cut PSU power; an OS reboot may not de-power the slot). Phase 3u.1's acceptance test (insmod/rmmod ×5) and all V-matrix items are blocked on this. The device does NOT advertise FLR (`FLReset-`), so no software reset path exists — consistent with §28's "dead until power cycle".
+
+### 31.1 Recovery confirmed + Phase 3u.1 acceptance PASSED (2026-11-09) [live]
+
+Full cold boot (user rebooted the machine; PSU cycled) revived the card — confirming the
+fabric needed a real de-power, not just a link reset. Fresh-boot dmesg: clean enumeration at
+t≈28 s, no AER events, BARs mapped normally.
+
+**3u.1 acceptance test (plan §8): PASSED.** 6 probes / 5 rmmod cycles of the production module
+(`linux-driver/afterburner/`, commit `6a0cdbf`), all with identical clean signatures:
+
+```
+fw gate: BAR0+0x8=0x0002003e (upper=0x0002 lower=0x003e)   ; live fw version, kext-exact gate
+decoder section header at BAR0+0x8000                      ; dir walk (stride 0x2C) found decoder block
+ready: BAR0+0x8008=0x3e0fd001 -> READY                     ; exact Phase-3k live value
+bring-up OK (warm=0)                                       ; warm=0 every probe — remove()'s stop
+                                                           ; (BAR0[hdr+4]=0, rb verified 0) resets it each time
+stop: BAR0+0x8004=0 (rb 0x00000000)                        ; ×5, one per rmmod
+```
+
+Zero AER events across the whole test window; only dmesg noise is the expected unsigned-module
+taint. The short-probe design (§28 lesson) held: ~40 s of repeated probe/stop with no wedge,
+no MalfTLP, card stable throughout. **3u.1 closed — 3u.2 (submit via ioctl) unblocked.**
