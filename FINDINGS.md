@@ -3260,9 +3260,11 @@ along with new frame dimensions if specified."
 
 **Answer: No.** There is **no pixel-format, stride, or dimension specification anywhere in the
 userland→firmware protocol**. The firmware derives everything from the ProRes input frame header
-(W/H at icpf+16/+18) and outputs a **fixed interleaved [U,Y0,V,Y1] yuv422p8** layout at input
-dimensions (W×H×2 bytes). Format/dimension conversion is not a feature of this card's protocol —
-on macOS it happens above the kext (VideoToolbox/AVFoundation), never in the driver.
+(W/H at icpf+16/+18) and outputs a **fixed interleaved [U,Y0,V,Y1] yuv422p8** layout — with the
+exact output size given by the padding rules in §35.3 (row stride = ceil(W·2/64)·64, rows =
+ceil(H/16)·16; for W%32==0 this reduces to W×H×2). Format/dimension conversion is not a feature of
+this card's protocol — on macOS it happens above the kext (VideoToolbox/AVFoundation), never in the
+driver.
 
 ### 35.1 Evidence chain (static RE of rework/arm64e.bin unless noted)
 1. **UC::bindFrame @0xdd9c** fully decoded: userland struct is only `{ptr, size, flag@+0x10,
@@ -3311,3 +3313,55 @@ on macOS it happens above the kext (VideoToolbox/AVFoundation), never in the dri
   sDescriptorLengthOffsetInfo = DMA geometry only (our driver supplies equivalent info via the
   segment array). Remaining open item: post-completion `BAR0[hdr+0xC]` write (firmware frame-done
   signal) — see §25.
+
+### 35.3 Output size refinement — padding rules discovered live [2026-11-10]
+
+**Motivation.** WWDC20 session 10090 ("Decode ProRes with AVFoundation and VideoToolbox") lists
+"optimal pixel formats" per profile (4444→Y416, 422→v216, RAW→RGhA) as the formats that avoid
+conversion copies. That is a userland negotiation above the kext — consistent with §35.1 — but it
+does not match this card's measured native output for ProRes 422 (interleaved yuv422p8). The one
+protocol variable still untested was **output buffer size** (it reaches firmware as descriptor
+lengths): if layout were size-selected, a v216-sized buffer might yield planar p10.
+
+**Method.** `AB_OUT_MULT` env override in abtest_4k.c scales out_len; sentinel-filled output region
+(0x5A) makes the exact written span measurable. Test frames generated with ffmpeg (ProRes profile 2,
+icpf-wrapped).
+
+**Results — layout is NOT size-selected:**
+- 320×180 fixture, buffer 2× (230,400 B): first 115,200 B byte-identical to baseline; firmware wrote
+  only its natural span. No v216/planar output at any size tested → format is fixed regardless of
+  described output size.
+
+**Results — true natural output size = S×R with padding:**
+
+| W×H | stride S (B) | rows R | total S×R | measured written span | luma vs FFmpeg ref |
+|---|---|---|---|---|---|
+| 320×180 | 640 (=W·2, %64==0) | 192 (ceil(180/16)·16) | 122,880 | 122,880 ✓ | ±1 (§32) |
+| 320×170 | 640 | 176 | 112,640 | 112,640 ✓ | — |
+| 320×184 | 640 | 192 (rules out M=8; 184%8==0) | 122,880 | 122,880 ✓ | — |
+| 3840×2160 | 7680 (%64==0) | 2160 (%16==0) | 16,588,800 | full (V3) | ±1 (§33.3) |
+| 322×180 | **704** = ceil(644/64)·64 — not 644, not 672 | 192 | 135,168 | 135,168 ✓ | **exact: 57,960/57,960 within ±1 (worst diff 0)** |
+
+- **Row stride S = ceil(W·2 / 64) · 64** — padded to a 64-byte boundary. W=322 row 1 located at
+  offset 704 by luma search; full-frame verify confirms all 180 rows at stride 704. All earlier
+  fixtures had W%32==0 → S == W·2, which is why the padding was invisible until now (and why V3's
+  4K output matched W×H×2 exactly).
+- **Row count R = ceil(H/16) · 16** — height padded in units of 16 rows. Extra rows H..R−1 are
+  byte-exact copies of the last real row (row H−1), including its intra-row padding.
+- **Intra-row padding** (pixels W .. S/2−1): deterministic garbage, not edge-replicated uniformly —
+  for W=322: luma 0xAA through px 335 then 0x00 to end of stride. Consumers must ignore pixels ≥W
+  and rows ≥H.
+- **Truncation semantics:** the c2h DMA is bounded by the described output descriptors. Undersized
+  buffer → leading real rows decode, tail silently truncated (no error status); oversized buffer →
+  natural S×R written + sentinel tail untouched. No write past the described region observed in any
+  run.
+
+**Driver fix.** abtest_4k.c now auto-sizes `out_len = S·R` from the frame header instead of W·H·2.
+The kernel module is a pure pass-through (region size + descriptor chain from out_len; no dimension
+validation) — **no module change needed**. Bug note: with the old W·H·2 sizing, any frame with
+W%32≠0 loses real rows (e.g. 322×180 → only ~164 of 180 rows captured).
+
+**WWDC interpretation.** The session's "native format" list describes Apple's built-in decode path;
+this card's measured native output for ProRes 422 is interleaved yuv422p8, so the macOS glue either
+advertises that or converts in userland — either way above the kext. Per-profile layouts for 4444 /
+RAW (ap4h/ap4x fixtures) remain untested; S/R padding constants may differ per profile.

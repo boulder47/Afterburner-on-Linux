@@ -32,7 +32,7 @@
 struct ab_ioc_submit {
 	__u32 in_off;    /* offset into mapped input region */
 	__u32 in_len;    /* compressed frame bytes */
-	__u32 out_len;   /* decoded YUV422 size (w*h*2) */
+	__u32 out_len;   /* decoded output size (padded layout: see abtest_4k.c §35.2) */
 	__u32 poll_ms;   /* completion window (0 = default 2000) */
 	/* out: */
 	__u32 status;    /* last handled completion word (+0x2044) */

@@ -121,7 +121,11 @@ int main(int argc, char **argv)
 	printf("[frame] %s: %u bytes (bind in=%u out=%u)\n", in_path, sz, in_size, out_len);
 
 	/* parse W/H from the ProRes frame header (u16BE at +16/+18 of the
-	 * 'icpf' box) so non-4K fixtures work; recompute out_len = w*h*2 */
+	 * 'icpf' box) so non-4K fixtures work; size the output buffer for the
+	 * firmware's NATURAL padded layout (§35.2): interleaved [U,Y0,V,Y1] with
+	 * row stride = ceil(W*2/64)*64 and rows = ceil(H/16)*16 (padding rows are
+	 * copies of the last real row). W*H*2 truncates real content whenever
+	 * W%32 != 0. */
 	{
 		int hf = open(in_path, O_RDONLY);
 		uint8_t hdr[32];
@@ -130,12 +134,28 @@ int main(int argc, char **argv)
 			uint16_t fw = (uint16_t)((hdr[16] << 8) | hdr[17]);
 			uint16_t fh = (uint16_t)((hdr[18] << 8) | hdr[19]);
 
-			if (fw && fh && ((uint32_t)fw * fh * 2u != out_len)) {
-				out_len = (uint32_t)fw * fh * 2u;
-				printf("[frame] header says %ux%u — out_len=%u\n", fw, fh, out_len);
+			if (fw && fh) {
+				uint32_t stride = ((fw * 2u + 63u) / 64u) * 64u;
+				uint32_t rows = ((fh + 15u) / 16u) * 16u;
+
+				out_len = stride * rows;
+				printf("[frame] header says %ux%u — stride=%u rows=%u out_len=%u\n",
+				       fw, fh, stride, rows, out_len);
 			}
 		}
 		close(hf);
+	}
+
+	/* AB_OUT_MULT=<factor> — scale out_len for output-layout experiments
+	 * (e.g. 2.0 = v216-sized buffer test; FINDINGS §35 follow-up: does the
+	 * firmware select its output layout from the bound buffer size?) */
+	{
+		const char *m = getenv("AB_OUT_MULT");
+
+		if (m && atof(m) > 0.0) {
+			out_len = (uint32_t)((double)out_len * atof(m));
+			printf("[frame] AB_OUT_MULT=%s — out_len scaled to %u\n", m, out_len);
+		}
 	}
 
 	struct ioc_bind b = { in_size, out_len };

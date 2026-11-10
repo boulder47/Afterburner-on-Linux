@@ -57,7 +57,7 @@ to port — that simplifies Phase 3 and means we should not look for encode regi
 | 3q — Confirm kext frame-commit path (static) | ✅ **DONE** (2026-11-02, FINDINGS.md §25) | Premise was wrong: vtable[+0x150] is IOKit return-to-pool. Real commit = UC trampoline @0xd708 → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified: channel cmd[+0x1c] (userland scalar via `mov x4,x21` @0xdb14), send = clear +4 / stage +0x4080..C / ring 0xFFE7F, batch = clear +0x1004 / stage +0x5080..C / ring 0x80FFE7F — **byte-exact match with our Linux driver**. BAR1 base = ctx->+0x130 (NOT +0x148 = BAR0+0x2000). Completion handler fn@0x985c: gated by +0x12f8, polls *(ctx->+0x90) vtable[+0x200/+0x210], send-completion writes BAR0[hdr+0xC]. |
 | 3r/3s — UC ABI decode + stop command (static) | ✅ **DONE** | sMethods dispatch table, trampoline ABI, submitFrame slot model; `stop()` = AB vtable slot 191, only HW write is decoder disable. See FINDINGS.md §26 + UC_METHODS.md §18/§21. |
 | 3t — Static RE batch 3 (ADRPs, metaclasses, resourceLoadCallback) | ✅ **DONE** (`29e03b0`) | ADRP encoding resolved via Keystone ground truth; three vtables corrected; installResource path decoded. See FINDINGS.md §30. |
-| 3u — Driver rewrite from decoded protocol (production module `linux-driver/afterburner/`) | 🟡 **IN PROGRESS** | **3u.1 ✅ PASSED** (insmod/rmmod ×5 clean, FINDINGS §31.1). **3u.2**: submit path via ioctl WORKS — multi-frame decode correct vs FFmpeg (FINDINGS §32); **V1 ✅ + V3 4K end-to-end ✅** (chunked DMA for no-IOMMU host; FINDINGS §33); p4k partial-decode = content-specific fw behavior (§34); **output format/dim NOT configurable — fixed interleaved yuv422p8 at input W/H, no spec field exists in protocol** (§35). V-matrix remaining: V3 idle watch, V4-rest, V5, V6. |
+| 3u — Driver rewrite from decoded protocol (production module `linux-driver/afterburner/`) | 🟡 **IN PROGRESS** | **3u.1 ✅ PASSED** (insmod/rmmod ×5 clean, FINDINGS §31.1). **3u.2**: submit path via ioctl WORKS — multi-frame decode correct vs FFmpeg (FINDINGS §32); **V1 ✅ + V3 4K end-to-end ✅** (chunked DMA for no-IOMMU host; FINDINGS §33); p4k partial-decode = content-specific fw behavior (§34); **output format/dim NOT configurable — fixed interleaved yuv422p8 at input W/H, no spec field exists in protocol; padding rules pinned live (stride=ceil(W·2/64)·64, rows=ceil(H/16)·16), layout not size-selected** (§35 incl. §35.3). V-matrix remaining: V3 idle watch, V4-rest, V5, V6. |
 | 4 — Userspace interface | ⬜ | |
 | 5 — Flash / bitfile mgmt | 🟡 **RE complete** (port pending) | Kext-side path fully decoded: descriptor chain, version selection by fuse word, two-phase update, SPI erase/program at flash addr `0x1400000`, pointer tables. See FINDINGS.md §20. Linux port still high-risk / last. |
 
@@ -424,8 +424,12 @@ PASSED end-to-end** (real 4K frame RC=0; chunked coherent DMA fallback for no-IO
 FINDINGS §33.2/§33.3). p4k partial-decode at slice #3418 investigated: content-specific firmware
 behavior, all hypotheses except "later-slice content state" ruled out (FINDINGS §34). **Output
 format/dimension configurability RESOLVED: no such field exists anywhere in the protocol —
-firmware outputs fixed interleaved yuv422p8 at input dimensions** (full evidence chain, FINDINGS
-§35; UC_METHODS §4.1/§4.3 updated). Remaining: V3 STOP + ≥75 s idle AER watch, RECOVER ioctl soak.
+firmware outputs fixed interleaved yuv422p8 at input dimensions, with padding rules now pinned
+live: row stride = ceil(W·2/64)·64, rows = ceil(H/16)·16 (extra rows copy last real row); layout
+NOT size-selected — 2× buffer yields identical p8 output** (full evidence chain + data table,
+FINDINGS §35 incl. §35.3; UC_METHODS §4.1/§4.3 updated). abtest_4k.c now auto-sizes out_len = S·R
+from the frame header (old W·H·2 sizing silently truncated real rows for W%32≠0 — no kernel change
+needed, module is a pure pass-through). Remaining: V3 STOP + ≥75 s idle AER watch, RECOVER ioctl soak.
 
 **3u.3 — Userspace.** chardev + sysfs + abctl client.
 *Accept:* userspace round-trip of the fixture frame; decoded output buffer matches an FFmpeg decode
