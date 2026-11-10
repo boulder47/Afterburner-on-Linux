@@ -61,9 +61,16 @@ static u32 ab_build_chain(struct ab_device *ab, struct ab_chain *ch,
 	if (!total || !nseg_src)
 		return 0;
 
-	ch->n = (u32)((total + seg_size - 1) / seg_size);
-	if (ch->n > AB_MAX_DESCS)
+	/* descriptors = sum over source segments — a chunk boundary can fall
+	 * mid-descriptor, so total/seg undercounts for multi-segment sources */
+	ch->n = 0;
+	for (c = 0; c < nseg_src; c++)
+		ch->n += (u32)((lens[c] + seg_size - 1) / seg_size);
+	if (!ch->n || ch->n > AB_MAX_DESCS) {
+		dev_err(&ab->pdev->dev, "chain: %d descs for %llu B exceeds cap\n",
+			ch->n, (unsigned long long)total);
 		return 0;
+	}
 
 	ch->virt = dma_alloc_coherent(&ab->pdev->dev, ch->n * AB_DESC_SIZE,
 				      &ch->pa, GFP_KERNEL);
@@ -172,11 +179,18 @@ static void ab_drain(struct ab_device *ab)
 	}
 }
 
-/* Adaptive segment size: start at the proven 4KB, double until the chain fits
- * the §28 cap. (kext uses ~16MB maxSegmentSize; we stay conservative.) */
+/* Segment size selection (V3, plan §8.5): adaptive default starts at the
+ * proven 4KB and doubles until the chain fits the §28 cap; out_seg=N overrides
+ * with a fixed N-byte segment on BOTH chains (clamped upward to the cap if
+ * needed). kext parity knob: ~4-16 MB segments keep multi-MB frames at
+ * single-digit descriptor counts. */
+static u32 ab_out_seg = 0;
+module_param_named(out_seg, ab_out_seg, uint, 0644);
+MODULE_PARM_DESC(out_seg, "fixed descriptor segment size in bytes for both chains (0=adaptive from 4KB)");
+
 static u32 ab_pick_seg(u64 total)
 {
-	u32 seg = AB_MIN_SEG;
+	u32 seg = ab_out_seg ? ab_out_seg : AB_MIN_SEG;
 
 	while ((total + seg - 1) / seg > AB_MAX_DESCS && (seg << 1) >= seg)
 		seg <<= 1;
@@ -260,22 +274,20 @@ static void ab_frame_reset(struct ab_device *ab)
 	dm->in_flight = 0;
 }
 
-int ab_submit_frame(struct ab_device *ab, dma_addr_t in_pa, u32 in_len,
-		    dma_addr_t out_pa, u32 out_len, u32 poll_ms,
+int ab_submit_frame(struct ab_device *ab,
+		    const dma_addr_t *in_pas, const size_t *in_lens, int n_in,
+		    const dma_addr_t *out_pas, const size_t *out_lens, int n_out,
+		    u32 in_len, u32 out_len, u32 poll_ms,
 		    u32 *out_status, u32 *out_data)
 {
 	struct ab_dma_state *dm = &ab->dma;
-	dma_addr_t in_pas[1] = { in_pa };
-	size_t in_lens[1] = { in_len };
-	dma_addr_t out_pas[1] = { out_pa };
-	size_t out_lens[1] = { out_len };
 	u32 last = 0, final_status = 0, data_word = 0, ncomp = 0;
 	bool fresh_in = false, fresh_out = false;
 	unsigned long deadline;
 
 	if (!ab->ready)
 		return -ENODEV;
-	if (!in_len || !out_len)
+	if (!in_len || !out_len || n_in < 1 || n_out < 1)
 		return -EINVAL;
 
 	mutex_lock(&dm->lock);
@@ -284,31 +296,37 @@ int ab_submit_frame(struct ab_device *ab, dma_addr_t in_pa, u32 in_len,
 		return -ENOSPC;
 	}
 
-	/* Persistent chains (kext parity): build once per (pa,len), reuse for
-	 * every submit. Per-submit alloc/free broke decoding from frame #2 on
-	 * (live test 2026-11-09 — FINDINGS §31). */
-	if (!dm->in_ch.virt || dm->ch_in_pa != in_pa || dm->ch_in_len != in_len) {
+	/* Persistent chains (kext parity): build once per segment list, reuse
+	 * for every submit. Per-submit alloc/free broke decoding from frame #2
+	 * on (live test 2026-11-09 — FINDINGS §31). Keyed on first PA + total
+	 * len + segment count: a rebind frees the chains, and an in_off change
+	 * moves the first PA. */
+	if (!dm->in_ch.virt || dm->ch_in_pa != in_pas[0] ||
+	    dm->ch_in_len != in_len || dm->ch_in_nseg != n_in) {
 		ab_chain_free(ab, &dm->in_ch);
-		if (!ab_build_chain(ab, &dm->in_ch, in_pas, in_lens, 1,
+		if (!ab_build_chain(ab, &dm->in_ch, in_pas, in_lens, n_in,
 				    ab_pick_seg(in_len), AB_DESC_PA_IN))
 			goto err_nomem;
-		dm->ch_in_pa = in_pa;
+		dm->ch_in_pa = in_pas[0];
 		dm->ch_in_len = in_len;
+		dm->ch_in_nseg = n_in;
 		fresh_in = true;
 	}
-	if (!dm->out_ch.virt || dm->ch_out_pa != out_pa || dm->ch_out_len != out_len) {
+	if (!dm->out_ch.virt || dm->ch_out_pa != out_pas[0] ||
+	    dm->ch_out_len != out_len || dm->ch_out_nseg != n_out) {
 		ab_chain_free(ab, &dm->out_ch);
-		if (!ab_build_chain(ab, &dm->out_ch, out_pas, out_lens, 1,
+		if (!ab_build_chain(ab, &dm->out_ch, out_pas, out_lens, n_out,
 				    ab_pick_seg(out_len), AB_DESC_PA_OUT))
 			goto err_nomem;
-		dm->ch_out_pa = out_pa;
+		dm->ch_out_pa = out_pas[0];
 		dm->ch_out_len = out_len;
+		dm->ch_out_nseg = n_out;
 		fresh_out = true;
 	}
 
-	dev_info(&ab->pdev->dev, "submit: in_pa=%pad out_pa=%pad in_len=%u out_len=%u in_descs=%u out_descs=%u (in_head=%pad out_head=%pad%s)\n",
-		 &in_pa, &out_pa, in_len, out_len, dm->in_ch.n, dm->out_ch.n,
-		 &dm->in_ch.pa, &dm->out_ch.pa,
+	dev_info(&ab->pdev->dev, "submit: in_head=%pad out_head=%pad in_len=%u out_len=%u in_descs=%u out_descs=%u (in_segs=%d out_segs=%d%s)\n",
+		 &in_pas[0], &out_pas[0], in_len, out_len,
+		 dm->in_ch.n, dm->out_ch.n, n_in, n_out,
 		 (fresh_in || fresh_out) ? " [chains built]" : "");
 
 	if (fresh_in || fresh_out) { /* ground-truth dump of the descriptors */
@@ -416,13 +434,22 @@ void ab_dma_release(struct ab_device *ab, bool free_bufs)
 	ab_chain_free(ab, &dm->out_ch);
 	dm->ch_in_pa = dm->ch_out_pa = 0;
 	dm->ch_in_len = dm->ch_out_len = 0;
+	dm->ch_in_nseg = dm->ch_out_nseg = 0;
 	if (free_bufs) {
-		if (dm->in.virt)
-			dma_free_coherent(&ab->pdev->dev, dm->in.size,
-					  dm->in.virt, dm->in.pa);
-		if (dm->out.virt)
-			dma_free_coherent(&ab->pdev->dev, dm->out.size,
-					  dm->out.virt, dm->out.pa);
+		int i;
+
+		for (i = 0; i < dm->in.n_chunks; i++)
+			if (dm->in.chunks[i].virt)
+				dma_free_coherent(&ab->pdev->dev,
+						  dm->in.chunks[i].len,
+						  dm->in.chunks[i].virt,
+						  dm->in.chunks[i].pa);
+		for (i = 0; i < dm->out.n_chunks; i++)
+			if (dm->out.chunks[i].virt)
+				dma_free_coherent(&ab->pdev->dev,
+						  dm->out.chunks[i].len,
+						  dm->out.chunks[i].virt,
+						  dm->out.chunks[i].pa);
 		memset(&dm->in, 0, sizeof(dm->in));
 		memset(&dm->out, 0, sizeof(dm->out));
 	}

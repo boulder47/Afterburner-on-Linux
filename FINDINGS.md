@@ -3175,3 +3175,139 @@ is consistent: luma at bytes 1,3 of each group.)
 - Card stable across repeated submits with per-frame decoder disable/enable; no wedge, no MalfTLP.
 - Next (plan §8 / V-matrix): larger frames (4K), multi-segment input chains, different resolutions,
   sustained throughput run, then the deferred mode-14/15 items as V3/V6.
+
+## 33. V-matrix live results: V1 ✅, V3 ✅ (2026-11-10)
+
+### 33.1 V1 — len=64 single-shot regression on production module: **PASSED**
+Minimal client `tests/abtest_v1.c` around the §21.7(a) descriptor (single desc, len=64):
+```
+[status] fw=0x0002003e ready=1 dec_enable=0x1 engine_ctrl=0x3
+[submit] ret=0 status=0x00000001 data_word=0x00000006
+[ok] input region untouched
+```
+status(+0x2044)=0x1 VALID, data(+0x44)=0x6 — exact §21.7(a) signature. Passed on every driver
+build since (incl. final page-aligned chunked-DMA build).
+
+### 33.2 Chunked coherent DMA fallback (no IOMMU on this host)
+16.6 MB single `dma_alloc_coherent` → ENOMEM without IOMMU translation. Design:
+- `AB_MAX_CHUNKS=64`, `AB_MAX_SEGS=48`; `struct ab_chunk { pa, virt, len }`.
+- `ab_alloc_region()` halves by **page count** (not bytes — byte-halving broke
+  `remap_pfn_range` alignment: `!PAGE_ALIGNED(addr)` WARN) from min(size>>1, 32 MB)/PAGE_SIZE
+  down to a 256-page floor.
+- Per-segment descriptor counting: Σ ceil(lens[c]/seg_size) per chunk boundary; segment array
+  passed through the submit ioctl (with truncation guard in `ab_chardev.c`).
+- mmap walks chunks; page-rounded bind sizes before allocation.
+
+### 33.3 V3 — real 4K frame end-to-end: **PASSED**
+`abtest_4k tmp/p4k_frame0.bin /tmp/v3_out_A.bin 30000` → RC=0, out_seg=4194304 (writable module
+param; client `[out_seg_bytes]` arg writes sysfs as root — sudoers gap workaround).
+- Input: p4k_frame0.bin = 2,552,068 B ProRes frame, 3840×2160, 4,050 slices (8×1 MB grid,
+  30 cols × 135 rows). W/H parsed from icpf header (+16/+18 u16BE); out_len = W*H*2.
+- Output: /tmp/v3_out_A.bin = 16,588,800 B (3840×2160×2) — see §34 for the partial-decode caveat.
+- **Segmentation independence:** C(4 MB)==D(1 MB)==E(8 MB) byte-identical; stop point identical
+  regardless of descriptor count/segment size.
+- **Determinism:** A/B/C/D/E/P2_meta all byte-identical to each other (P2 = colorimetry-patched
+  input — see §35). Decoder is a pure function of input bytes + fixed bring-up state.
+
+### 33.4 Driver additions this phase
+`AB_IOC_STOP` (_IO('A',7)) → kext stop fn@0xc0a4 parity (BAR0[hdr+4]=0), EBUSY guard via dm->lock;
+`AB_IOC_START` (_IO('A',8)) → `ab_recover()` under lock — eliminates rmmod/insmod for re-bring-up;
+client auto-issues START when !st.ready. `AB_NOSTOP=1` skips trailing STOP.
+
+## 34. Partial-decode investigation: p4k stops at slice #3418 (2026-11-10)
+
+### 34.1 Observed behavior
+p4k_frame0.bin decodes only partway: firmware halts mid-frame, leaving tail rows unwritten
+(sentinel 0x5A pre-fill; genuine unwritten = completely-empty rows — 0x5A is a legitimate pixel
+value so isolated hits are false positives). Stop geometry (deterministic, same input):
+- **Run A:** aborts at slice #3418 of 4,050, row 1818 x=3584 — mid-slice: Y block-row 0→1
+  transition inside the slice (local rows 0–9 written → frame rows 1808–1823); rows 1819+ empty.
+- **Run S7:** clean full-row halt at row 2048 = start of slice #3840; all slice rows 0–127
+  (30×128) fully written; rows 2048+ empty. Different structural character than A's mid-slice abort.
+
+### 34.2 Ruled out (all with live or full-parse evidence)
+- **2 MiB input limit:** #3173 crosses it, stop is at #3418 — no.
+- **Complexity/total size:** F3 noisy frame (13.75 MB compressed) decodes FULLY; A-vs-S7
+  complexity counters don't match between the two stops — no.
+- **Apple metadata in frame header:** P2 patched 4 bytes at file offsets [21,22,24,25]
+  (reserved/colorimetry/alpha region) → output byte-identical to A — no.
+- **Cumulative internal counter:** F3b exceeds all p4k stop counters; A-vs-S7 no match — no.
+- **Per-block anomaly at #3418:** full FFmpeg-exact coefficient parse of ALL 4,050 slices →
+  ZERO errors (structural + coefficient level); #3418 has no statistical or structural anomaly.
+- **Qscale position:** p4k mixed {1,3,4}; F3b uniform q=6; F1 more extreme but full — no.
+- **Fixed input-byte budget:** A and S7 share early slices #0..#3419 and diverge at #3420+;
+  a single byte budget B cannot explain both stop points (A stops inside shared region, S7 after) — no.
+
+### 34.3 Splice experiments (trigger localization)
+- **S1:** replaced slice #3418 with #3417's data → stop STAYED at row 1818 ⇒ trigger is NOT in
+  #3418's own payload; it depends on what precedes/follows.
+- **S7 (decisive):** kept p4k slices #0..#3419 intact, replaced #3420..#4049 with F3b slices →
+  stop MOVED to row 2048 (#3840) ⇒ the trigger is related to **later-slice content** (or a state
+  accumulated through it), not a fixed budget. Fixture p4k_s7.bin = 4,348,200 B (incl. 10-byte
+  mdat tail).
+
+### 34.4 Status
+Mechanism of the content-dependent stop is **open**. All slices are bitstream-valid; the stop
+is deterministic and segmentation-independent. Remaining hypotheses: firmware-internal buffer or
+counter sensitive to specific coefficient patterns in later slices (e.g., a per-slice-row
+accumulator that overflows only for p4k's actual content). Not blocking V-matrix completion —
+V3 passes end-to-end (RC=0); the partial decode is a firmware behavior, not a driver defect.
+
+## 35. Output format & dimension configurability: RESOLVED — no such field exists (2026-11-10)
+
+**Question:** "I thought the card decodes the frame and outputs in whichever format specified
+along with new frame dimensions if specified."
+
+**Answer: No.** There is **no pixel-format, stride, or dimension specification anywhere in the
+userland→firmware protocol**. The firmware derives everything from the ProRes input frame header
+(W/H at icpf+16/+18) and outputs a **fixed interleaved [U,Y0,V,Y1] yuv422p8** layout at input
+dimensions (W×H×2 bytes). Format/dimension conversion is not a feature of this card's protocol —
+on macOS it happens above the kext (VideoToolbox/AVFoundation), never in the driver.
+
+### 35.1 Evidence chain (static RE of rework/arm64e.bin unless noted)
+1. **UC::bindFrame @0xdd9c** fully decoded: userland struct is only `{ptr, size, flag@+0x10,
+   slot_idx@+0x18}`; flag=0 → auto-allocate new slot (max 256), non-zero → reuse explicit slot.
+   Creates IOMemoryDescriptor via withAddressRange(ptr,size,write); stores in UC slot array
+   @UC+0xF0+i·0x18: `{desc@+0xF0, end@+0xF8, size@+0x100}`. **No format/dimension fields.**
+2. **UC::submitFrame @0xd708** fully decoded: reads from s_inputDataStruct only
+   `ptr@+0, size@+8, slot_idx@+0x10, u64 tag@+0x18 (→w5/w6), flag@+0x20`; **+0x14 is never read**.
+   Builds input IOMemoryDescriptor (read perm) from page-aligned ptr/size; looks up output desc in
+   slot; calls `AB::submitFrame(AB, &UC[0x18F8], in_desc, out_desc, stamp_ptr, w5, w6, flag,
+   sDescriptorLengthOffsetInfo)`.
+3. **sDescriptorLengthOffsetInfo** (32 B stack struct, x8) = `{in_offset@+0 (input ptr offset
+   within its page), in_length@+8 (raw size), out_end@+0x10 (slot+0xF8), out_size@+0x18
+   (slot+0x100)}` — **pure DMA geometry**, no format/dimension/stride.
+4. **AB::submitFrame @0xa9ac:** busy check (AB+0x12C8); decoder-running check (AB+0x11D0 → else
+   0xE000_02D8 "no space"); thermal-distress gate (AB+0x160 non-zero → log engine status words
+   BAR0[hdr]+0x10 / +0x80>>7 / +0x84>>7 / +0x88>>7 and drop frame); then two submitData calls —
+   stage 0 with in_desc, stage 1 with out_desc — both passing the same (stamp_ptr, w5, w6, flag).
+5. **submitData @0xa67c** fully decoded: `[AB+0x88].vt[+0x8F8](obj,1)` prepare; decoder object
+   AB+0x158 ready-bit check ([dec+8] bit 0); pre-submit `BAR0[hdr+0x18]=0x1F` (byte-verified
+   @0xa714); N=AB+0x11E0>>4; fn@0xa28c pre-step (attaches desc, fills segment list only at stage 1);
+   fn@0x9c5c chain builder (`{ctrl=0xAD4Bxxxx|count, len@+4, PA@(stage? +0x10 : +8), next@+0x18}`);
+   on success: IOAlloc(0x48) completion record (layout in UC_METHODS §4.1) enqueued via
+   `[AB+0x90].vt[+0x1E8](obj, PAC(fn@0x985c), rec, 0,0,0)`; `*stamp_ptr = AB+0xC8` written to
+   userland; **only stage 1** increments `AB+0xC8 += 1`.
+6. **w5/w6/flag never touch hardware** — stored only in the completion record for bookkeeping
+   (echoed back via queryCompletion). The descriptor chain + BAR writes contain no format,
+   dimension, or stride data whatsoever. fn@0xa28c populates segment list at stage 1 only; NO
+   format/dimension writes anywhere in the submit path.
+7. **Kext string section (0x2f00–0x9000)** contains no IORegistry property names for output
+   format/width/height/stride — the kext reads no such properties from the registry.
+8. **Live evidence:** P2 run patched 4 bytes in the ProRes frame header (reserved/colorimetry/
+   alpha region, file offsets [21,22,24,25]) → output byte-identical to unpatched A. Firmware
+   ignores these metadata bytes for output-format selection.
+9. **Our driver** replicates the kext's submit path byte-for-byte on all hardware-facing elements
+   (verified: luma 100% within ±1 vs FFmpeg, §32) and produces the same fixed-format output — so
+   our driver is not leaving any spec field unset; no such field exists to set.
+
+### 35.2 Consequences
+- The chroma half-vertical behavior (§32.5) is part of this **fixed** output format, not a
+  configurable option or a bug in our plumbing.
+- "Output in whichever format specified / new frame dimensions if specified" would require
+  firmware support that does not exist; any such conversion must happen post-decode (userspace).
+- The three former submit-path gaps are now resolved: w5/w6 = bookkeeping tag (zero-fill is
+  correct — kext passes userland's value, we pass 0, and it never reaches HW); flag likewise;
+  sDescriptorLengthOffsetInfo = DMA geometry only (our driver supplies equivalent info via the
+  segment array). Remaining open item: post-completion `BAR0[hdr+0xC]` write (firmware frame-done
+  signal) — see §25.

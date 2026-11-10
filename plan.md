@@ -57,7 +57,7 @@ to port — that simplifies Phase 3 and means we should not look for encode regi
 | 3q — Confirm kext frame-commit path (static) | ✅ **DONE** (2026-11-02, FINDINGS.md §25) | Premise was wrong: vtable[+0x150] is IOKit return-to-pool. Real commit = UC trampoline @0xd708 → submitFrame @0xa9ac → submitData @0xa67c; doorbell fn@0x6800 byte-verified: channel cmd[+0x1c] (userland scalar via `mov x4,x21` @0xdb14), send = clear +4 / stage +0x4080..C / ring 0xFFE7F, batch = clear +0x1004 / stage +0x5080..C / ring 0x80FFE7F — **byte-exact match with our Linux driver**. BAR1 base = ctx->+0x130 (NOT +0x148 = BAR0+0x2000). Completion handler fn@0x985c: gated by +0x12f8, polls *(ctx->+0x90) vtable[+0x200/+0x210], send-completion writes BAR0[hdr+0xC]. |
 | 3r/3s — UC ABI decode + stop command (static) | ✅ **DONE** | sMethods dispatch table, trampoline ABI, submitFrame slot model; `stop()` = AB vtable slot 191, only HW write is decoder disable. See FINDINGS.md §26 + UC_METHODS.md §18/§21. |
 | 3t — Static RE batch 3 (ADRPs, metaclasses, resourceLoadCallback) | ✅ **DONE** (`29e03b0`) | ADRP encoding resolved via Keystone ground truth; three vtables corrected; installResource path decoded. See FINDINGS.md §30. |
-| 3u — Driver rewrite from decoded protocol (production module `linux-driver/afterburner/`) | 🟡 **IN PROGRESS** | **3u.1 ✅ PASSED** (insmod/rmmod ×5 clean, FINDINGS §31.1). **3u.2 🟡**: submit path via ioctl WORKS — 4× identical fixture frames decode correctly vs FFmpeg reference (luma 100% within ±1; chroma half-vertical, even rows only); root cause of multi-frame garbage = missing per-frame reset + cmd_word delta semantics (FINDINGS §32). V-matrix (§8.5) pending: V3/V4-rest/V5/V6. |
+| 3u — Driver rewrite from decoded protocol (production module `linux-driver/afterburner/`) | 🟡 **IN PROGRESS** | **3u.1 ✅ PASSED** (insmod/rmmod ×5 clean, FINDINGS §31.1). **3u.2**: submit path via ioctl WORKS — multi-frame decode correct vs FFmpeg (FINDINGS §32); **V1 ✅ + V3 4K end-to-end ✅** (chunked DMA for no-IOMMU host; FINDINGS §33); p4k partial-decode = content-specific fw behavior (§34); **output format/dim NOT configurable — fixed interleaved yuv422p8 at input W/H, no spec field exists in protocol** (§35). V-matrix remaining: V3 idle watch, V4-rest, V5, V6. |
 | 4 — Userspace interface | ⬜ | |
 | 5 — Flash / bitfile mgmt | 🟡 **RE complete** (port pending) | Kext-side path fully decoded: descriptor chain, version selection by fuse word, two-phase update, SPI erase/program at flash addr `0x1400000`, pointer tables. See FINDINGS.md §20. Linux port still high-risk / last. |
 
@@ -415,11 +415,17 @@ completion poll + ack; per-frame reset; RECOVER ioctl (re-bringup cycle first, F
 *Accept:* len=64 consumed + status VALID (regression vs §3i); 320×180 fixture chain completes with
 sane data words (§3o R9-1 parity); **H1/H2 test** — full frame `out_seg=4MB` (8 descs) + stop
 command + ≥75 s idle, AER-checked, run outside probe (the pending mode-14/15 question, now safe).
-**🟡 IN PROGRESS 2026-11-09:** fixture chain via batch/receive WORKS — 4× identical frames, all
+**🟡 IN PROGRESS 2026-11-10:** fixture chain via batch/receive WORKS — 4× identical frames, all
 complete with status=0x1/data=0x6, output verified against FFmpeg reference decode (luma 100%
 within ±1; chroma = half-vertical even rows only, deterministic — FINDINGS §32.5). Multi-frame
 garbage root-caused + fixed: per-frame `AB::reset()` parity + cmd_word delta semantics (§32.3/§32.4).
-Remaining: len=64 regression re-run on the production module (V1), H1/H2 4K test (V3), RECOVER ioctl.
+**V1 ✅ PASSED** (len=64 regression on production module, all builds — FINDINGS §33.1); **V3 ✅
+PASSED end-to-end** (real 4K frame RC=0; chunked coherent DMA fallback for no-IOMMU host —
+FINDINGS §33.2/§33.3). p4k partial-decode at slice #3418 investigated: content-specific firmware
+behavior, all hypotheses except "later-slice content state" ruled out (FINDINGS §34). **Output
+format/dimension configurability RESOLVED: no such field exists anywhere in the protocol —
+firmware outputs fixed interleaved yuv422p8 at input dimensions** (full evidence chain, FINDINGS
+§35; UC_METHODS §4.1/§4.3 updated). Remaining: V3 STOP + ≥75 s idle AER watch, RECOVER ioctl soak.
 
 **3u.3 — Userspace.** chardev + sysfs + abctl client.
 *Accept:* userspace round-trip of the fixture frame; decoded output buffer matches an FFmpeg decode
@@ -440,9 +446,9 @@ destructive control run (no stop command) goes LAST in the suite per mode-15 des
 
 | # | test | purpose | status (2026-11-09) |
 |---|---|---|---|
-| V1 | len=64 single-shot + VALID ack | regression baseline (§3i) | ⬜ pending on production module |
+| V1 | len=64 single-shot + VALID ack | regression baseline (§3i) | ✅ **PASSED** (2026-11-10, all builds incl. chunked-DMA; FINDINGS §33.1) |
 | V2 | fixture frame chain, batch/receive | §3o R9-1 parity via the new code path | ✅ **DONE** — 4× identical frames complete (status=0x1/data=0x6), output verified vs FFmpeg reference (FINDINGS §32.5) |
-| V3 | full 4K ProRes frame (§24), `out_seg=4MB` (8 descs), stop cmd, ≥75 s idle + AER check | **H1 vs H2** (§27.5) — mode-14 equivalent | ⬜ pending |
+| V3 | full 4K ProRes frame (§24), `out_seg=4MB` (8 descs), stop cmd, ≥75 s idle + AER check | **H1 vs H2** (§27.5) — mode-14 equivalent | ✅ **PASSED end-to-end** (RC=0; 3840×2160 → 16,588,800 B out; segmentation-independent C==D==E byte-identical; FINDINGS §33.3). Caveat: p4k frame partial-decodes at slice #3418 — firmware behavior, content-specific (FINDINGS §34). ⏳ STOP + ≥75 s idle AER watch still owed |
 | V4 | multi-frame ×N across channels; count≥1 batch completion (+0x1044 path) | plan §7 item 3 | 🟡 partial — sequential multi-frame ×4 verified (FINDINGS §32); cross-channel + count≥1 paths remain |
 | V5 | induced stall → watchdog reset/re-bringup | UC_METHODS §17 port check | ⬜ pending (3u.4) |
 | V6 (destructive, last) | full frame, NO stop command, ≥75 s idle + AER watch | mode-15 control — expected to die; confirms stop-command necessity | ⬜ pending (LAST) |

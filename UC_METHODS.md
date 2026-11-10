@@ -83,23 +83,27 @@ KSYM undef[127]). GOT[57] = &AB gMetaClass data pointer (safeMetaCast in start()
 ### Input struct layouts (from body field loads)
 
 ```c
-// s_inputDataStruct — 40 bytes (submitFrame)
+// s_inputDataStruct — 40 bytes (submitFrame)   [FULLY DECODED 2026-11-10, FINDINGS §35]
 struct s_inputDataStruct {
     u64 ptr;        // +0x00  input frame buffer PA (ProRes data); NULL/0 → badarg
     u64 size;       // +0x08  byte length; 0 → badarg
     u32 slot_idx;   // +0x10  output-slot index; must be < UC+0x18F0 (slot count)
-    u32 ?;          // +0x14
-    u64 ?;          // +0x18
-    u32 flag;       // +0x20  passed as w7 to AB::submitFrame (stage/flag select)
-    ...            // 40B total
+    u32 unused;     // +0x14  NEVER READ by UC::submitFrame (verified: no load from +0x14)
+    u64 tag;        // +0x18  userland bookkeeping tag → w5=lo32, w6=hi32 of AB::submitFrame.
+                   //         Stored ONLY in the completion record (+0x30/+0x34); never touches HW.
+    u32 flag;       // +0x20  userland bookkeeping tag → w7. Stored ONLY in completion record
+                   //         (+0x38). NOT a stage/format selector — both submitData stages get it.
+    ...            // 40B total (rest unused)
 };
 
-// s_bindDataStruct — 32 bytes (bindFrame)
+// s_bindDataStruct — 32 bytes (bindFrame)      [FULLY DECODED 2026-11-10, FINDINGS §35]
 struct s_bindDataStruct {
     u64 ptr;        // +0x00  output buffer PA (decoded pixels land here); NULL → badarg
     u64 size;       // +0x08  byte length; 0 → badarg
-    u8  flag;       // +0x10  dumped in debug log @0x339A — semantics TODO
-    u64 field;      // +0x18  dumped in debug log — possibly explicit slot index (TODO)
+    u8  flag;       // +0x10  0 = auto-allocate a NEW slot (max 256, count ≤ 0xFF enforced);
+                   //         non-zero = REUSE explicit slot given in field@+0x18 (must be < count)
+    u32 pad;        // +0x11..+0x17
+    u64 slot_idx;   // +0x18  explicit output-slot index, used only when flag != 0
 };
 
 // s_bufDataStruct — 16 bytes (checkForSpace)
@@ -118,21 +122,51 @@ Common wrapper pattern in every body:
 4. arg validation; badarg paths log and return **0xE000_02C2** (`w19 -= 0x17` trick)
 5. call AB helper; pass its return through (0 = success); non-zero → IOLog + return it
 
-### 4.1 submitFrame ✅ — body 0xd708–0xdc64, tramp 0xcd7c (`tmp/dis_uc_submitFrame.txt`)
+### 4.1 submitFrame ✅ — body 0xd708–0xdc64, tramp 0xcd7c (`tmp/dis_uc_submitFrame.txt`) [FULLY DECODED 2026-11-10]
 
 `u32 UC::submitFrame(s_inputDataStruct* in, u64* out)`
-- Validates: in, in->ptr, in->size, out, `in->slot_idx < [UC+0x18F0]`.
-- Creates **input** descriptor: `IOMemoryDescriptor::withAddressRange(ptr, size, dir=2, task=[UC+0xE0])`
+- Validates: in, in->ptr, in->size, out, `in->slot_idx < [UC+0x18F0]`; overflow-checks ptr+size.
+  Page-aligns input: `aligned_start = ptr & ~PAGE_MASK`, `offset = ptr - aligned_start`.
+- Creates **input** descriptor: `IOMemoryDescriptor::withAddressRange(aligned_start, len, dir=2, task=[UC+0xE0])`
   (PLT GOT[24]); wire-check `[vt+0x218](desc_in, type=2)` — non-zero → log + release desc.
-- Loads **output** descriptor from slot: `entry = UC + slot_idx*0x18; out_desc = [entry+0xF0]`;
+- Loads **output** descriptor from slot: `entry = UC + 0xF0 + slot_idx*0x18; out_desc = [entry+0xF0]`;
   if NULL → error log (no bound buffer). Validity check `[out_desc_vt+0x1E8](out_desc)` must == 1.
-- Calls **`AB::submitFrame(sContext*, IOMemoryDescriptor* in, IOMemoryDescriptor* out, u64*, u32, u32, u32, sDescriptorLengthOffsetInfo)`** @0xa9ac —
-  args: x0=AB(this), x1=&UC+0x18F8 (sContext*), w7=in->flag(+0x20), last arg built from slot entry.
+- Builds **sDescriptorLengthOffsetInfo** on the stack (32 B, passed as x8) — DECODED:
+  ```c
+  struct sDescriptorLengthOffsetInfo {   // pure DMA geometry — NO format/dimension fields
+      u64 in_offset;    // +0x00  input ptr offset within its page (ptr - aligned_start)
+      u64 in_length;    // +0x08  raw input size (unaligned)
+      u64 out_end;      // +0x10  [slot+0xF8] — output buffer end/aligned value (from bindFrame)
+      u64 out_size;     // +0x18  [slot+0x100] — output buffer size (from bindFrame)
+  };
+  ```
+- Calls **`AB::submitFrame(sContext*, IOMemoryDescriptor* in, IOMemoryDescriptor* out, u64* stamp, u32 w5, u32 w6, u32 flag, sDescriptorLengthOffsetInfo)`** @0xa9ac —
+  args: x0=AB([UC+0xD8]), x1=&UC[0x18F8] (sContext*), x2=in_desc, x3=out_desc, x4=out (userland stamp ptr),
+  `ldp w5,w6,[in+0x18]` (tag lo/hi), w7=in->flag(+0x20). **w5/w6/flag are bookkeeping only** — see FINDINGS §35.
 - Return handling of AB result (w22):
   - `== 0` → success: `[UC+0x1958] = out[0]`; call `[out_desc_vt+0x1F8](out_desc, 1)`; return **0**
+    (AB::submitFrame already wrote `*out = AB+0xC8` frame counter before returning)
   - `== 0xE000_02D8` ("no space") → special path @0xdbfc (log; no desc teardown)
   - other non-zero → error log + `[in_desc_vt+0x220](desc_in, 0)` teardown + release
 - kernel_debug trace points: `kernel_debug(0x2B61FA4, class=3/4/5, ...)` at 0xd858 / 0xdaac / 0xdb38.
+
+**Completion record (72 B, IOAlloc(0x48) in submitData @0xa8c8)** — enqueued via
+`[AB+0x90].vt[+0x1E8](obj, PAC(fn@0x985c), rec, 0, 0, 0)`; callback = completion fn @0x985c:
+
+| off | field | source |
+|---|---|---|
+| +0x00 | list node | set by enqueue |
+| +0x10 | chain head desc ptr | local stamp slot (first iter of fn@0x9c5c) |
+| +0x18 | count word | max(remaining−1, 0) from chain builder |
+| +0x1C / +0x20 | stage / stage-flag | submitData arg w3 / cset(stage≠0) |
+| +0x28 | stamp base | AB+0xC8 (frame counter at submit time) |
+| +0x30 / +0x34 | tag lo/hi | userland s_inputDataStruct+0x18 (w5/w6) — bookkeeping only |
+| +0x38 / +0x3C | flag, active=1 | userland s_inputDataStruct+0x20; marker |
+| +0x40 | out_obj ptr | [AB+stage*8+0x1278] value at submit time (last-desc slot) |
+
+On success submitData writes `*stamp_ptr = AB+0xC8` to userland and, **only for stage 1**
+(output descriptor), increments `AB+0xC8 += 1` — the per-frame counter that drives the
+cmd_word high-16 delta semantics (FINDINGS §32.4).
 
 ### 4.2 queryCompletion ✅ — body 0xdcc4–0xdd9c (`tmp/dis_uc_small.txt`)
 
@@ -145,8 +179,9 @@ Common wrapper pattern in every body:
 ### 4.3 bindFrame ✅ — body 0xdd9c–0xe2a4 (`tmp/dis_uc_bindFrame.txt`)
 
 `u32 UC::bindFrame(s_bindDataStruct* in, u64* out)` — out[0]=slot idx, out[1]=0
-- Slot selection (dd9c..de8c): uses slot count `[UC+0x18F0]`, cap check `count <= 0xFF`;
-  exact auto-assign vs explicit-index logic 🟡 TODO.
+- Slot selection (dd9c..de8c) [DECODED 2026-11-10]: `flag = in->[+0x10]`.
+  - **flag == 0** → auto-allocate: `idx = count` (`[UC+0x18F0]`); cap check `count <= 0xFF` (max 256 slots).
+  - **flag != 0** → reuse explicit slot: `idx = in->[+0x18]`; must be `< count`, else badarg.
 - **Existing-slot path** (slot.desc != NULL):
   - `[desc_vt+0x200](desc) == 1` → frame in use by firmware → error log (existing-slot err@0x33E9), return err
   - else **replace**: `[old_vt+0x220](old, 0)` teardown + release; zero slot f2/size fields; fall through to new-bind.

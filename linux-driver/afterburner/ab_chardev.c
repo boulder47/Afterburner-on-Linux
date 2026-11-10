@@ -56,6 +56,97 @@ struct ab_ioc_space { __u32 in_flight; __u32 max_in_flight; };
 #define AB_IOC_CHECK_SPACE  _IOR ('A', 4, struct ab_ioc_space)  /* checkForSpace */
 #define AB_IOC_UNBIND_ALL   _IO  ('A', 5)                       /* unbindAll     */
 #define AB_IOC_GET_PERCENT  _IOR ('A', 6, __u32)                /* getPercent    */
+#define AB_IOC_STOP         _IO  ('A', 7)                       /* stop (kext fn@0xc0a4) */
+#define AB_IOC_START        _IO  ('A', 8)                       /* re-bring-up after STOP */
+
+/* ------------------------------------------------------------------ *
+ * Region allocation — single coherent block first; on no-IOMMU hosts a
+ * large coherent alloc needs physically contiguous memory and fails
+ * (order-N page alloc, ENOMEM). Fall back to chunked allocations: the chain
+ * builder walks multi-segment lists so descriptors simply span chunks.
+ * ------------------------------------------------------------------ */
+
+static int ab_alloc_region(struct ab_device *ab, struct ab_buf *r, size_t size)
+{
+	r->virt = dma_alloc_coherent(&ab->pdev->dev, size, &r->pa, GFP_KERNEL);
+	if (r->virt) {
+		r->size = size;
+		r->n_chunks = 1;
+		r->chunks[0].pa = r->pa;
+		r->chunks[0].virt = r->virt;
+		r->chunks[0].len = size;
+		return 0;
+	}
+
+	/* no-IOMMU fallback: several smaller coherent allocations.  The
+	 * ladder works in whole pages — halving a byte size can land on a
+	 * half-page boundary (odd page count), which breaks remap_pfn_range
+	 * alignment downstream. */
+	for (size_t cpages = min(size >> 1, (size_t)8 * PAGE_SIZE * 1024) / PAGE_SIZE;
+	     cpages >= 256; cpages >>= 1) {
+		size_t chunk = cpages * PAGE_SIZE;
+		int n = (int)((size + chunk - 1) / chunk), i;
+		size_t off = 0;
+
+		if ((u32)n > AB_MAX_CHUNKS)
+			continue;
+		for (i = 0; i < n; i++) {
+			size_t len = min(chunk, size - off);
+
+			r->chunks[i].virt = dma_alloc_coherent(&ab->pdev->dev, len,
+							       &r->chunks[i].pa, GFP_KERNEL);
+			if (!r->chunks[i].virt)
+				break;
+			r->chunks[i].len = len;
+			off += len;
+		}
+		if (i == n) {
+			r->n_chunks = n;
+			r->size = size;
+			r->virt = r->chunks[0].virt;
+			r->pa = r->chunks[0].pa;
+			dev_info(&ab->pdev->dev,
+				 "alloc: %zu B as %d x %zu B chunks (no-IOMMU fallback)\n",
+				 size, n, chunk);
+			return 0;
+		}
+		for (; i >= 0; i--)
+			if (r->chunks[i].virt) {
+				dma_free_coherent(&ab->pdev->dev, r->chunks[i].len,
+						  r->chunks[i].virt, r->chunks[i].pa);
+				r->chunks[i].virt = NULL;
+			}
+	}
+	return -ENOMEM;
+}
+
+/* Slice [off, off+len) of a (possibly chunked) region into per-chunk
+ * (pa,len) segments for the chain builder; at most max entries. */
+static int ab_slice_segments(const struct ab_buf *r, u32 off, u32 len,
+			     dma_addr_t *pas, size_t *lens, int max)
+{
+	int n = 0, i;
+	u64 pos = 0, end = (u64)off + len;
+
+	for (i = 0; i < r->n_chunks && n < max; i++) {
+		const struct ab_chunk *c = &r->chunks[i];
+		u64 cend = pos + c->len, s, e;
+
+		if (cend <= off) {
+			pos = cend;
+			continue;
+		}
+		if (pos >= end)
+			break;
+		s = max((u64)off, pos);
+		e = min(end, cend);
+		pas[n] = c->pa + (s - pos);
+		lens[n] = e - s;
+		n++;
+		pos = cend;
+	}
+	return n;
+}
 
 /* ------------------------------------------------------------------ *
  * mmap — offset 0 = input region, offset 1 = output region.
@@ -78,7 +169,6 @@ static int ab_mmap(struct file *filp, struct vm_area_struct *vma)
 	struct ab_device *ab = filp->private_data;
 	struct ab_buf *r;
 	size_t size = vma->vm_end - vma->vm_start;
-	unsigned long i;
 	pgprot_t prot = pgprot_noncached(vma->vm_page_prot);
 	int ret;
 
@@ -104,16 +194,31 @@ static int ab_mmap(struct file *filp, struct vm_area_struct *vma)
 		return -EINVAL;
 	}
 
-	for (i = 0; i < size / PAGE_SIZE; i++) {
-		unsigned long pfn = virt_to_phys((char *)r->virt + i * PAGE_SIZE) >> PAGE_SHIFT;
+	/* walk chunks — a no-IOMMU fallback region spans several coherent
+	 * allocations (FINDINGS §33); each chunk's pages map at its logical
+	 * offset in the VMA */
+	{
+		u64 pos = 0;
+		int ci;
 
-		ret = remap_pfn_range(vma, vma->vm_start + i * PAGE_SIZE, pfn,
-				      PAGE_SIZE, prot);
-		if (ret) {
-			dev_err(&ab->pdev->dev, "mmap: remap_pfn_range page %lu failed (%d)\n",
-				i, ret);
-			mutex_unlock(&ab->dma.lock);
-			return ret;
+		for (ci = 0; ci < r->n_chunks && pos < size; ci++) {
+			const struct ab_chunk *c = &r->chunks[ci];
+			u64 cend = pos + c->len, s = pos, e = min(cend, (u64)size);
+			u64 p;
+
+			for (p = s; p < e; p += PAGE_SIZE) {
+				unsigned long pfn = virt_to_phys((char *)c->virt + (p - pos)) >> PAGE_SHIFT;
+
+				ret = remap_pfn_range(vma, vma->vm_start + p, pfn,
+						      PAGE_SIZE, prot);
+				if (ret) {
+					dev_err(&ab->pdev->dev, "mmap: remap_pfn_range at %llu failed (%d)\n",
+						(unsigned long long)p, ret);
+					mutex_unlock(&ab->dma.lock);
+					return ret;
+				}
+			}
+			pos = cend;
 		}
 	}
 	mutex_unlock(&ab->dma.lock);
@@ -134,6 +239,9 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	switch (cmd) {
 	case AB_IOC_SUBMIT_FRAME: {
 		struct ab_ioc_submit s;
+		dma_addr_t in_pas[AB_MAX_SEGS], out_pas[AB_MAX_SEGS];
+		size_t in_lens[AB_MAX_SEGS], out_lens[AB_MAX_SEGS];
+		int n_in, n_out;
 		u32 status = 0, data_word = 0;
 		int ret;
 
@@ -144,8 +252,29 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		if ((u64)s.in_off + s.in_len > dm->in.size || s.out_len > dm->out.size)
 			return -EINVAL;
 
-		ret = ab_submit_frame(ab, dm->in.pa + s.in_off, s.in_len,
-				      dm->out.pa, s.out_len, s.poll_ms,
+		n_in = ab_slice_segments(&dm->in, s.in_off, s.in_len, in_pas, in_lens, AB_MAX_SEGS);
+		n_out = ab_slice_segments(&dm->out, 0, s.out_len, out_pas, out_lens, AB_MAX_SEGS);
+		if (!n_in || !n_out)
+			return -EINVAL;
+
+		{ /* truncation guard: sliced bytes must cover the request */
+			u64 sum = 0;
+			int k;
+
+			for (k = 0; k < n_in; k++)
+				sum += in_lens[k];
+			if (sum != s.in_len)
+				return -EINVAL;
+			sum = 0;
+			for (k = 0; k < n_out; k++)
+				sum += out_lens[k];
+			if (sum != s.out_len)
+				return -EINVAL;
+		}
+
+		ret = ab_submit_frame(ab, in_pas, in_lens, n_in,
+				      out_pas, out_lens, n_out,
+				      s.in_len, s.out_len, s.poll_ms,
 				      &status, &data_word);
 		s.status = status;
 		s.data_word = data_word;
@@ -177,20 +306,16 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		ab_dma_release(ab, true);
 		mutex_lock(&dm->lock);
 		if (b.in_size) {
-			dm->in.virt = dma_alloc_coherent(&ab->pdev->dev, b.in_size,
-							 &dm->in.pa, GFP_KERNEL);
-			if (!dm->in.virt)
-				ret = -ENOMEM;
-			else
-				dm->in.size = b.in_size;
+			size_t sz = (size_t)b.in_size + PAGE_SIZE - 1;
+
+			sz &= ~(PAGE_SIZE - 1);
+			ret = ab_alloc_region(ab, &dm->in, sz);
 		}
 		if (ret == 0 && b.out_size) {
-			dm->out.virt = dma_alloc_coherent(&ab->pdev->dev, b.out_size,
-							  &dm->out.pa, GFP_KERNEL);
-			if (!dm->out.virt)
-				ret = -ENOMEM;
-			else
-				dm->out.size = b.out_size;
+			size_t sz = (size_t)b.out_size + PAGE_SIZE - 1;
+
+			sz &= ~(PAGE_SIZE - 1);
+			ret = ab_alloc_region(ab, &dm->out, sz);
 		}
 		mutex_unlock(&dm->lock);
 		return ret;
@@ -242,7 +367,38 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			return -EFAULT;
 		return 0;
 	}
+
+	case AB_IOC_STOP: {
+		/* kext stop() fn@0xc0a4 — decoder disable (BAR0[hdr+4]=0). Leaves the
+		 * engine stopped until re-bring-up (rmmod/insmod or RECOVER); used by
+		 * the V3 idle-AER test to hold the card quiescent with the driver
+		 * still attached. Serialized against in-flight submits via dm->lock. */
+		mutex_lock(&dm->lock);
+		if (dm->in_flight) {
+			mutex_unlock(&dm->lock);
+			return -EBUSY; /* don't yank the decoder under a live frame */
+		}
+		ab_stop(ab);
+		mutex_unlock(&dm->lock);
+		return 0;
 	}
+
+	case AB_IOC_START: {
+		/* Re-bring-up after STOP (or a wedged engine): decoder disable/enable
+		 * cycle + init writer + ready poll — the kext's own recovery path
+		 * (mode-8 rung A, §3n). Serialized against in-flight submits. */
+		bool ok;
+
+		mutex_lock(&dm->lock);
+		if (dm->in_flight) {
+			mutex_unlock(&dm->lock);
+			return -EBUSY; /* don't cycle the decoder under a live frame */
+		}
+		ok = ab_recover(ab);
+		mutex_unlock(&dm->lock);
+		return ok ? 0 : -ETIMEDOUT;
+	}
+}
 	return -ENOTTY;
 }
 

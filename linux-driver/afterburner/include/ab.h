@@ -11,10 +11,23 @@
 /* kext self->+0xc0 — max outstanding frames (wait path @0x996c) */
 #define AB_MAX_IN_FLIGHT	32
 
-struct ab_buf {
-	void	*virt;	/* coherent DMA buffer (CPU side) */
+/* No-IOMMU hosts: large coherent allocations need physically contiguous
+ * memory and fail; regions fall back to chunked allocations (FINDINGS §33). */
+#define AB_MAX_CHUNKS 64
+#define AB_MAX_SEGS	48	/* per-submit segment lists (ioctl stack budget) */
+
+struct ab_chunk {
 	dma_addr_t	pa;
-	size_t		size;
+	void		*virt;
+	size_t		len;
+};
+
+struct ab_buf {
+	void		*virt;	/* first chunk vaddr (NULL when unbound) */
+	dma_addr_t	pa;		/* first chunk PA */
+	size_t		size;		/* logical total bytes */
+	int		n_chunks;	/* 1 = single allocation */
+	struct ab_chunk chunks[AB_MAX_CHUNKS];
 };
 
 /* 32B descriptor chain (arm64e layout, fn@0x9c5c). PERSISTENT across submits
@@ -35,10 +48,11 @@ struct ab_dma_state {
 	bool	last_done;	/* last submit completed (getPercent v1 stub) */
 	struct ab_buf in;	/* input region: compressed frame (mmap offset 0) */
 	struct ab_buf out;	/* output region: decoded YUV422 c2h target (offset 1) */
-	struct ab_chain in_ch;	/* persistent input chain, keyed on ch_in_pa/len */
-	struct ab_chain out_ch;	/* persistent receive chain, keyed on ch_out_pa/len */
+	struct ab_chain in_ch;	/* persistent input chain, keyed on ch_in_pa/len/nseg */
+	struct ab_chain out_ch;	/* persistent receive chain, keyed on ch_out_pa/len/nseg */
 	dma_addr_t	ch_in_pa, ch_out_pa;
 	u32		ch_in_len, ch_out_len;
+	u32		ch_in_nseg, ch_out_nseg;
 };
 
 struct ab_device {
@@ -66,9 +80,13 @@ int  ab_bringup(struct ab_device *ab);
 void ab_stop(struct ab_device *ab);
 bool ab_recover(struct ab_device *ab);
 
-/* ab_dma.c — frame submission engine (Phase 3u.2, kext fn@0x985c port) */
-int ab_submit_frame(struct ab_device *ab, dma_addr_t in_pa, u32 in_len,
-		    dma_addr_t out_pa, u32 out_len, u32 poll_ms,
+/* ab_dma.c — frame submission engine (Phase 3u.2, kext fn@0x985c port).
+ * in/out are (pa,len) segment lists — one entry per coherent chunk the region
+ * spans (nseg==1 for single allocations); in_len/out_len are logical totals. */
+int ab_submit_frame(struct ab_device *ab,
+		    const dma_addr_t *in_pas, const size_t *in_lens, int n_in,
+		    const dma_addr_t *out_pas, const size_t *out_lens, int n_out,
+		    u32 in_len, u32 out_len, u32 poll_ms,
 		    u32 *out_status, u32 *out_data);
 int ab_query_completion(struct ab_device *ab, u32 *status, u32 *data_word);
 void ab_dma_release(struct ab_device *ab, bool free_bufs);
