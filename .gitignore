@@ -1,6 +1,12 @@
 # Regenerable test media (kept on disk, not in git)
 prorestest.mov
 frame0.yuv
+DW0001C027_251020_135413_p1I7H.mxf
+FILMPLUS-ProResRaw-NinjaV-FX6-3.MOV
+prores4444.mov
+
+# Scratch
+tmp/__pycache__/
 
 # Kernel build intermediates
 *.o

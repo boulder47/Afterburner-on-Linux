@@ -3365,3 +3365,54 @@ W%32≠0 loses real rows (e.g. 322×180 → only ~164 of 180 rows captured).
 this card's measured native output for ProRes 422 is interleaved yuv422p8, so the macOS glue either
 advertises that or converts in userland — either way above the kext. Per-profile layouts for 4444 /
 RAW (ap4h/ap4x fixtures) remain untested; S/R padding constants may differ per profile.
+**[RESOLVED §36: neither profile is decoded by this fw at all — no layout to verify.]**
+
+## 36. Per-profile capability probe + V5 stall verification (2026-11-10) [live]
+
+### 36.1 ProRes 4444 and ProRes RAW (`aprn`) are NOT decoded by this firmware
+
+Tested with real content, not just fixtures:
+- **ProRes 4444** (from `prores4444b.mov`, 640×360): stage-A ack only (`status=0x1 data=0x6`),
+  no batch/receive completion event, output buffer 100% sentinel (0x5A) — zero bytes written.
+- **ProRes RAW** (user-supplied `FILMPLUS-ProResRaw-NinjaV-FX6-3.MOV`, fourcc `aprn`, container
+  3872×2192; frame 0 extracted via box-walker, 2.1 MB): identical behavior — stage-A ack only,
+  zero output bytes, no AER. FFmpeg reference decode confirms the codec decodes to
+  **bayer_rggb16le at 3840×2160** (16,588,800 B/frame) — i.e. a real RAW Bayer payload, not YUV;
+  this card's decoder section simply does not implement the profile.
+
+`afterburner_map.ko` sweep of the decoder section (BAR0+0x8000..terminator +0x802C) shows **no
+per-profile configuration registers** — only the enable bit at hdr+4. The non-decode is a firmware
+capability limit, not missing driver configuration. Closes §35's open item: there is no per-profile
+layout/padding to verify for 4444/RAW on this card.
+
+### 36.2 V5 — sleep_timer port verified via driver-level stall injection
+
+**Userspace vectors all rejected.** The firmware acks every input in ~4 ms regardless of content;
+none induced a hang: garbage after the 148 B header, declared-size mismatch (0x400000 vs actual),
+absurd fmpg dims (65535×65535 — failed earlier at userspace mmap auto-sizing, not in fw),
+mid-frame scramble, header-only frame (zero slices), valid frame with 4-byte output buffer.
+Submit-while-decoder-disabled is rejected by the driver's `!ready → -ENODEV` guard before reaching
+the engine (correct kext parity — the kext never submits while powerState/decoder is off).
+
+**Driver-level injection.** Added to ab_dma.c:
+1. `ab_test_hang_ms` module param (0644, default 0 = off): when set, the completion poll loop
+   skips reads for N ms after the doorbell — simulating a firmware hang without touching HW state.
+2. Stale-completion flush at submit start: if +0x2044 still holds an un-acked valid bit from a
+   previously timed-out frame, `ab_handle_completion()` dual-acks it before polling begins (the
+   reset path drains c2h/h2c status words but does not clear the completion word itself).
+
+**Live result (single module instance, no reload between phases):**
+```
+hang_ms=5000, poll_ms=3000:  submit → "no completion in 3000 ms window"
+                             → ab_frame_reset() ("reset: decoder status=0x3e0fd001 after 0 ms")
+                             → userspace -ETIMEDOUT            [sleep_timer port fires]
+hang_ms=0,    poll_ms=8000:  submit +58 ms later → completion count=1 data(+0x1044)=0x6 at +3.4 ms
+                             → output luma/chroma 100% within ±1 vs FFmpeg ref (±1 = rounding)
+```
+Recovery needed **no STOP/START cycle** — `ab_frame_reset()` alone (doorbell clear, decoder
+disable, status drain, re-enable to ready bit) restores decode capability on the same instance,
+matching kext sleep_timer semantics (reset, not power-cycle). Zero AER events across both phases.
+
+Note: abtest_4k.c's failure printf shows `strerror(-ret)` where ret is ioctl()'s -1 — cosmetic
+only; perror() correctly reports ETIMEDOUT. v5_stall.c (submit-while-disabled attempt) kept in
+tests/ as the record of the ENODEV guard behavior.

@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 	uint32_t sz = 0, in_size;
 
 	if (argc < 3) {
-		fprintf(stderr, "usage: %s <frame.bin> <output_dump.bin> [poll_ms] [out_seg_bytes]\n", argv[0]);
+		fprintf(stderr, "usage: %s <frame.bin> <output_dump.bin> [poll_ms] [out_seg_bytes] [out_len]\n", argv[0]);
 		return 1;
 	}
 	in_path = argv[1];
@@ -156,6 +156,13 @@ int main(int argc, char **argv)
 			out_len = (uint32_t)((double)out_len * atof(m));
 			printf("[frame] AB_OUT_MULT=%s — out_len scaled to %u\n", m, out_len);
 		}
+	}
+
+	/* optional: explicit out_len override (layout experiments; e.g. the
+	 * unpadded W*H*2 size used in FINDINGS §32) */
+	if (argc > 5) {
+		out_len = (uint32_t)strtoul(argv[5], NULL, 10);
+		printf("[frame] out_len overridden to %u\n", out_len);
 	}
 
 	struct ioc_bind b = { in_size, out_len };

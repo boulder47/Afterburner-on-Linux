@@ -138,10 +138,10 @@ static u32 ab_handle_completion(struct ab_device *ab, u32 s)
 	} else if (count == 1) {	/* batch-channel completion (status=0x2) */
 		u32 h10 = ab_read(ab, AB_BAR0, ab->hdr_off + 0x10);
 
-		dev_dbg(&ab->pdev->dev, "completion: BAR0[hdr+0x10]=0x%08x idx=%u\n",
-			h10, h10 >> 16);
 		data = ab_read(ab, AB_BAR1, AB_B1_DATA_BATCH);
 		ab_read(ab, AB_BAR1, AB_B1_DATA_BATCH + 4); /* wordB R-to-C */
+		dev_info(&ab->pdev->dev, "completion: count=1 BAR0[hdr+0x10]=0x%08x idx=%u data(+0x1044)=0x%08x\n",
+			 h10, h10 >> 16, data);
 	}
 	/* count>1: no per-item read (kext @0x6568) */
 	ab_write(ab, AB_BAR1, AB_B1_ACK_1, s);	/* ack#2 (@0x666c), after data */
@@ -187,6 +187,13 @@ static void ab_drain(struct ab_device *ab)
 static u32 ab_out_seg = 0;
 module_param_named(out_seg, ab_out_seg, uint, 0644);
 MODULE_PARM_DESC(out_seg, "fixed descriptor segment size in bytes for both chains (0=adaptive from 4KB)");
+
+/* V5 validation hook (plan.md §8.5): ignore completions for N ms after the
+ * doorbell to simulate a firmware hang and exercise the sleep_timer port's
+ * timeout path (dev_err + ab_frame_reset + -ETIMEDOUT). 0 = disabled. */
+static int ab_test_hang_ms;
+module_param(ab_test_hang_ms, int, 0644);
+MODULE_PARM_DESC(ab_test_hang_ms, "V5 test hook: ignore completions for N ms after doorbell (0=off)");
 
 static u32 ab_pick_seg(u64 total)
 {
@@ -376,18 +383,39 @@ int ab_submit_frame(struct ab_device *ab,
 	if (!poll_ms)
 		poll_ms = 2000;
 	deadline = jiffies + msecs_to_jiffies(poll_ms);
-	while (time_before(jiffies, deadline)) {
-		u32 s = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
+	{
+		unsigned long hang_until = ab_test_hang_ms ?
+			jiffies + msecs_to_jiffies(ab_test_hang_ms) : 0;
 
-		if (s && s != last) {
-			last = s;
-			ncomp++;
-			final_status = s;
-			data_word = ab_handle_completion(ab, s);
-		} else if (!s) {
-			last = 0;	/* cleared — ready for next event */
+		/* Flush a stale completion left by a previously timed-out frame:
+		 * an un-acked valid bit would otherwise be counted as this frame's
+		 * event (the dual-ack in ab_handle_completion clears +0x2044). */
+		u32 stale = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
+
+		if (stale) {
+			dev_info(&ab->pdev->dev, "submit: flushing stale completion 0x%08x\n", stale);
+			ab_handle_completion(ab, stale);
 		}
-		usleep_range(2000, 4000);
+
+		while (time_before(jiffies, deadline)) {
+			u32 s;
+
+			if (time_before(jiffies, hang_until)) {
+				usleep_range(2000, 4000);
+				continue;	/* V5 hook: simulate firmware hang */
+			}
+			s = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
+
+			if (s && s != last) {
+				last = s;
+				ncomp++;
+				final_status = s;
+				data_word = ab_handle_completion(ab, s);
+			} else if (!s) {
+				last = 0;	/* cleared — ready for next event */
+			}
+			usleep_range(2000, 4000);
+		}
 	}
 
 	if (ncomp == 0) {
