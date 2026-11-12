@@ -3456,13 +3456,26 @@ kext — Apple shipped zero Afterburner firmware updates over ~7 years. MacOS bi
 that extraction (Resources-only copy).
 
 Sequoia 15.x SharedSupport.dmg: full pbzx→YAA extraction (47 payload chunks; stored-chunk fix
-`comp==uncomp → raw copy`) recovered the kext's Resources before hitting a corrupt xz stream in
-payload.12 chunk 4 (bit-rot in the downloaded image — re-extraction from the pkg's own dmg copy
-in progress). The four **live_2.62** bitfiles it yielded are **byte-identical to both Sonoma and
-Dec-2019**; only the two live_2.63 files remain unverified (they sit past the corrupt chunk) —
-given 4/4 + 6/6 prior identity, a Sequoia firmware change is effectively ruled out: fw 2.62 is
-the latest publicly available, and the §37.1/§37.2 matrix is the complete capability set of any
-obtainable firmware for this card.
+`comp==uncomp → raw copy`) recovered **all six** kext bitfiles — the two live_2.63 files sat in a
+payload past the corrupt chunk, reached once the extractor was made fault-tolerant (skip failed
+chunks, salvage partial YAA). Result: **every Sequoia bitfile is byte-identical to both Sonoma and
+Dec-2019** (cmp on all six; 4× live_2.62 @17,024,762B + 2× live_2.63 @19,144,428B).
+
+Side finding: the corrupt xz chunks (payload.12 chunk 4, payload.42 chunk 68) are **not** download
+bit-rot — `SharedSupport.dmg` extracted from today's pkg is md5-identical to my copy, so the damage
+exists in Apple's installer image itself (stubbed/optional components; no kext content lost).
+
+**Conclusion: fw 2.62 is the latest publicly available Afterburner firmware.** Apple shipped zero
+firmware updates Dec-2019 → Sonoma 14.8.5 → Sequoia 15.x (~7+ years), so the §37.1/§37.2 matrix
+(422 + 422HQ decode pixel-perfect; 4444/RAW ack-only) is the complete capability set of any
+obtainable firmware for this card. The Apple FAQ's "all ProRes + RAW" claim does not apply to this
+board generation's FPGA — RAW/4444 decode simply does not exist in any shipped bitfile.
+
+Kext bundle versions did move (CFBundleVersion 3.2 → 6.0 Sonoma → 6.1 Sequoia, ProjectName "Athena"
+throughout) — Apple updated the driver code while leaving every FPGA bitstream untouched. The kext's
+MacOS binary is absent from SharedSupport.dmg entirely (matches the user's Sonoma extraction; only
+Resources/plists ship there), and a userland `AppleAfterburnerProResDecoder.bundle` VT plugin
+(721KB MacOS binary) ships alongside — neither affects the firmware conclusion.
 
 **Capability summary (fw 2.62):** decodes = ProRes 422 (`apco`, fmpg v0) + ProRes 422 HQ
 (`apch`, icpf v1); acks-but-no-output = ProRes 4444 (`ap4h`) and ProRes RAW (`prrf`/`aprn`).
