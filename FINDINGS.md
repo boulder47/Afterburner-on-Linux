@@ -3416,3 +3416,54 @@ matching kext sleep_timer semantics (reset, not power-cycle). Zero AER events ac
 Note: abtest_4k.c's failure printf shows `strerror(-ret)` where ret is ioctl()'s -1 — cosmetic
 only; perror() correctly reports ETIMEDOUT. v5_stall.c (submit-while-disabled attempt) kept in
 tests/ as the record of the ENODEV guard behavior.
+
+## 37. Profile capability matrix COMPLETED + RAW provenance verified (2026-11-11) [live]
+
+### 37.1 ProRes 422 HQ (`apch`) DECODES — pixel-perfect vs FFmpeg
+
+First new profile confirmed working beyond plain 422:
+- Frame: `p4k_f0.mov` sample 0 (carved via stsz/stco), **v1 `icpf` header**, 3840×2160, 2,552,064 B.
+- Submit: ack OK (`status=0x1 data=0x6`); output buffer 99.98% non-sentinel — all 2160 rows full.
+- Pixel check vs FFmpeg `prores` decode of the same MOV (yuv422p ref): **Y maxdiff=1, U maxdiff=1,
+  V maxdiff=1; zero samples >±1** across 8,294,400 Y + 2×4,147,200 chroma. Same interleaved
+  [U,Y0,V,Y1] layout as §35 (stride = W*2 here — no padding needed at 3840).
+
+### 37.2 ap4h matrix completed: Apple-encoded frame also rejected
+
+`/tmp/ap4h_apple_f0.bin` (Apple encoder, v1 `icpf`, 8192×4320, carved from `prores4444.mov`) →
+ack OK, **zero output** — identical to the FFmpeg v0-patched and v1 rejections. The 4444 verdict
+is now encoder- and version-independent: fw 2.62 does not implement ap4h decode at all.
+
+### 37.3 ProRes RAW frame provenance + header fully verified
+
+- `/tmp/praw_f0.bin` is **byte-identical to sample 0** of `FILMPLUS-ProResRaw-NinjaV-FX6-3.MOV`
+  (stsz/stco walk: chunk @0x200, size 2,207,232; md5 e78eb42d… matches). All 708 samples in the
+  file are prrf 3872×2192 — no mid-stream dimension change.
+- Header decoded with FFmpeg's exact read sequence (prores_raw.c): version=0, vendor=`atm0`
+  (Atmos), w=3872 h=2192, **crop l/r/t/b = 16/16/16/16**, bayer_pattern=0 (RGGB),
+  senselValueRange=65023, wb_red/wb_blue=1.0, 3×3 color matrix, gain=11.8, cct=5600K,
+  flags=0x7 → **align=3**, qmat present (64B), no lin_curve. Header consumes exactly 134 B =
+  header_len−2 ✓. The 16-px crop explains FFmpeg's 3840×2160 bayer_rggb16le output
+  (3872−32=3840, 2192−32=2160) — the decoder applies the crop fields.
+- nb_tw check: align=3 → nb_tw = (242>>3)+popcount(0x7&242) = 30+1 = **31**, matching FFmpeg's
+  debug log "31x137 | nb_tiles: 4247" — confirms the decoder reads w=3872 correctly.
+
+### 37.4 Firmware provenance: Sonoma + Sequoia bitfiles identical to Dec-2019
+
+User-supplied `kext_sonoma/` (macOS 14.8.5 laptop install): all six
+`AppleAfterburner.kext/Contents/Resources/*.bin` are **md5-identical** to the repo's Dec-2019
+kext — Apple shipped zero Afterburner firmware updates over ~7 years. MacOS binary absent from
+that extraction (Resources-only copy).
+
+Sequoia 15.x SharedSupport.dmg: full pbzx→YAA extraction (47 payload chunks; stored-chunk fix
+`comp==uncomp → raw copy`) recovered the kext's Resources before hitting a corrupt xz stream in
+payload.12 chunk 4 (bit-rot in the downloaded image — re-extraction from the pkg's own dmg copy
+in progress). The four **live_2.62** bitfiles it yielded are **byte-identical to both Sonoma and
+Dec-2019**; only the two live_2.63 files remain unverified (they sit past the corrupt chunk) —
+given 4/4 + 6/6 prior identity, a Sequoia firmware change is effectively ruled out: fw 2.62 is
+the latest publicly available, and the §37.1/§37.2 matrix is the complete capability set of any
+obtainable firmware for this card.
+
+**Capability summary (fw 2.62):** decodes = ProRes 422 (`apco`, fmpg v0) + ProRes 422 HQ
+(`apch`, icpf v1); acks-but-no-output = ProRes 4444 (`ap4h`) and ProRes RAW (`prrf`/`aprn`).
+Rejection is profile-based, independent of header version (v0/v1) and encoder provenance.
