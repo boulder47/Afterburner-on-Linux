@@ -424,6 +424,14 @@ static const struct file_operations ab_fops = {
 static dev_t ab_devno;
 static struct class *ab_class;
 
+/* userland decode tools access the node directly (cf. /dev/dri/renderD*) */
+static char *ab_devnode(const struct device *dev, umode_t *mode)
+{
+	if (mode)
+		*mode = 0666;
+	return NULL; /* default name */
+}
+
 int ab_chardev_register(struct ab_device *ab)
 {
 	int ret;
@@ -437,6 +445,7 @@ int ab_chardev_register(struct ab_device *ab)
 		ret = PTR_ERR(ab_class);
 		goto out_devno;
 	}
+	ab_class->devnode = ab_devnode;
 
 	cdev_init(&ab->cdev, &ab_fops);
 	ab->cdev.owner = THIS_MODULE;

@@ -63,6 +63,15 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		ab_stop(ab);	/* decoder was brought up — stop before unmap */
 		goto out_unmap;
 	}
+
+	/* Phase A — read-only sysfs surface (identity/engine/thermal) */
+	ret = ab_sysfs_register(ab);
+	if (ret) {
+		dev_err(&pdev->dev, "sysfs registration failed (%d)\n", ret);
+		ab_chardev_unregister(ab);
+		ab_stop(ab);
+		goto out_unmap;
+	}
 	return 0;
 
 out_unmap:
@@ -83,6 +92,8 @@ static void ab_remove(struct pci_dev *pdev)
 	if (ab) {
 		/* Drop /dev node first so no new ioctl can start. */
 		ab_chardev_unregister(ab);
+		/* sysfs attrs read live registers — drop before iounmap too. */
+		ab_sysfs_unregister(ab);
 		/* Free persistent chains + bound DMA regions (waits for any
 		 * in-flight submit holding dm->lock). Must precede iounmap:
 		 * dma_free_coherent may program the device's IOMMU/ATU state. */

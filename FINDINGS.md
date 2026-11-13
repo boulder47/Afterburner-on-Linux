@@ -3480,3 +3480,65 @@ Resources/plists ship there), and a userland `AppleAfterburnerProResDecoder.bund
 **Capability summary (fw 2.62):** decodes = ProRes 422 (`apco`, fmpg v0) + ProRes 422 HQ
 (`apch`, icpf v1); acks-but-no-output = ProRes 4444 (`ap4h`) and ProRes RAW (`prrf`/`aprn`).
 Rejection is profile-based, independent of header version (v0/v1) and encoder provenance.
+
+## 38. Phase A complete: sysfs + abctl validated end-to-end; apcn decodes; §32 chroma claim REFUTED (2026-11-12) [live]
+
+### 38.1 Phase A deliverables live
+
+- `ab_sysfs.c` — 14 read-only attributes under `/sys/class/afterburner/afterburner0/`,
+  every attr reads live registers on access (no cached state). Verified after fresh insmod:
+  board_id=0x10020014, fw_version "2.62" (raw 0x0002003E), image_type, fuse_user,
+  decoder_ready/enable, engine_ctrl, completion, thermal_status + 4 ADC temps
+  (+0x1080..C val>>7 °C: backcard/fpga_die/faceplate/bottom = 26–39 °C observed) + sysmon raw.
+- `userspace/abctl.c` — supported client (`status`, `decode <frame> [out.yuv] [--poll N]
+  [--nostop] [--seg BYTES]`, `start`, `stop`). Auto-parses W/H from the ProRes header, sizes
+  output per §35.2 padding (stride=ceil(W·2/64)·64, rows=ceil(H/16)·16). Decode **stops the
+  decoder by default** — full-frame decode + enabled decoder + long idle is the V6 kill state
+  (§28/§33); `--nostop` for active multi-frame workloads only.
+- Device node permissions: `struct cdev` has no `.mode` member on kernel 7.2; fixed via
+  class devnode callback (`ab_class->devnode`, two-arg signature in this tree) → `/dev/afterburner0`
+  is now crw-rw-rw-, so abctl runs unprivileged (no sudo).
+
+### 38.2 Decode validation vs FFmpeg reference — all pixel-perfect ±1
+
+Reference generation: `tests/wrap_prores.py` wraps a raw ProRes sample in a minimal single-frame
+MOV that **FFmpeg n9** accepts. Key discovery: FFmpeg ≥n9 reads the sample-table atoms as
+FullBoxes — `stsd`, `stsc`, `stsz`, `stts`, `stco` all carry version(1)+flags(3) before their
+count (mov.c `mov_read_stsd`: `avio_r8; avio_rb24; entries=avio_rb32`). Older ffmpeg muxers
+write the same FullBox form, so files made by any recent ffmpeg parse identically.
+
+`tests/compare_card_ref.py` — correct comparator: card interleaved [U,Y0,V,Y1] groups vs planar
+yuv422p reference (Y W·H | U (W/2)·H | V (W/2)·H), direct row mapping, tests both chroma models.
+
+| test | source | result |
+|---|---|---|
+| single frame 320×180 apco | `testdata/prores_320x180_frame0.bin` via abctl | Y/U/V **100% within ±1** (maxdiff=1); re-run byte-identical (deterministic) |
+| ProRes Standard 1920×1080 `apcn` | sample 10 of `prorestest.mov` via abctl | Y/U/V **100% within ±1** — **new matrix data point: apcn DECODES** |
+| multi-frame, warm decoder, real motion | 4 frames (t=0/1/2/3 s) of a prores_ks-encoded testsrc2 640×360 apco sequence, `--nostop` between invocations | every frame Y/U/V **100% within ±1**; decoder stayed ready across calls (no re-bringup needed); clean stop after last frame |
+
+**Capability matrix update (fw 2.62):** decodes = ProRes 422 Proxy (`apco`) + Standard
+(`apcn`) + HQ (`apch`), all pixel-perfect vs FFmpeg; acks-but-zero-output unchanged = 4444
+(`ap4h`) + RAW (`prrf`). LT (`apcs`) untested.
+
+### 38.3 §32 chroma "half-vertical even-rows-only" claim REFUTED — correction of record
+
+§32 (and plan2.md line 25, carried from it) stated card chroma is half-vertical: "card row y →
+ref row 2y for y < H/2; rows ≥ H/2 garbage". Re-tested on identical data with the correct
+comparator (`compare_card_ref.py`):
+
+- direct mapping (card row y vs ref row y): **100% within ±1, maxdiff=1** — all frames above.
+- half-vertical model: fails badly on the same 320×180 fixture (U maxdiff=158, V maxdiff=239;
+  only ~60–63% within ±1). Running the old `v3_compare.py` on today's decode of the *same*
+  fixture reproduces exactly that failure in its own "valid region" section.
+
+The card outputs **full-vertical chroma aligned to luma rows** — same interleaved [U,Y0,V,Y1]
+layout, no row remapping, no dead bottom half. The §32 conclusion was an artifact of the early
+comparison methodology (v3_compare.py encodes the wrong model in its docstring and comparison;
+treat its chroma sections as invalid — luma/sentinel/run-length checks remain usable).
+`compare_card_ref.py` supersedes it for pixel validation.
+
+### 38.4 Card state after all runs
+
+Healthy: no AER in dmesg across ~10 submits (incl. 4× 1080p + 4× 360p multi-frame); clean
+stop sequence (`BAR0+0x8004=0`, ready=0) after each default-stop decode; decoder quiesced at end
+of session. V-matrix unaffected (V1–V5 ✅, V6 still LAST).

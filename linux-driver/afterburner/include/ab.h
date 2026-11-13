@@ -95,4 +95,8 @@ void ab_dma_release(struct ab_device *ab, bool free_bufs);
 int  ab_chardev_register(struct ab_device *ab);
 void ab_chardev_unregister(struct ab_device *ab);
 
+/* ab_sysfs.c — read-only attributes under /sys/class/afterburner/afterburnerN */
+int  ab_sysfs_register(struct ab_device *ab);
+void ab_sysfs_unregister(struct ab_device *ab);
+
 #endif /* _AB_H_ */

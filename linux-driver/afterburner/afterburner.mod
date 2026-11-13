@@ -3,3 +3,4 @@
 ./ab_engine.o
 ./ab_dma.o
 ./ab_chardev.o
+./ab_sysfs.o

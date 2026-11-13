@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """v3_compare.py — V3 (plan.md §8.5) card-output vs FFmpeg-reference compare.
 
+!!! DEPRECATED CHROMA MODEL (§38.3, 2026-11-12) !!!
+The "half-vertical even-rows-only" chroma model below was REFUTED: the card outputs
+full-vertical chroma aligned to luma rows (direct row y ↔ ref row y, ±1 vs FFmpeg).
+Use tests/compare_card_ref.py for pixel validation. Only the sentinel-coverage and
+longest-run checks here remain meaningful.
+
 Card output layout (FINDINGS §32, live-verified on 320x180):
     interleaved [U, Y0, V, Y1] x (W/2 groups per row) x H rows = W*H*2 bytes
     luma: full height, all rows valid
