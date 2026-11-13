@@ -1,0 +1,214 @@
+=== 1. PLT[0xe950] resolution ===
+PLT[0xe950]: adrp	x16, #0x14000 | ldr	x16, [x16, #0xd0] -> GOT=0x140d0; stub_map->26 => {'lib': 254, 'weak': 0, 'name': '__ZN22IOInterruptEventSource20interruptEventSourceEP8OSObjectPFvS1_PS_iEP9IOServicei'}
+
+=== 2. strings @0x9f7, @0x186c, @0x90d (page-0 and page-1000) ===
+  0x09f7: 'AppleAfterburner Error: %s[%p]::%s: unsupported golden image %u.%u... bailing out\n'
+  0x186c: 'AppleAfterburner Info: %s[%p]::%s: image type is live... reconfiguring to golden for flash update\n'
+  0x090d: ' Error: %s[%p]::%s: Could not find one or more section headers: 0x%llx 0x%llx 0x%llx 0x%llx... bailing out\n'
+
+=== 3. fn@0x6b94 prologue between restore loop and switch: 0x6bf4..0x6cd8 ===
+  0x6bf4: strb	wzr, [x19, #0x170]
+  0x6bf8: ldr	x8, [x19, #0x138]
+  0x6bfc: ldr	w24, [x8, #4]
+  0x6c00: ldr	x16, [x19]
+  0x6c04: mov	x22, x19
+  0x6c08: movk	x22, #0xcda1, lsl #48
+  0x6c0c: mov	x17, x19
+  0x6c10: movk	x17, #0xcda1, lsl #48
+  0x6c14: autda	x16, x17
+  0x6c18: mov	x17, x16
+  0x6c1c: xpacd	x17
+  0x6c20: cmp	x16, x17
+  0x6c24: b.eq	#0x6c2c
+  0x6c28: brk	#0xc472
+  0x6c2c: add	x8, x16, #0x3a8
+  0x6c30: ldr	x9, [x16, #0x3a8]
+  0x6c34: movk	x8, #0xc9c, lsl #48
+  0x6c38: mov	x0, x19
+  0x6c3c: mov	x1, #0
+  0x6c40: blraa	x9, x8
+  0x6c44: adrp	x21, #0x1000
+  0x6c48: add	x21, x21, #0x60c
+  0x6c4c: stp	x21, x24, [sp, #0x10]
+  0x6c50: stp	x0, x19, [sp]
+  0x6c54: adrp	x0, #0
+  0x6c58: add	x0, x0, #0x979
+  0x6c5c: bl	#0xe884
+  0x6c60: ldr	x8, [x19, #0x138]
+  0x6c64: ldr	w25, [x8, #8]
+  0x6c68: ubfx	x20, x25, #0x10, #0x10
+  0x6c6c: and	w23, w25, #0xffff
+  0x6c70: ldr	x16, [x19]
+  0x6c74: mov	x17, x19
+  0x6c78: movk	x17, #0xcda1, lsl #48
+  0x6c7c: autda	x16, x17
+  0x6c80: mov	x17, x16
+  0x6c84: xpacd	x17
+  0x6c88: cmp	x16, x17
+  0x6c8c: b.eq	#0x6c94
+  0x6c90: brk	#0xc472
+  0x6c94: add	x8, x16, #0x3a8
+  0x6c98: ldr	x9, [x16, #0x3a8]
+  0x6c9c: movk	x8, #0xc9c, lsl #48
+  0x6ca0: mov	x0, x19
+  0x6ca4: mov	x1, #0
+  0x6ca8: blraa	x9, x8
+  0x6cac: stp	x20, x23, [sp, #0x20]
+  0x6cb0: stp	x21, x25, [sp, #0x10]
+  0x6cb4: stp	x0, x19, [sp]
+  0x6cb8: adrp	x0, #0
+  0x6cbc: add	x0, x0, #0x9b4
+  0x6cc0: bl	#0xe884
+  0x6cc4: ubfx	w16, w24, #0x10, #4
+  0x6cc8: cmp	w16, #3
+  0x6ccc: b.hi	#0x6d94
+  0x6cd0: cmp	x16, #3
+  0x6cd4: csel	x16, x16, xzr, ls
+
+=== 4. fn@0x7508 prologue between restore loop and switch: 0x75f4..0x763c ===
+  0x75f4: brk	#0xc472
+  0x75f8: add	x8, x16, #0x3a8
+  0x75fc: ldr	x9, [x16, #0x3a8]
+  0x7600: movk	x8, #0xc9c, lsl #48
+  0x7604: mov	x0, x19
+  0x7608: mov	x1, #0
+  0x760c: blraa	x9, x8
+  0x7610: stp	x24, x23, [sp, #0x20]
+  0x7614: stp	x21, x25, [sp, #0x10]
+  0x7618: stp	x0, x19, [sp]
+  0x761c: adrp	x0, #0
+  0x7620: add	x0, x0, #0x9b4
+  0x7624: bl	#0xe884
+  0x7628: ubfx	w16, w20, #0x10, #4
+  0x762c: cmp	w16, #3
+  0x7630: b.hi	#0x7790
+  0x7634: cmp	x16, #3
+  0x7638: csel	x16, x16, xzr, ls
+
+=== 5. fn@0x821c (block writer) full decode ===
+  0x821c: pacibsp	
+  0x8220: sub	sp, sp, #0x90
+  0x8224: stp	x28, x27, [sp, #0x30]
+  0x8228: stp	x26, x25, [sp, #0x40]
+  0x822c: stp	x24, x23, [sp, #0x50]
+  0x8230: stp	x22, x21, [sp, #0x60]
+  0x8234: stp	x20, x19, [sp, #0x70]
+  0x8238: stp	x29, x30, [sp, #0x80]
+  0x823c: add	x29, sp, #0x80
+  0x8240: mov	x22, x5
+  0x8244: mov	x21, x4
+  0x8248: mov	x23, x3
+  0x824c: mov	x24, x2
+  0x8250: mov	x20, x1
+  0x8254: mov	x19, x0
+  0x8258: ldr	x16, [x0]
+  0x825c: mov	x25, x0
+  0x8260: movk	x25, #0xcda1, lsl #48
+  0x8264: mov	x17, x0
+  0x8268: movk	x17, #0xcda1, lsl #48
+  0x826c: autda	x16, x17
+  0x8270: mov	x17, x16
+  0x8274: xpacd	x17
+  0x8278: cmp	x16, x17
+  0x827c: b.eq	#0x8284
+  0x8280: brk	#0xc472
+  0x8284: add	x8, x16, #0x3a8
+  0x8288: ldr	x9, [x16, #0x3a8]
+  0x828c: movk	x8, #0xc9c, lsl #48
+  0x8290: mov	x1, #0
+  0x8294: blraa	x9, x8
+  0x8298: adrp	x26, #0x1000
+  0x829c: add	x26, x26, #0x492
+  0x82a0: stp	x26, x20, [sp, #0x10]
+  0x82a4: stp	x0, x19, [sp]
+  0x82a8: adrp	x0, #0x1000
+  0x82ac: add	x0, x0, #0x453
+  0x82b0: bl	#0xe884
+  0x82b4: mov	w8, #0xaaaa
+  0x82b8: ldr	x9, [x19, #0x150]
+  0x82bc: bfi	w8, w20, #0x10, #0x10
+  0x82c0: str	w24, [x9, #0x40]
+  0x82c4: str	w8, [x9, #0x48]
+  0x82c8: cmp	w21, #4
+  0x82cc: str	x20, [sp, #0x20]
+  0x82d0: b.lo	#0x8570
+  0x82d4: mov	w28, #0
+  0x82d8: adrp	x24, #0x1000
+  0x82dc: add	x24, x24, #0x49d
+  0x82e0: mov	x27, x21
+  0x82e4: ldr	w8, [x23]
+  0x82e8: rev	w9, w8
+  0x82ec: cmp	w22, #0
+
+=== 6. fn@0x8580 full decode (pointer switcher) ===
+  0x8580: pacibsp	
+  0x8584: stp	x20, x19, [sp, #-0x20]!
+  0x8588: stp	x29, x30, [sp, #0x10]
+  0x858c: add	x29, sp, #0x10
+  0x8590: mov	x19, x1
+  0x8594: mov	x20, x0
+  0x8598: mov	w8, #0xff40
+  0x859c: movk	w8, #0x13f, lsl #16
+  0x85a0: sub	w1, w8, #0xf40
+  0x85a4: bl	#0x809c
+  0x85a8: adrp	x8, #0
+  0x85ac: add	x8, x8, #0x670
+  0x85b0: adrp	x9, #0
+  0x85b4: add	x9, x9, #0x5f0
+  0x85b8: cmp	w19, #1
+  0x85bc: csel	x3, x9, x8, eq
+  0x85c0: adrp	x8, #0
+  0x85c4: add	x8, x8, #0x6b0
+  0x85c8: adrp	x9, #0
+  0x85cc: add	x9, x9, #0x630
+  0x85d0: csel	x19, x9, x8, eq
+  0x85d4: mov	x0, x20
+  0x85d8: mov	w1, #0
+  0x85dc: mov	w2, #0xff40
+  0x85e0: movk	w2, #0x13f, lsl #16
+  0x85e4: mov	w4, #0x40
+  0x85e8: mov	w5, #0
+  0x85ec: bl	#0x821c
+  0x85f0: mov	x0, x20
+  0x85f4: mov	w1, #1
+  0x85f8: mov	w2, #0xff40
+  0x85fc: movk	w2, #0x13f, lsl #16
+  0x8600: mov	x3, x19
+  0x8604: mov	w4, #0x40
+  0x8608: mov	w5, #0
+  0x860c: ldp	x29, x30, [sp, #0x10]
+  0x8610: ldp	x20, x19, [sp], #0x20
+  0x8614: autibsp	
+  0x8618: eor	x9, x30, x30, lsl #1
+  0x861c: tbz	x9, #0x3e, #0x8624
+  0x8620: brk	#0xc471
+  0x8624: b	#0x821c
+  0x8628: pacibsp	
+  0x862c: sub	sp, sp, #0x70
+  0x8630: stp	x24, x23, [sp, #0x30]
+  0x8634: stp	x22, x21, [sp, #0x40]
+  0x8638: stp	x20, x19, [sp, #0x50]
+  0x863c: stp	x29, x30, [sp, #0x60]
+
+=== 7. what is vt[0x1f0]=slot49 on the sub-objects? check AB vtable slot 49 ===
+  AB vtable slot 49: word=000000000000010c
+
+=== 8. data table @0x1d970 — wider context (looks like {fn, flags} pairs) ===
+  0x1d940: lo=00008060 hi=00000000
+  0x1d948: lo=00000912 hi=0000030f
+  0x1d950: lo=00008048 hi=00000000
+  0x1d958: lo=00000942 hi=0000030f
+  0x1d960: lo=00007c1c hi=00000000
+  0x1d968: lo=00000986 hi=0000030f
+  0x1d970: lo=00007508 hi=00000000
+  0x1d978: lo=000009d1 hi=0000030f
+  0x1d980: lo=000090d0 hi=00000000
+  0x1d988: lo=00000a26 hi=0000030f
+  0x1d990: lo=000055d8 hi=00000000
+  0x1d998: lo=00000a5b hi=0000030f
+  0x1d9a0: lo=0000888c hi=00000000
+  0x1d9a8: lo=00000a96 hi=0000030f
+  0x1d9b0: lo=0000c984 hi=00000000
+  0x1d9b8: lo=00000ab4 hi=0000030f
+
+=== 9. who references the table region 0x1d960-0x1d9c0? (adrp+add to page 0x1d000) ===

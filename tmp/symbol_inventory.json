@@ -1,0 +1,2552 @@
+[
+ {
+  "addr": 1520,
+  "mangled": "__ZL12livePointer0",
+  "name": "__ZL12livePointer0"
+ },
+ {
+  "addr": 1584,
+  "mangled": "__ZL12livePointer1",
+  "name": "__ZL12livePointer1"
+ },
+ {
+  "addr": 1648,
+  "mangled": "__ZL14goldenPointer0",
+  "name": "__ZL14goldenPointer0"
+ },
+ {
+  "addr": 1712,
+  "mangled": "__ZL14goldenPointer1",
+  "name": "__ZL14goldenPointer1"
+ },
+ {
+  "addr": 16456,
+  "mangled": "__ZN16AppleAfterburner9MetaClassD1Ev",
+  "name": "__ZN16AppleAfterburner9MetaClassD1Ev"
+ },
+ {
+  "addr": 51912,
+  "mangled": "__ZN16AppleAfterburner9MetaClassD0Ev",
+  "name": "__ZN16AppleAfterburner9MetaClassD0Ev"
+ },
+ {
+  "addr": 51916,
+  "mangled": "__GLOBAL__sub_I_Athena.cpp",
+  "name": "__GLOBAL__sub_I_Athena.cpp"
+ },
+ {
+  "addr": 51996,
+  "mangled": "__GLOBAL__D_a",
+  "name": "__GLOBAL__D_a"
+ },
+ {
+  "addr": 52080,
+  "mangled": "__ZN26AppleAfterburnerUserClient9MetaClassD1Ev",
+  "name": "__ZN26AppleAfterburnerUserClient9MetaClassD1Ev"
+ },
+ {
+  "addr": 59244,
+  "mangled": "__ZN26AppleAfterburnerUserClient9MetaClassD0Ev",
+  "name": "__ZN26AppleAfterburnerUserClient9MetaClassD0Ev"
+ },
+ {
+  "addr": 59248,
+  "mangled": "__GLOBAL__sub_I_AthenaUserClient.cpp",
+  "name": "__GLOBAL__sub_I_AthenaUserClient.cpp"
+ },
+ {
+  "addr": 59328,
+  "mangled": "__GLOBAL__D_a",
+  "name": "__GLOBAL__D_a"
+ },
+ {
+  "addr": 59340,
+  "mangled": "__start",
+  "name": "__start"
+ },
+ {
+  "addr": 59372,
+  "mangled": "_OSKextGetCurrentIdentifier",
+  "name": "_OSKextGetCurrentIdentifier"
+ },
+ {
+  "addr": 59388,
+  "mangled": "_OSKextGetCurrentVersionString",
+  "name": "_OSKextGetCurrentVersionString"
+ },
+ {
+  "addr": 59404,
+  "mangled": "_OSKextGetCurrentLoadTag",
+  "name": "_OSKextGetCurrentLoadTag"
+ },
+ {
+  "addr": 59420,
+  "mangled": "__stop",
+  "name": "__stop"
+ },
+ {
+  "addr": 65732,
+  "mangled": "__kext_apple_cc",
+  "name": "__kext_apple_cc"
+ },
+ {
+  "addr": 65736,
+  "mangled": "__ZL18sAthenaPowerStates",
+  "name": "__ZL18sAthenaPowerStates"
+ },
+ {
+  "addr": 65928,
+  "mangled": "__realmain",
+  "name": "__realmain"
+ },
+ {
+  "addr": 65936,
+  "mangled": "__antimain",
+  "name": "__antimain"
+ },
+ {
+  "addr": 48528,
+  "mangled": "__ZN16AppleAfterburner10cardStatusEPy",
+  "name": "__ZN16AppleAfterburner10cardStatusEPy"
+ },
+ {
+  "addr": 65944,
+  "mangled": "__ZN16AppleAfterburner10gMetaClassE",
+  "name": "__ZN16AppleAfterburner10gMetaClassE"
+ },
+ {
+  "addr": 48544,
+  "mangled": "__ZN16AppleAfterburner10getPercentEPy",
+  "name": "__ZN16AppleAfterburner10getPercentEPy"
+ },
+ {
+  "addr": 33308,
+  "mangled": "__ZN16AppleAfterburner10spiprogramEjjPvmb",
+  "name": "__ZN16AppleAfterburner10spiprogramEjjPvmb"
+ },
+ {
+  "addr": 42620,
+  "mangled": "__ZN16AppleAfterburner10submitDataEP8sContextP18IOMemoryDescriptorjPyjjjyy",
+  "name": "__ZN16AppleAfterburner10submitDataEP8sContextP18IOMemoryDescriptorjPyjjjyy"
+ },
+ {
+  "addr": 82400,
+  "mangled": "__ZN16AppleAfterburner10superClassE",
+  "name": "__ZN16AppleAfterburner10superClassE"
+ },
+ {
+  "addr": 41612,
+  "mangled": "__ZN16AppleAfterburner11getSegmentsEP8sContextP18IOMemoryDescriptorPN12IODMACommand9Segment64EPjyyy",
+  "name": "__ZN16AppleAfterburner11getSegmentsEP8sContextP18IOMemoryDescriptorPN12IODMACommand9Segment64EPjyyy"
+ },
+ {
+  "addr": 34344,
+  "mangled": "__ZN16AppleAfterburner11loadBitfileEPKcj",
+  "name": "__ZN16AppleAfterburner11loadBitfileEPKcj"
+ },
+ {
+  "addr": 27136,
+  "mangled": "__ZN16AppleAfterburner11sleep_timerEP18IOTimerEventSource",
+  "name": "__ZN16AppleAfterburner11sleep_timerEP18IOTimerEventSource"
+ },
+ {
+  "addr": 43436,
+  "mangled": "__ZN16AppleAfterburner11submitFrameEP8sContextP18IOMemoryDescriptorS3_Pyjjj27sDescriptorLengthOffsetInfo",
+  "name": "__ZN16AppleAfterburner11submitFrameEP8sContextP18IOMemoryDescriptorS3_Pyjjj27sDescriptorLengthOffsetInfo"
+ },
+ {
+  "addr": 49004,
+  "mangled": "__ZN16AppleAfterburner11unbindFrameEP18IOMemoryDescriptor",
+  "name": "__ZN16AppleAfterburner11unbindFrameEP18IOMemoryDescriptor"
+ },
+ {
+  "addr": 51840,
+  "mangled": "__ZN16AppleAfterburner12didTerminateEP9IOServicejPb",
+  "name": "__ZN16AppleAfterburner12didTerminateEP9IOServicejPb"
+ },
+ {
+  "addr": 49132,
+  "mangled": "__ZN16AppleAfterburner13checkForSpaceEPy",
+  "name": "__ZN16AppleAfterburner13checkForSpaceEPy"
+ },
+ {
+  "addr": 31840,
+  "mangled": "__ZN16AppleAfterburner13setPowerStateEmP9IOService",
+  "name": "__ZN16AppleAfterburner13setPowerStateEmP9IOService"
+ },
+ {
+  "addr": 51816,
+  "mangled": "__ZN16AppleAfterburner13willTerminateEP9IOServicej",
+  "name": "__ZN16AppleAfterburner13willTerminateEP9IOServicej"
+ },
+ {
+  "addr": 34176,
+  "mangled": "__ZN16AppleAfterburner14change_pointerEj",
+  "name": "__ZN16AppleAfterburner14change_pointerEj"
+ },
+ {
+  "addr": 29892,
+  "mangled": "__ZN16AppleAfterburner14reconfig_timerEP18IOTimerEventSource",
+  "name": "__ZN16AppleAfterburner14reconfig_timerEP18IOTimerEventSource"
+ },
+ {
+  "addr": 35568,
+  "mangled": "__ZN16AppleAfterburner14submitResourceEP24IOBufferMemoryDescriptorj",
+  "name": "__ZN16AppleAfterburner14submitResourceEP24IOBufferMemoryDescriptorj"
+ },
+ {
+  "addr": 39904,
+  "mangled": "__ZN16AppleAfterburner14updateIdleTimeEv",
+  "name": "__ZN16AppleAfterburner14updateIdleTimeEv"
+ },
+ {
+  "addr": 23276,
+  "mangled": "__ZN16AppleAfterburner15handleInterruptEP8OSObjectP22IOInterruptEventSourcei",
+  "name": "__ZN16AppleAfterburner15handleInterruptEP8OSObjectP22IOInterruptEventSourcei"
+ },
+ {
+  "addr": 47244,
+  "mangled": "__ZN16AppleAfterburner15queryCompletionEP8sContextPyS2_",
+  "name": "__ZN16AppleAfterburner15queryCompletionEP8sContextPyS2_"
+ },
+ {
+  "addr": 32828,
+  "mangled": "__ZN16AppleAfterburner15readDMARegisterEj",
+  "name": "__ZN16AppleAfterburner15readDMARegisterEj"
+ },
+ {
+  "addr": 39004,
+  "mangled": "__ZN16AppleAfterburner15submitDataGatedEP10sDmaConfig",
+  "name": "__ZN16AppleAfterburner15submitDataGatedEP10sDmaConfig"
+ },
+ {
+  "addr": 21952,
+  "mangled": "__ZN16AppleAfterburner16readBAR0RegisterEj",
+  "name": "__ZN16AppleAfterburner16readBAR0RegisterEj"
+ },
+ {
+  "addr": 27540,
+  "mangled": "__ZN16AppleAfterburner16reconfig_handlerEP22IOInterruptEventSourcei",
+  "name": "__ZN16AppleAfterburner16reconfig_handlerEP22IOInterruptEventSourcei"
+ },
+ {
+  "addr": 48740,
+  "mangled": "__ZN16AppleAfterburner16updateActiveTimeEv",
+  "name": "__ZN16AppleAfterburner16updateActiveTimeEv"
+ },
+ {
+  "addr": 32816,
+  "mangled": "__ZN16AppleAfterburner16writeDMARegisterEjj",
+  "name": "__ZN16AppleAfterburner16writeDMARegisterEjj"
+ },
+ {
+  "addr": 40028,
+  "mangled": "__ZN16AppleAfterburner17getDescriptorListEP8sContextPN12IODMACommand9Segment64EjjPyPjy",
+  "name": "__ZN16AppleAfterburner17getDescriptorListEP8sContextPN12IODMACommand9Segment64EjjPyPjy"
+ },
+ {
+  "addr": 32900,
+  "mangled": "__ZN16AppleAfterburner17readFlashRegisterEj",
+  "name": "__ZN16AppleAfterburner17readFlashRegisterEj"
+ },
+ {
+  "addr": 32804,
+  "mangled": "__ZN16AppleAfterburner17writeBAR0RegisterEjj",
+  "name": "__ZN16AppleAfterburner17writeBAR0RegisterEjj"
+ },
+ {
+  "addr": 23252,
+  "mangled": "__ZN16AppleAfterburner18readDecodeRegisterEj",
+  "name": "__ZN16AppleAfterburner18readDecodeRegisterEj"
+ },
+ {
+  "addr": 32912,
+  "mangled": "__ZN16AppleAfterburner18writeFlashRegisterEjj",
+  "name": "__ZN16AppleAfterburner18writeFlashRegisterEjj"
+ },
+ {
+  "addr": 23100,
+  "mangled": "__ZN16AppleAfterburner19configureInterruptsEv",
+  "name": "__ZN16AppleAfterburner19configureInterruptsEv"
+ },
+ {
+  "addr": 36188,
+  "mangled": "__ZN16AppleAfterburner19getResourceSegmentsEP24IOBufferMemoryDescriptorPN12IODMACommand9Segment64EPjy",
+  "name": "__ZN16AppleAfterburner19getResourceSegmentsEP24IOBufferMemoryDescriptorPN12IODMACommand9Segment64EPjy"
+ },
+ {
+  "addr": 32876,
+  "mangled": "__ZN16AppleAfterburner19readBitfileRegisterEj",
+  "name": "__ZN16AppleAfterburner19readBitfileRegisterEj"
+ },
+ {
+  "addr": 32852,
+  "mangled": "__ZN16AppleAfterburner19readThermalRegisterEj",
+  "name": "__ZN16AppleAfterburner19readThermalRegisterEj"
+ },
+ {
+  "addr": 21964,
+  "mangled": "__ZN16AppleAfterburner19readVersionRegisterEj",
+  "name": "__ZN16AppleAfterburner19readVersionRegisterEj"
+ },
+ {
+  "addr": 38552,
+  "mangled": "__ZN16AppleAfterburner19submitResourceGatedEP10sDmaConfig",
+  "name": "__ZN16AppleAfterburner19submitResourceGatedEP10sDmaConfig"
+ },
+ {
+  "addr": 32788,
+  "mangled": "__ZN16AppleAfterburner19writeDecodeRegisterEjj",
+  "name": "__ZN16AppleAfterburner19writeDecodeRegisterEjj"
+ },
+ {
+  "addr": 46644,
+  "mangled": "__ZN16AppleAfterburner20queryCompletionGatedEPyPi",
+  "name": "__ZN16AppleAfterburner20queryCompletionGatedEPyPi"
+ },
+ {
+  "addr": 34760,
+  "mangled": "__ZN16AppleAfterburner20resourceLoadCallbackEjiPKvjPv",
+  "name": "__ZN16AppleAfterburner20resourceLoadCallbackEjiPKvjPv"
+ },
+ {
+  "addr": 32888,
+  "mangled": "__ZN16AppleAfterburner20writeBitfileRegisterEjj",
+  "name": "__ZN16AppleAfterburner20writeBitfileRegisterEjj"
+ },
+ {
+  "addr": 32864,
+  "mangled": "__ZN16AppleAfterburner20writeThermalRegisterEjj",
+  "name": "__ZN16AppleAfterburner20writeThermalRegisterEjj"
+ },
+ {
+  "addr": 32840,
+  "mangled": "__ZN16AppleAfterburner20writeVersionRegisterEjj",
+  "name": "__ZN16AppleAfterburner20writeVersionRegisterEjj"
+ },
+ {
+  "addr": 31772,
+  "mangled": "__ZN16AppleAfterburner21pointer_restore_timerEP18IOTimerEventSource",
+  "name": "__ZN16AppleAfterburner21pointer_restore_timerEP18IOTimerEventSource"
+ },
+ {
+  "addr": 29960,
+  "mangled": "__ZN16AppleAfterburner23pointer_restore_handlerEP22IOInterruptEventSourcei",
+  "name": "__ZN16AppleAfterburner23pointer_restore_handlerEP22IOInterruptEventSourcei"
+ },
+ {
+  "addr": 37072,
+  "mangled": "__ZN16AppleAfterburner25getResourceDescriptorListEPN12IODMACommand9Segment64EjjPyPjy",
+  "name": "__ZN16AppleAfterburner25getResourceDescriptorListEPN12IODMACommand9Segment64EjjPyPjy"
+ },
+ {
+  "addr": 21976,
+  "mangled": "__ZN16AppleAfterburner26updateIORegistryPropertiesEv",
+  "name": "__ZN16AppleAfterburner26updateIORegistryPropertiesEv"
+ },
+ {
+  "addr": 34956,
+  "mangled": "__ZN16AppleAfterburner27resourceLoadCallbackHandlerEjiPKvj",
+  "name": "__ZN16AppleAfterburner27resourceLoadCallbackHandlerEjiPKvj"
+ },
+ {
+  "addr": 51588,
+  "mangled": "__ZN16AppleAfterburner4freeEv",
+  "name": "__ZN16AppleAfterburner4freeEv"
+ },
+ {
+  "addr": 51392,
+  "mangled": "__ZN16AppleAfterburner4initEP12OSDictionary",
+  "name": "__ZN16AppleAfterburner4initEP12OSDictionary"
+ },
+ {
+  "addr": 49316,
+  "mangled": "__ZN16AppleAfterburner4stopEP9IOService",
+  "name": "__ZN16AppleAfterburner4stopEP9IOService"
+ },
+ {
+  "addr": 51608,
+  "mangled": "__ZN16AppleAfterburner5probeEP9IOServicePi",
+  "name": "__ZN16AppleAfterburner5probeEP9IOServicePi"
+ },
+ {
+  "addr": 44712,
+  "mangled": "__ZN16AppleAfterburner5resetEv",
+  "name": "__ZN16AppleAfterburner5resetEv"
+ },
+ {
+  "addr": 16980,
+  "mangled": "__ZN16AppleAfterburner5startEP9IOService",
+  "name": "__ZN16AppleAfterburner5startEP9IOService"
+ },
+ {
+  "addr": 45292,
+  "mangled": "__ZN16AppleAfterburner7cleanUpEP8sContext",
+  "name": "__ZN16AppleAfterburner7cleanUpEP8sContext"
+ },
+ {
+  "addr": 51888,
+  "mangled": "__ZN16AppleAfterburner8finalizeEj",
+  "name": "__ZN16AppleAfterburner8finalizeEj"
+ },
+ {
+  "addr": 32924,
+  "mangled": "__ZN16AppleAfterburner8spieraseEj",
+  "name": "__ZN16AppleAfterburner8spieraseEj"
+ },
+ {
+  "addr": 16384,
+  "mangled": "__ZN16AppleAfterburner9MetaClassC1Ev",
+  "name": "__ZN16AppleAfterburner9MetaClassC1Ev"
+ },
+ {
+  "addr": 16632,
+  "mangled": "__ZN16AppleAfterburner9MetaClassC2Ev",
+  "name": "__ZN16AppleAfterburner9MetaClassC2Ev"
+ },
+ {
+  "addr": 48860,
+  "mangled": "__ZN16AppleAfterburner9bindFrameEP18IOMemoryDescriptor",
+  "name": "__ZN16AppleAfterburner9bindFrameEP18IOMemoryDescriptor"
+ },
+ {
+  "addr": 49240,
+  "mangled": "__ZN16AppleAfterburner9freeSpaceEPy",
+  "name": "__ZN16AppleAfterburner9freeSpaceEPy"
+ },
+ {
+  "addr": 82392,
+  "mangled": "__ZN16AppleAfterburner9metaClassE",
+  "name": "__ZN16AppleAfterburner9metaClassE"
+ },
+ {
+  "addr": 51864,
+  "mangled": "__ZN16AppleAfterburner9terminateEj",
+  "name": "__ZN16AppleAfterburner9terminateEj"
+ },
+ {
+  "addr": 16512,
+  "mangled": "__ZN16AppleAfterburnerC1EPK11OSMetaClass",
+  "name": "__ZN16AppleAfterburnerC1EPK11OSMetaClass"
+ },
+ {
+  "addr": 16804,
+  "mangled": "__ZN16AppleAfterburnerC1Ev",
+  "name": "__ZN16AppleAfterburnerC1Ev"
+ },
+ {
+  "addr": 16460,
+  "mangled": "__ZN16AppleAfterburnerC2EPK11OSMetaClass",
+  "name": "__ZN16AppleAfterburnerC2EPK11OSMetaClass"
+ },
+ {
+  "addr": 16892,
+  "mangled": "__ZN16AppleAfterburnerC2Ev",
+  "name": "__ZN16AppleAfterburnerC2Ev"
+ },
+ {
+  "addr": 16572,
+  "mangled": "__ZN16AppleAfterburnerD0Ev",
+  "name": "__ZN16AppleAfterburnerD0Ev"
+ },
+ {
+  "addr": 16568,
+  "mangled": "__ZN16AppleAfterburnerD1Ev",
+  "name": "__ZN16AppleAfterburnerD1Ev"
+ },
+ {
+  "addr": 16564,
+  "mangled": "__ZN16AppleAfterburnerD2Ev",
+  "name": "__ZN16AppleAfterburnerD2Ev"
+ },
+ {
+  "addr": 16616,
+  "mangled": "__ZN16AppleAfterburnerdlEPvm",
+  "name": "__ZN16AppleAfterburnerdlEPvm"
+ },
+ {
+  "addr": 16800,
+  "mangled": "__ZN16AppleAfterburnernwEm",
+  "name": "__ZN16AppleAfterburnernwEm"
+ },
+ {
+  "addr": 58020,
+  "mangled": "__ZN26AppleAfterburnerUserClient10cardStatusEPy",
+  "name": "__ZN26AppleAfterburnerUserClient10cardStatusEPy"
+ },
+ {
+  "addr": 54580,
+  "mangled": "__ZN26AppleAfterburnerUserClient10clientDiedEv",
+  "name": "__ZN26AppleAfterburnerUserClient10clientDiedEv"
+ },
+ {
+  "addr": 65984,
+  "mangled": "__ZN26AppleAfterburnerUserClient10gMetaClassE",
+  "name": "__ZN26AppleAfterburnerUserClient10gMetaClassE"
+ },
+ {
+  "addr": 59044,
+  "mangled": "__ZN26AppleAfterburnerUserClient10getPercentEPy",
+  "name": "__ZN26AppleAfterburnerUserClient10getPercentEPy"
+ },
+ {
+  "addr": 52788,
+  "mangled": "__ZN26AppleAfterburnerUserClient10sBindFrameEPS_PvP25IOExternalMethodArguments",
+  "name": "__ZN26AppleAfterburnerUserClient10sBindFrameEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "addr": 53024,
+  "mangled": "__ZN26AppleAfterburnerUserClient10sUnbindAllEPS_PvP25IOExternalMethodArguments",
+  "name": "__ZN26AppleAfterburnerUserClient10sUnbindAllEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "addr": 84880,
+  "mangled": "__ZN26AppleAfterburnerUserClient10superClassE",
+  "name": "__ZN26AppleAfterburnerUserClient10superClassE"
+ },
+ {
+  "addr": 54264,
+  "mangled": "__ZN26AppleAfterburnerUserClient11clientCloseEv",
+  "name": "__ZN26AppleAfterburnerUserClient11clientCloseEv"
+ },
+ {
+  "addr": 52912,
+  "mangled": "__ZN26AppleAfterburnerUserClient11sCardStatusEPS_PvP25IOExternalMethodArguments",
+  "name": "__ZN26AppleAfterburnerUserClient11sCardStatusEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "addr": 53136,
+  "mangled": "__ZN26AppleAfterburnerUserClient11sGetPercentEPS_PvP25IOExternalMethodArguments",
+  "name": "__ZN26AppleAfterburnerUserClient11sGetPercentEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "addr": 55048,
+  "mangled": "__ZN26AppleAfterburnerUserClient11submitFrameEP17s_inputDataStructPy",
+  "name": "__ZN26AppleAfterburnerUserClient11submitFrameEP17s_inputDataStructPy"
+ },
+ {
+  "addr": 54796,
+  "mangled": "__ZN26AppleAfterburnerUserClient12didTerminateEP9IOServicejPb",
+  "name": "__ZN26AppleAfterburnerUserClient12didTerminateEP9IOServicejPb"
+ },
+ {
+  "addr": 53252,
+  "mangled": "__ZN26AppleAfterburnerUserClient12initWithTaskEP4taskPvjP12OSDictionary",
+  "name": "__ZN26AppleAfterburnerUserClient12initWithTaskEP4taskPvjP12OSDictionary"
+ },
+ {
+  "addr": 52604,
+  "mangled": "__ZN26AppleAfterburnerUserClient12sSubmitFrameEPS_PvP25IOExternalMethodArguments",
+  "name": "__ZN26AppleAfterburnerUserClient12sSubmitFrameEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "addr": 58220,
+  "mangled": "__ZN26AppleAfterburnerUserClient13checkForSpaceEP15s_bufDataStruct",
+  "name": "__ZN26AppleAfterburnerUserClient13checkForSpaceEP15s_bufDataStruct"
+ },
+ {
+  "addr": 54604,
+  "mangled": "__ZN26AppleAfterburnerUserClient13willTerminateEP9IOServicej",
+  "name": "__ZN26AppleAfterburnerUserClient13willTerminateEP9IOServicej"
+ },
+ {
+  "addr": 53192,
+  "mangled": "__ZN26AppleAfterburnerUserClient14externalMethodEjP25IOExternalMethodArgumentsP24IOExternalMethodDispatchP8OSObjectPv",
+  "name": "__ZN26AppleAfterburnerUserClient14externalMethodEjP25IOExternalMethodArgumentsP24IOExternalMethodDispatchP8OSObjectPv"
+ },
+ {
+  "addr": 52968,
+  "mangled": "__ZN26AppleAfterburnerUserClient14sCheckForSpaceEPS_PvP25IOExternalMethodArguments",
+  "name": "__ZN26AppleAfterburnerUserClient14sCheckForSpaceEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "addr": 56516,
+  "mangled": "__ZN26AppleAfterburnerUserClient15queryCompletionEPyS0_",
+  "name": "__ZN26AppleAfterburnerUserClient15queryCompletionEPyS0_"
+ },
+ {
+  "addr": 52728,
+  "mangled": "__ZN26AppleAfterburnerUserClient16sQueryCompletionEPS_PvP25IOExternalMethodArguments",
+  "name": "__ZN26AppleAfterburnerUserClient16sQueryCompletionEPS_PvP25IOExternalMethodArguments"
+ },
+ {
+  "addr": 53852,
+  "mangled": "__ZN26AppleAfterburnerUserClient4stopEP9IOService",
+  "name": "__ZN26AppleAfterburnerUserClient4stopEP9IOService"
+ },
+ {
+  "addr": 53732,
+  "mangled": "__ZN26AppleAfterburnerUserClient5startEP9IOService",
+  "name": "__ZN26AppleAfterburnerUserClient5startEP9IOService"
+ },
+ {
+  "addr": 55024,
+  "mangled": "__ZN26AppleAfterburnerUserClient8finalizeEj",
+  "name": "__ZN26AppleAfterburnerUserClient8finalizeEj"
+ },
+ {
+  "addr": 87680,
+  "mangled": "__ZN26AppleAfterburnerUserClient8sMethodsE",
+  "name": "__ZN26AppleAfterburnerUserClient8sMethodsE"
+ },
+ {
+  "addr": 52008,
+  "mangled": "__ZN26AppleAfterburnerUserClient9MetaClassC1Ev",
+  "name": "__ZN26AppleAfterburnerUserClient9MetaClassC1Ev"
+ },
+ {
+  "addr": 52256,
+  "mangled": "__ZN26AppleAfterburnerUserClient9MetaClassC2Ev",
+  "name": "__ZN26AppleAfterburnerUserClient9MetaClassC2Ev"
+ },
+ {
+  "addr": 56732,
+  "mangled": "__ZN26AppleAfterburnerUserClient9bindFrameEP16s_bindDataStructPy",
+  "name": "__ZN26AppleAfterburnerUserClient9bindFrameEP16s_bindDataStructPy"
+ },
+ {
+  "addr": 84872,
+  "mangled": "__ZN26AppleAfterburnerUserClient9metaClassE",
+  "name": "__ZN26AppleAfterburnerUserClient9metaClassE"
+ },
+ {
+  "addr": 55000,
+  "mangled": "__ZN26AppleAfterburnerUserClient9terminateEj",
+  "name": "__ZN26AppleAfterburnerUserClient9terminateEj"
+ },
+ {
+  "addr": 58560,
+  "mangled": "__ZN26AppleAfterburnerUserClient9unbindAllEv",
+  "name": "__ZN26AppleAfterburnerUserClient9unbindAllEv"
+ },
+ {
+  "addr": 52136,
+  "mangled": "__ZN26AppleAfterburnerUserClientC1EPK11OSMetaClass",
+  "name": "__ZN26AppleAfterburnerUserClientC1EPK11OSMetaClass"
+ },
+ {
+  "addr": 52428,
+  "mangled": "__ZN26AppleAfterburnerUserClientC1Ev",
+  "name": "__ZN26AppleAfterburnerUserClientC1Ev"
+ },
+ {
+  "addr": 52084,
+  "mangled": "__ZN26AppleAfterburnerUserClientC2EPK11OSMetaClass",
+  "name": "__ZN26AppleAfterburnerUserClientC2EPK11OSMetaClass"
+ },
+ {
+  "addr": 52516,
+  "mangled": "__ZN26AppleAfterburnerUserClientC2Ev",
+  "name": "__ZN26AppleAfterburnerUserClientC2Ev"
+ },
+ {
+  "addr": 52196,
+  "mangled": "__ZN26AppleAfterburnerUserClientD0Ev",
+  "name": "__ZN26AppleAfterburnerUserClientD0Ev"
+ },
+ {
+  "addr": 52192,
+  "mangled": "__ZN26AppleAfterburnerUserClientD1Ev",
+  "name": "__ZN26AppleAfterburnerUserClientD1Ev"
+ },
+ {
+  "addr": 52188,
+  "mangled": "__ZN26AppleAfterburnerUserClientD2Ev",
+  "name": "__ZN26AppleAfterburnerUserClientD2Ev"
+ },
+ {
+  "addr": 52240,
+  "mangled": "__ZN26AppleAfterburnerUserClientdlEPvm",
+  "name": "__ZN26AppleAfterburnerUserClientdlEPvm"
+ },
+ {
+  "addr": 52424,
+  "mangled": "__ZN26AppleAfterburnerUserClientnwEm",
+  "name": "__ZN26AppleAfterburnerUserClientnwEm"
+ },
+ {
+  "addr": 16620,
+  "mangled": "__ZNK16AppleAfterburner12getMetaClassEv",
+  "name": "__ZNK16AppleAfterburner12getMetaClassEv"
+ },
+ {
+  "addr": 16704,
+  "mangled": "__ZNK16AppleAfterburner9MetaClass5allocEv",
+  "name": "__ZNK16AppleAfterburner9MetaClass5allocEv"
+ },
+ {
+  "addr": 52244,
+  "mangled": "__ZNK26AppleAfterburnerUserClient12getMetaClassEv",
+  "name": "__ZNK26AppleAfterburnerUserClient12getMetaClassEv"
+ },
+ {
+  "addr": 52328,
+  "mangled": "__ZNK26AppleAfterburnerUserClient9MetaClass5allocEv",
+  "name": "__ZNK26AppleAfterburnerUserClient9MetaClass5allocEv"
+ },
+ {
+  "addr": 82408,
+  "mangled": "__ZTV16AppleAfterburner",
+  "name": "__ZTV16AppleAfterburner"
+ },
+ {
+  "addr": 84888,
+  "mangled": "__ZTV26AppleAfterburnerUserClient",
+  "name": "__ZTV26AppleAfterburnerUserClient"
+ },
+ {
+  "addr": 84608,
+  "mangled": "__ZTVN16AppleAfterburner9MetaClassE",
+  "name": "__ZTVN16AppleAfterburner9MetaClassE"
+ },
+ {
+  "addr": 87416,
+  "mangled": "__ZTVN26AppleAfterburnerUserClient9MetaClassE",
+  "name": "__ZTVN26AppleAfterburnerUserClient9MetaClassE"
+ },
+ {
+  "addr": 65536,
+  "mangled": "_kmod_info",
+  "name": "_kmod_info"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IODelay",
+  "name": "_IODelay"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOFree",
+  "name": "_IOFree"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOLockAlloc",
+  "name": "_IOLockAlloc"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOLockFree",
+  "name": "_IOLockFree"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOLockLock",
+  "name": "_IOLockLock"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOLockUnlock",
+  "name": "_IOLockUnlock"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOLog",
+  "name": "_IOLog"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOMalloc",
+  "name": "_IOMalloc"
+ },
+ {
+  "addr": 0,
+  "mangled": "_IOSleep",
+  "name": "_IOSleep"
+ },
+ {
+  "addr": 0,
+  "mangled": "_OSKextRequestResource",
+  "name": "_OSKextRequestResource"
+ },
+ {
+  "addr": 0,
+  "mangled": "_PAGE_SHIFT_CONST",
+  "name": "_PAGE_SHIFT_CONST"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN10IOWorkLoop8workLoopEv",
+  "name": "__ZN10IOWorkLoop8workLoopEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11IOPCIDevice20extendedConfigRead32Ey",
+  "name": "__ZN11IOPCIDevice20extendedConfigRead32Ey"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11IOPCIDevice21extendedConfigWrite32Eyj",
+  "name": "__ZN11IOPCIDevice21extendedConfigWrite32Eyj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11IOPCIDevice9metaClassE",
+  "name": "__ZN11IOPCIDevice9metaClassE"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass0Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass0Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass1Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass1Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass2Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass3Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass3Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass4Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass4Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass5Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass5Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass6Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass6Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClass21_RESERVEDOSMetaClass7Ev",
+  "name": "__ZN11OSMetaClass21_RESERVEDOSMetaClass7Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClassC2EPKcPKS_j",
+  "name": "__ZN11OSMetaClassC2EPKcPKS_j"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN11OSMetaClassD2Ev",
+  "name": "__ZN11OSMetaClassD2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IODMACommand14OutputLittle64EPS_NS_9Segment64EPvj",
+  "name": "__ZN12IODMACommand14OutputLittle64EPS_NS_9Segment64EPvj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IODMACommand17withSpecificationEPFbPS_NS_9Segment64EPvjEhyNS_14MappingOptionsEyjP8IOMapperS2_",
+  "name": "__ZN12IODMACommand17withSpecificationEPFbPS_NS_9Segment64EPvjEhyNS_14MappingOptionsEyjP8IOMapperS2_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient10gMetaClassE",
+  "name": "__ZN12IOUserClient10gMetaClassE"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient10getServiceEv",
+  "name": "__ZN12IOUserClient10getServiceEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient12initWithTaskEP4taskPvj",
+  "name": "__ZN12IOUserClient12initWithTaskEP4taskPvj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient13connectClientEPS_",
+  "name": "__ZN12IOUserClient13connectClientEPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient19clientMemoryForTypeEjPjPP18IOMemoryDescriptor",
+  "name": "__ZN12IOUserClient19clientMemoryForTypeEjPjPP18IOMemoryDescriptor"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient20exportObjectToClientEP4taskP8OSObjectPS3_",
+  "name": "__ZN12IOUserClient20exportObjectToClientEP4taskP8OSObjectPS3_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient0Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient0Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient1Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient1Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient2Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient3Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient3Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient4Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient4Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient5Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient5Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient6Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient6Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient7Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient7Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient8Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient8Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient22_RESERVEDIOUserClient9Ev",
+  "name": "__ZN12IOUserClient22_RESERVEDIOUserClient9Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient23_RESERVEDIOUserClient10Ev",
+  "name": "__ZN12IOUserClient23_RESERVEDIOUserClient10Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient23_RESERVEDIOUserClient11Ev",
+  "name": "__ZN12IOUserClient23_RESERVEDIOUserClient11Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient23_RESERVEDIOUserClient12Ev",
+  "name": "__ZN12IOUserClient23_RESERVEDIOUserClient12Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient23_RESERVEDIOUserClient13Ev",
+  "name": "__ZN12IOUserClient23_RESERVEDIOUserClient13Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient23_RESERVEDIOUserClient14Ev",
+  "name": "__ZN12IOUserClient23_RESERVEDIOUserClient14Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient23_RESERVEDIOUserClient15Ev",
+  "name": "__ZN12IOUserClient23_RESERVEDIOUserClient15Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient23getExternalTrapForIndexEj",
+  "name": "__ZN12IOUserClient23getExternalTrapForIndexEj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient24getNotificationSemaphoreEjPP9semaphore",
+  "name": "__ZN12IOUserClient24getNotificationSemaphoreEjPP9semaphore"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient24getTargetAndTrapForIndexEPP9IOServicej",
+  "name": "__ZN12IOUserClient24getTargetAndTrapForIndexEPP9IOServicej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient24registerNotificationPortEP8ipc_portjj",
+  "name": "__ZN12IOUserClient24registerNotificationPortEP8ipc_portjj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient24registerNotificationPortEP8ipc_portjy",
+  "name": "__ZN12IOUserClient24registerNotificationPortEP8ipc_portjy"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient25getExternalMethodForIndexEj",
+  "name": "__ZN12IOUserClient25getExternalMethodForIndexEj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient26getTargetAndMethodForIndexEPP9IOServicej",
+  "name": "__ZN12IOUserClient26getTargetAndMethodForIndexEPP9IOServicej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient30getExternalAsyncMethodForIndexEj",
+  "name": "__ZN12IOUserClient30getExternalAsyncMethodForIndexEj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient31getAsyncTargetAndMethodForIndexEPP9IOServicej",
+  "name": "__ZN12IOUserClient31getAsyncTargetAndMethodForIndexEPP9IOServicej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient4freeEv",
+  "name": "__ZN12IOUserClient4freeEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient4initEP12OSDictionary",
+  "name": "__ZN12IOUserClient4initEP12OSDictionary"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient4initEv",
+  "name": "__ZN12IOUserClient4initEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClient8DispatchE5IORPC",
+  "name": "__ZN12IOUserClient8DispatchE5IORPC"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClientC2EPK11OSMetaClass",
+  "name": "__ZN12IOUserClientC2EPK11OSMetaClass"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN12IOUserClientD2Ev",
+  "name": "__ZN12IOUserClientD2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN13IOCommandGate11commandGateEP8OSObjectPFiS1_PvS2_S2_S2_E",
+  "name": "__ZN13IOCommandGate11commandGateEP8OSObjectPFiS1_PvS2_S2_S2_E"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN13IOCommandPool12withWorkLoopEP10IOWorkLoop",
+  "name": "__ZN13IOCommandPool12withWorkLoopEP10IOWorkLoop"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11detachAboveEPK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry11detachAboveEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setLocationEPK8OSSymbolPK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry11setLocationEPK8OSSymbolPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setLocationEPKcPK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry11setLocationEPKcPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setPropertyEPK8OSStringP8OSObject",
+  "name": "__ZN15IORegistryEntry11setPropertyEPK8OSStringP8OSObject"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setPropertyEPK8OSSymbolP8OSObject",
+  "name": "__ZN15IORegistryEntry11setPropertyEPK8OSSymbolP8OSObject"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setPropertyEPKcP8OSObject",
+  "name": "__ZN15IORegistryEntry11setPropertyEPKcP8OSObject"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setPropertyEPKcPvj",
+  "name": "__ZN15IORegistryEntry11setPropertyEPKcPvj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setPropertyEPKcS1_",
+  "name": "__ZN15IORegistryEntry11setPropertyEPKcS1_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setPropertyEPKcb",
+  "name": "__ZN15IORegistryEntry11setPropertyEPKcb"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry11setPropertyEPKcyj",
+  "name": "__ZN15IORegistryEntry11setPropertyEPKcyj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry13attachToChildEPS_PK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry13attachToChildEPS_PK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry13childFromPathEPKcPK15IORegistryPlanePcPi",
+  "name": "__ZN15IORegistryEntry13childFromPathEPKcPK15IORegistryPlanePcPi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry13setPropertiesEP8OSObject",
+  "name": "__ZN15IORegistryEntry13setPropertiesEP8OSObject"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry14attachToParentEPS_PK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry14attachToParentEPS_PK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry14removePropertyEPK8OSString",
+  "name": "__ZN15IORegistryEntry14removePropertyEPK8OSString"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry14removePropertyEPK8OSSymbol",
+  "name": "__ZN15IORegistryEntry14removePropertyEPK8OSSymbol"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry14removePropertyEPKc",
+  "name": "__ZN15IORegistryEntry14removePropertyEPKc"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry15detachFromChildEPS_PK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry15detachFromChildEPS_PK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry16detachFromParentEPS_PK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry16detachFromParentEPS_PK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry16setPropertyTableEP12OSDictionary",
+  "name": "__ZN15IORegistryEntry16setPropertyTableEP12OSDictionary"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry17runPropertyActionEPFiP8OSObjectPvS2_S2_S2_ES1_S2_S2_S2_S2_",
+  "name": "__ZN15IORegistryEntry17runPropertyActionEPFiP8OSObjectPvS2_S2_S2_ES1_S2_S2_S2_S2_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry0Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry0Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry1Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry1Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry2Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry3Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry3Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry4Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry4Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry5Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry5Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry6Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry6Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry7Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry7Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry8Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry8Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry9Ev",
+  "name": "__ZN15IORegistryEntry25_RESERVEDIORegistryEntry9Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry10Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry10Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry11Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry11Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry12Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry12Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry13Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry13Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry14Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry14Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry15Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry15Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry16Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry16Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry17Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry17Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry18Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry18Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry19Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry19Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry20Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry20Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry21Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry21Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry22Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry22Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry23Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry23Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry24Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry24Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry25Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry25Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry26Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry26Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry27Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry27Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry28Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry28Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry29Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry29Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry30Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry30Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry31Ev",
+  "name": "__ZN15IORegistryEntry26_RESERVEDIORegistryEntry31Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry7setNameEPK8OSSymbolPK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry7setNameEPK8OSSymbolPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry7setNameEPKcPK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry7setNameEPKcPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15IORegistryEntry9detachAllEPK15IORegistryPlane",
+  "name": "__ZN15IORegistryEntry9detachAllEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass",
+  "name": "__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase0Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase0Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase1Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase1Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase2Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase3Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase3Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase4Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase4Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase5Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase5Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase6Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase6Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase7Ev",
+  "name": "__ZN15OSMetaClassBase25_RESERVEDOSMetaClassBase7Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN15OSMetaClassBase8DispatchE5IORPC",
+  "name": "__ZN15OSMetaClassBase8DispatchE5IORPC"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN18IOMemoryDescriptor16withAddressRangeEyyjP4task",
+  "name": "__ZN18IOMemoryDescriptor16withAddressRangeEyyjP4task"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN18IOTimerEventSource16timerEventSourceEP8OSObjectPFvS1_PS_E",
+  "name": "__ZN18IOTimerEventSource16timerEventSourceEP8OSObjectPFvS1_PS_E"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN22IOInterruptEventSource20interruptEventSourceEP8OSObjectPFvS1_PS_iEP9IOServicei",
+  "name": "__ZN22IOInterruptEventSource20interruptEventSourceEP8OSObjectPFvS1_PS_iEP9IOServicei"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN24IOBufferMemoryDescriptor11withOptionsEjmm",
+  "name": "__ZN24IOBufferMemoryDescriptor11withOptionsEjmm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN24IOBufferMemoryDescriptor9withBytesEPKvmjb",
+  "name": "__ZN24IOBufferMemoryDescriptor9withBytesEPKvmjb"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN6OSData9withBytesEPKvj",
+  "name": "__ZN6OSData9withBytesEPKvj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8IOMapper19copyMapperForDeviceEP9IOService",
+  "name": "__ZN8IOMapper19copyMapperForDeviceEP9IOService"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8IOMapper7gSystemE",
+  "name": "__ZN8IOMapper7gSystemE"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject0Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject0Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject1Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject1Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject2Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject3Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject3Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject4Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject4Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject5Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject5Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject6Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject6Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject7Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject7Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject8Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject8Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject18_RESERVEDOSObject9Ev",
+  "name": "__ZN8OSObject18_RESERVEDOSObject9Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject19_RESERVEDOSObject10Ev",
+  "name": "__ZN8OSObject19_RESERVEDOSObject10Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject19_RESERVEDOSObject11Ev",
+  "name": "__ZN8OSObject19_RESERVEDOSObject11Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject19_RESERVEDOSObject12Ev",
+  "name": "__ZN8OSObject19_RESERVEDOSObject12Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject19_RESERVEDOSObject13Ev",
+  "name": "__ZN8OSObject19_RESERVEDOSObject13Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject19_RESERVEDOSObject14Ev",
+  "name": "__ZN8OSObject19_RESERVEDOSObject14Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject19_RESERVEDOSObject15Ev",
+  "name": "__ZN8OSObject19_RESERVEDOSObject15Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObject4initEv",
+  "name": "__ZN8OSObject4initEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObjectdlEPvm",
+  "name": "__ZN8OSObjectdlEPvm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN8OSObjectnwEm",
+  "name": "__ZN8OSObjectnwEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService10adjustBusyEi",
+  "name": "__ZN9IOService10adjustBusyEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService10gMetaClassE",
+  "name": "__ZN9IOService10gMetaClassE"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService10handleOpenEPS_jPv",
+  "name": "__ZN9IOService10handleOpenEPS_jPv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService10joinPMtreeEPS_",
+  "name": "__ZN9IOService10joinPMtreeEPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService11handleCloseEPS_j",
+  "name": "__ZN9IOService11handleCloseEPS_j"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService12getBusyStateEv",
+  "name": "__ZN9IOService12getBusyStateEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService12getResourcesEv",
+  "name": "__ZN9IOService12getResourcesEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService12requestProbeEj",
+  "name": "__ZN9IOService12requestProbeEj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService12tellChangeUpEm",
+  "name": "__ZN9IOService12tellChangeUpEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService12updateReportEP19IOReportChannelListjPvS2_",
+  "name": "__ZN9IOService12updateReportEP19IOReportChannelListjPvS2_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService13addPowerChildEPS_",
+  "name": "__ZN9IOService13addPowerChildEPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService13askChangeDownEm",
+  "name": "__ZN9IOService13askChangeDownEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService13matchLocationEPS_",
+  "name": "__ZN9IOService13matchLocationEPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService13messageClientEjP8OSObjectPvm",
+  "name": "__ZN9IOService13messageClientEjP8OSObjectPvm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService13newUserClientEP4taskPvjP12OSDictionaryPP12IOUserClient",
+  "name": "__ZN9IOService13newUserClientEP4taskPvjP12OSDictionaryPP12IOUserClient"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService13newUserClientEP4taskPvjPP12IOUserClient",
+  "name": "__ZN9IOService13newUserClientEP4taskPvjPP12IOUserClient"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService13setPowerStateEmPS_",
+  "name": "__ZN9IOService13setPowerStateEmPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService14activityTickleEmm",
+  "name": "__ZN9IOService14activityTickleEmm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService14applyToClientsEPFvPS_PvES1_",
+  "name": "__ZN9IOService14applyToClientsEPFvPS_PvES1_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService14causeInterruptEi",
+  "name": "__ZN9IOService14causeInterruptEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService14messageClientsEjPvm",
+  "name": "__ZN9IOService14messageClientsEjPvm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService14tellChangeDownEm",
+  "name": "__ZN9IOService14tellChangeDownEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15comparePropertyEP12OSDictionaryPK8OSString",
+  "name": "__ZN9IOService15comparePropertyEP12OSDictionaryPK8OSString"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15comparePropertyEP12OSDictionaryPKc",
+  "name": "__ZN9IOService15comparePropertyEP12OSDictionaryPKc"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15configureReportEP19IOReportChannelListjPvS2_",
+  "name": "__ZN9IOService15configureReportEP19IOReportChannelListjPvS2_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15enableInterruptEi",
+  "name": "__ZN9IOService15enableInterruptEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15errnoFromReturnEi",
+  "name": "__ZN9IOService15errnoFromReturnEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15getDeviceMemoryEv",
+  "name": "__ZN9IOService15getDeviceMemoryEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15nextIdleTimeoutEyyj",
+  "name": "__ZN9IOService15nextIdleTimeoutEyyj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15powerChangeDoneEm",
+  "name": "__ZN9IOService15powerChangeDoneEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15registerServiceEj",
+  "name": "__ZN9IOService15registerServiceEj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15setDeviceMemoryEP7OSArray",
+  "name": "__ZN9IOService15setDeviceMemoryEP7OSArray"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService15terminateClientEPS_j",
+  "name": "__ZN9IOService15terminateClientEPS_j"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16allowPowerChangeEm",
+  "name": "__ZN9IOService16allowPowerChangeEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16applyToProvidersEPFvPS_PvES1_",
+  "name": "__ZN9IOService16applyToProvidersEPFvPS_PvES1_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16disableInterruptEi",
+  "name": "__ZN9IOService16disableInterruptEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16getInterruptTypeEiPi",
+  "name": "__ZN9IOService16getInterruptTypeEiPi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16registerInterestEPK8OSSymbolPFiPvS3_jPS_S3_mES3_S3_",
+  "name": "__ZN9IOService16registerInterestEPK8OSSymbolPFiPvS3_jPS_S3_mES3_S3_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16removePowerChildEP17IOPowerConnection",
+  "name": "__ZN9IOService16removePowerChildEP17IOPowerConnection"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16requestTerminateEPS_j",
+  "name": "__ZN9IOService16requestTerminateEPS_j"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16stringFromReturnEi",
+  "name": "__ZN9IOService16stringFromReturnEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService16tellNoChangeDownEm",
+  "name": "__ZN9IOService16tellNoChangeDownEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService17addNeededResourceEPKc",
+  "name": "__ZN9IOService17addNeededResourceEPKc"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService17applyToInterestedEPK8OSSymbolPFvP8OSObjectPvES5_",
+  "name": "__ZN9IOService17applyToInterestedEPK8OSSymbolPFvP8OSObjectPvES5_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService17cancelPowerChangeEm",
+  "name": "__ZN9IOService17cancelPowerChangeEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService17comparePropertiesEP12OSDictionaryP12OSCollection",
+  "name": "__ZN9IOService17comparePropertiesEP12OSDictionaryP12OSCollection"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService17getAggressivenessEmPm",
+  "name": "__ZN9IOService17getAggressivenessEmPm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService17registerInterruptEiP8OSObjectPFvS1_PvPS_iES2_",
+  "name": "__ZN9IOService17registerInterruptEiP8OSObjectPFvS1_PvPS_iES2_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService17setAggressivenessEmm",
+  "name": "__ZN9IOService17setAggressivenessEmm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService18lockForArbitrationEb",
+  "name": "__ZN9IOService18lockForArbitrationEb"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService18matchPropertyTableEP12OSDictionary",
+  "name": "__ZN9IOService18matchPropertyTableEP12OSDictionary"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService18matchPropertyTableEP12OSDictionaryPi",
+  "name": "__ZN9IOService18matchPropertyTableEP12OSDictionaryPi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService18setIdleTimerPeriodEm",
+  "name": "__ZN9IOService18setIdleTimerPeriodEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService18systemWillShutdownEj",
+  "name": "__ZN9IOService18systemWillShutdownEj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService0Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService0Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService1Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService1Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService2Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService3Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService3Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService4Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService4Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService5Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService5Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService6Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService6Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService7Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService7Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService8Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService8Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19_RESERVEDIOService9Ev",
+  "name": "__ZN9IOService19_RESERVEDIOService9Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19registerPowerDriverEPS_P14IOPMPowerStatem",
+  "name": "__ZN9IOService19registerPowerDriverEPS_P14IOPMPowerStatem"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService19unregisterInterruptEi",
+  "name": "__ZN9IOService19unregisterInterruptEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService10Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService10Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService11Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService11Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService12Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService12Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService13Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService13Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService14Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService14Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService15Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService15Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService16Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService16Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService17Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService17Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService18Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService18Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService19Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService19Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService20Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService20Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService21Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService21Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService22Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService22Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService23Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService23Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService24Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService24Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService25Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService25Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService26Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService26Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService27Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService27Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService28Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService28Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService29Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService29Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService30Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService30Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService31Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService31Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService32Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService32Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService33Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService33Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService34Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService34Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService35Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService35Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService36Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService36Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService37Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService37Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService38Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService38Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService39Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService39Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService40Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService40Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService41Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService41Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService42Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService42Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService43Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService43Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService44Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService44Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService45Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService45Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService46Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService46Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20_RESERVEDIOService47Ev",
+  "name": "__ZN9IOService20_RESERVEDIOService47Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20callPlatformFunctionEPK8OSSymbolbPvS3_S3_S3_",
+  "name": "__ZN9IOService20callPlatformFunctionEPK8OSSymbolbPvS3_S3_S3_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20callPlatformFunctionEPKcbPvS2_S2_S2_",
+  "name": "__ZN9IOService20callPlatformFunctionEPKcbPvS2_S2_S2_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20getDeviceMemoryCountEv",
+  "name": "__ZN9IOService20getDeviceMemoryCountEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService20unlockForArbitrationEv",
+  "name": "__ZN9IOService20unlockForArbitrationEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService21powerStateDidChangeToEmmPS_",
+  "name": "__ZN9IOService21powerStateDidChangeToEmmPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService22copyClientWithCategoryEPK8OSSymbol",
+  "name": "__ZN9IOService22copyClientWithCategoryEPK8OSSymbol"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService22powerStateWillChangeToEmmPS_",
+  "name": "__ZN9IOService22powerStateWillChangeToEmmPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService23acknowledgeNotificationEPvj",
+  "name": "__ZN9IOService23acknowledgeNotificationEPvj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService23requestPowerDomainStateEmP17IOPowerConnectionm",
+  "name": "__ZN9IOService23requestPowerDomainStateEmP17IOPowerConnectionm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService24acknowledgeSetPowerStateEv",
+  "name": "__ZN9IOService24acknowledgeSetPowerStateEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService24getDeviceMemoryWithIndexEj",
+  "name": "__ZN9IOService24getDeviceMemoryWithIndexEj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService24mapDeviceMemoryWithIndexEjj",
+  "name": "__ZN9IOService24mapDeviceMemoryWithIndexEjj"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService24powerStateForDomainStateEm",
+  "name": "__ZN9IOService24powerStateForDomainStateEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService27maxCapabilityForDomainStateEm",
+  "name": "__ZN9IOService27maxCapabilityForDomainStateEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService31initialPowerStateForDomainStateEm",
+  "name": "__ZN9IOService31initialPowerStateForDomainStateEm"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService4initEP15IORegistryEntryPK15IORegistryPlane",
+  "name": "__ZN9IOService4initEP15IORegistryEntryPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService4openEPS_jPv",
+  "name": "__ZN9IOService4openEPS_jPv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService5closeEPS_j",
+  "name": "__ZN9IOService5closeEPS_j"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService5probeEPS_Pi",
+  "name": "__ZN9IOService5probeEPS_Pi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService6PMinitEv",
+  "name": "__ZN9IOService6PMinitEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService6PMstopEv",
+  "name": "__ZN9IOService6PMstopEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService6attachEPS_",
+  "name": "__ZN9IOService6attachEPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService6detachEPS_",
+  "name": "__ZN9IOService6detachEPS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService7messageEjPS_Pv",
+  "name": "__ZN9IOService7messageEjPS_Pv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOService8DispatchE5IORPC",
+  "name": "__ZN9IOService8DispatchE5IORPC"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOServiceC2EPK11OSMetaClass",
+  "name": "__ZN9IOServiceC2EPK11OSMetaClass"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZN9IOServiceD2Ev",
+  "name": "__ZN9IOServiceD2Ev"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass12getMetaClassEv",
+  "name": "__ZNK11OSMetaClass12getMetaClassEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass12taggedRetainEPKv",
+  "name": "__ZNK11OSMetaClass12taggedRetainEPKv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass13taggedReleaseEPKv",
+  "name": "__ZNK11OSMetaClass13taggedReleaseEPKv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass13taggedReleaseEPKvi",
+  "name": "__ZNK11OSMetaClass13taggedReleaseEPKvi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass14getRetainCountEv",
+  "name": "__ZNK11OSMetaClass14getRetainCountEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass19instanceConstructedEv",
+  "name": "__ZNK11OSMetaClass19instanceConstructedEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass6retainEv",
+  "name": "__ZNK11OSMetaClass6retainEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass7releaseEi",
+  "name": "__ZNK11OSMetaClass7releaseEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass7releaseEv",
+  "name": "__ZNK11OSMetaClass7releaseEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK11OSMetaClass9serializeEP11OSSerialize",
+  "name": "__ZNK11OSMetaClass9serializeEP11OSSerialize"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11compareNameEP8OSStringPS1_",
+  "name": "__ZNK15IORegistryEntry11compareNameEP8OSStringPS1_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11getLocationEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry11getLocationEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11getPropertyEPK8OSString",
+  "name": "__ZNK15IORegistryEntry11getPropertyEPK8OSString"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11getPropertyEPK8OSStringPK15IORegistryPlanej",
+  "name": "__ZNK15IORegistryEntry11getPropertyEPK8OSStringPK15IORegistryPlanej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11getPropertyEPK8OSSymbol",
+  "name": "__ZNK15IORegistryEntry11getPropertyEPK8OSSymbol"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11getPropertyEPK8OSSymbolPK15IORegistryPlanej",
+  "name": "__ZNK15IORegistryEntry11getPropertyEPK8OSSymbolPK15IORegistryPlanej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11getPropertyEPKc",
+  "name": "__ZNK15IORegistryEntry11getPropertyEPKc"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry11getPropertyEPKcPK15IORegistryPlanej",
+  "name": "__ZNK15IORegistryEntry11getPropertyEPKcPK15IORegistryPlanej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12compareNamesEP8OSObjectPP8OSString",
+  "name": "__ZNK15IORegistryEntry12compareNamesEP8OSObjectPP8OSString"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12copyLocationEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry12copyLocationEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12copyPropertyEPK8OSString",
+  "name": "__ZNK15IORegistryEntry12copyPropertyEPK8OSString"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12copyPropertyEPK8OSStringPK15IORegistryPlanej",
+  "name": "__ZNK15IORegistryEntry12copyPropertyEPK8OSStringPK15IORegistryPlanej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12copyPropertyEPK8OSSymbol",
+  "name": "__ZNK15IORegistryEntry12copyPropertyEPK8OSSymbol"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12copyPropertyEPK8OSSymbolPK15IORegistryPlanej",
+  "name": "__ZNK15IORegistryEntry12copyPropertyEPK8OSSymbolPK15IORegistryPlanej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12copyPropertyEPKc",
+  "name": "__ZNK15IORegistryEntry12copyPropertyEPKc"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry12copyPropertyEPKcPK15IORegistryPlanej",
+  "name": "__ZNK15IORegistryEntry12copyPropertyEPKcPK15IORegistryPlanej"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry13getChildEntryEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry13getChildEntryEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry14applyToParentsEPFvPS_PvES1_PK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry14applyToParentsEPFvPS_PvES1_PK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry14copyChildEntryEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry14copyChildEntryEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry14getParentEntryEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry14getParentEntryEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry15applyToChildrenEPFvPS_PvES1_PK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry15applyToChildrenEPFvPS_PvES1_PK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry15copyParentEntryEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry15copyParentEntryEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry16getChildIteratorEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry16getChildIteratorEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry16getPathComponentEPcPiPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry16getPathComponentEPcPiPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry17getParentIteratorEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry17getParentIteratorEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry24dictionaryWithPropertiesEv",
+  "name": "__ZNK15IORegistryEntry24dictionaryWithPropertiesEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry7getNameEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry7getNameEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry7getPathEPcPiPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry7getPathEPcPiPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry7inPlaneEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry7inPlaneEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry7isChildEPS_PK15IORegistryPlaneb",
+  "name": "__ZNK15IORegistryEntry7isChildEPS_PK15IORegistryPlaneb"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry8copyNameEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry8copyNameEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry8getDepthEPK15IORegistryPlane",
+  "name": "__ZNK15IORegistryEntry8getDepthEPK15IORegistryPlane"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15IORegistryEntry8isParentEPS_PK15IORegistryPlaneb",
+  "name": "__ZNK15IORegistryEntry8isParentEPS_PK15IORegistryPlaneb"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK15OSMetaClassBase9isEqualToEPKS_",
+  "name": "__ZNK15OSMetaClassBase9isEqualToEPKS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject12taggedRetainEPKv",
+  "name": "__ZNK8OSObject12taggedRetainEPKv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject13taggedReleaseEPKv",
+  "name": "__ZNK8OSObject13taggedReleaseEPKv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject13taggedReleaseEPKvi",
+  "name": "__ZNK8OSObject13taggedReleaseEPKvi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject14getRetainCountEv",
+  "name": "__ZNK8OSObject14getRetainCountEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject6retainEv",
+  "name": "__ZNK8OSObject6retainEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject7releaseEi",
+  "name": "__ZNK8OSObject7releaseEi"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject7releaseEv",
+  "name": "__ZNK8OSObject7releaseEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK8OSObject9serializeEP11OSSerialize",
+  "name": "__ZNK8OSObject9serializeEP11OSSerialize"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService10isInactiveEv",
+  "name": "__ZNK9IOService10isInactiveEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService11getProviderEv",
+  "name": "__ZNK9IOService11getProviderEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService11getWorkLoopEv",
+  "name": "__ZNK9IOService11getWorkLoopEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService12handleIsOpenEPKS_",
+  "name": "__ZNK9IOService12handleIsOpenEPKS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService17getClientIteratorEv",
+  "name": "__ZNK9IOService17getClientIteratorEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService19getProviderIteratorEv",
+  "name": "__ZNK9IOService19getProviderIteratorEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService19serializePropertiesEP11OSSerialize",
+  "name": "__ZNK9IOService19serializePropertiesEP11OSSerialize"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService21getOpenClientIteratorEv",
+  "name": "__ZNK9IOService21getOpenClientIteratorEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService23getOpenProviderIteratorEv",
+  "name": "__ZNK9IOService23getOpenProviderIteratorEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService6isOpenEPKS_",
+  "name": "__ZNK9IOService6isOpenEPKS_"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService8getStateEv",
+  "name": "__ZNK9IOService8getStateEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZNK9IOService9getClientEv",
+  "name": "__ZNK9IOService9getClientEv"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZTV12IOUserClient",
+  "name": "__ZTV12IOUserClient"
+ },
+ {
+  "addr": 0,
+  "mangled": "__ZTV9IOService",
+  "name": "__ZTV9IOService"
+ },
+ {
+  "addr": 0,
+  "mangled": "___memcpy_chk",
+  "name": "___memcpy_chk"
+ },
+ {
+  "addr": 0,
+  "mangled": "___stack_chk_fail",
+  "name": "___stack_chk_fail"
+ },
+ {
+  "addr": 0,
+  "mangled": "___stack_chk_guard",
+  "name": "___stack_chk_guard"
+ },
+ {
+  "addr": 0,
+  "mangled": "_clock_interval_to_deadline",
+  "name": "_clock_interval_to_deadline"
+ },
+ {
+  "addr": 0,
+  "mangled": "_gIODTModelKey",
+  "name": "_gIODTModelKey"
+ },
+ {
+  "addr": 0,
+  "mangled": "_gIODTTypeKey",
+  "name": "_gIODTTypeKey"
+ },
+ {
+  "addr": 0,
+  "mangled": "_kOSBooleanTrue",
+  "name": "_kOSBooleanTrue"
+ },
+ {
+  "addr": 0,
+  "mangled": "_kernel_debug",
+  "name": "_kernel_debug"
+ },
+ {
+  "addr": 0,
+  "mangled": "_microtime",
+  "name": "_microtime"
+ },
+ {
+  "addr": 0,
+  "mangled": "_snprintf",
+  "name": "_snprintf"
+ },
+ {
+  "addr": 0,
+  "mangled": "_strlen",
+  "name": "_strlen"
+ },
+ {
+  "addr": 0,
+  "mangled": "_timevalsub",
+  "name": "_timevalsub"
+ }
+]

@@ -1,0 +1,104 @@
+===== readFlashRegister @0x8084-0x809c =====
+008084: ldr	x8, [x0, #0x150]
+008088: ldr	w0, [x8, w1, uxtw]
+00808c: ret	
+008090: ldr	x8, [x0, #0x150]
+008094: str	w2, [x8, w1, uxtw]
+008098: ret	
+===== writeFlashRegister @0x809c-0x821c =====
+00809c: pacibsp	
+0080a0: sub	sp, sp, #0x60
+0080a4: stp	x24, x23, [sp, #0x20]
+0080a8: stp	x22, x21, [sp, #0x30]
+0080ac: stp	x20, x19, [sp, #0x40]
+0080b0: stp	x29, x30, [sp, #0x50]
+0080b4: add	x29, sp, #0x50
+0080b8: mov	x20, x1
+0080bc: mov	x19, x0
+0080c0: ldr	x16, [x0]
+0080c4: mov	x21, x0
+0080c8: movk	x21, #0xcda1, lsl #48
+0080cc: mov	x17, x0
+0080d0: movk	x17, #0xcda1, lsl #48
+0080d4: autda	x16, x17
+0080d8: mov	x17, x16
+0080dc: xpacd	x17
+0080e0: cmp	x16, x17
+0080e4: b.eq	#0x80ec
+0080e8: brk	#0xc472
+0080ec: add	x8, x16, #0x3a8
+0080f0: ldr	x9, [x16, #0x3a8]
+0080f4: movk	x8, #0xc9c, lsl #48
+0080f8: mov	x1, #0
+0080fc: blraa	x9, x8
+008100: adrp	x22, #0x1000
+008104: add	x22, x22, #0x3c1
+008108: stp	x19, x22, [sp, #8]
+00810c: str	x0, [sp]
+008110: adrp	x0, #0x1000
+008114: add	x0, x0, #0x389
+008118: bl	#0xe884
+00811c: ldr	x16, [x19]
+008120: mov	x17, x19
+008124: movk	x17, #0xcda1, lsl #48
+008128: autda	x16, x17
+00812c: mov	x17, x16
+008130: xpacd	x17
+008134: cmp	x16, x17
+008138: b.eq	#0x8140
+00813c: brk	#0xc472
+008140: add	x8, x16, #0x3a8
+008144: ldr	x9, [x16, #0x3a8]
+008148: movk	x8, #0xc9c, lsl #48
+00814c: mov	x0, x19
+008150: mov	x1, #0
+008154: blraa	x9, x8
+008158: stp	x22, x20, [sp, #0x10]
+00815c: stp	x0, x19, [sp]
+008160: adrp	x0, #0x1000
+008164: add	x0, x0, #0x3ca
+008168: bl	#0xe884
+00816c: ldr	x8, [x19, #0x150]
+008170: mov	w23, #1
+008174: mov	x9, x8
+008178: str	w23, [x9, #0x54]!
+00817c: str	wzr, [x9]
+008180: str	w20, [x8, #0x40]
+008184: mov	w10, #0xeeee
+008188: str	w10, [x8, #0x48]!
+00818c: ldur	w10, [x8, #-0x38]
+008190: tbz	w10, #5, #0x81b0
+008194: mov	w0, #0x3e8
+008198: bl	#0xe89c
+00819c: ldr	x9, [x19, #0x150]
+0081a0: ldr	w8, [x9, #0x10]
+0081a4: tbnz	w8, #5, #0x8194
+0081a8: add	x8, x9, #0x48
+0081ac: add	x9, x9, #0x54
+0081b0: str	wzr, [x8]
+0081b4: str	w23, [x9]
+0081b8: str	wzr, [x9]
+0081bc: ldr	x16, [x19]
+0081c0: autda	x16, x21
+0081c4: mov	x17, x16
+0081c8: xpacd	x17
+0081cc: cmp	x16, x17
+0081d0: b.eq	#0x81d8
+0081d4: brk	#0xc472
+0081d8: add	x8, x16, #0x3a8
+0081dc: ldr	x9, [x16, #0x3a8]
+0081e0: movk	x8, #0xc9c, lsl #48
+0081e4: mov	x0, x19
+0081e8: mov	x1, #0
+0081ec: blraa	x9, x8
+0081f0: stp	x19, x22, [sp, #8]
+0081f4: str	x0, [sp]
+0081f8: adrp	x0, #0x1000
+0081fc: add	x0, x0, #0x41c
+008200: bl	#0xe884
+008204: ldp	x29, x30, [sp, #0x50]
+008208: ldp	x20, x19, [sp, #0x40]
+00820c: ldp	x22, x21, [sp, #0x30]
+008210: ldp	x24, x23, [sp, #0x20]
+008214: add	sp, sp, #0x60
+008218: retab	

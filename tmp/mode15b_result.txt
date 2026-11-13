@@ -1,0 +1,34 @@
+Apple Afterburner [106b:0205] Phase 3i-3k BAR1 submit + bring-up (mode=15)
+
+--- PRE-STATE ---
+  BAR1+0x0000 engine ctrl/status   = 0xffffffff
+  BAR1+0x0004 send doorbell        = 0xffffffff
+  BAR1+0x0090 chA mask             = 0xffffffff
+  BAR1+0x1004 recv doorbell        = 0xffffffff
+  BAR1+0x1090 chB mask             = 0xffffffff
+  BAR1+0x2004 engine enable        = 0xffffffff
+  BAR1+0x2010 eng ctrl             = 0xffffffff
+  BAR1+0x2014 ack reg B (@0x666c)  = 0xffffffff
+  BAR1+0x2018 completion ack       = 0xffffffff
+  BAR1+0x2044 completion status    = 0xffffffff
+  BAR1+0x3080 (old 3g guess)       = 0xffffffff
+  BAR1+0x4080 send stage lo        = 0xffffffff
+  BAR1+0x4084 send stage hi        = 0xffffffff
+  BAR1+0x4088 send local_val       = 0xffffffff
+--- PRE-STATE (BAR0) ---
+  BAR0+0x0008 fw version           = 0xffffffff
+  BAR0+0x1014 status A (tail)      = 0xffffffff
+  BAR0+0x1020 status B (tail)      = 0xffffffff
+  BAR0+0x1024 status C (tail)      = 0xffffffff
+  BAR0+0x2014 probe gate           = 0xffffffff
+  BAR0+0x202c int blk A            = 0xffffffff
+  BAR0+0x2030 int blk B            = 0xffffffff
+  BAR0+0x2034 counter slot 0       = 0xffffffff
+  BAR0+0x8014 decoder counter      = 0xffffffff
+  BAR0+0x8018 pre-submit reg (kext writes 0x1f) = 0xffffffff
+
+--- FW VERSION GATE (@0x75c4) ---
+BAR0+0x0008 = 0xffffffff (upper=0xffff lower=0xffff)
+GATE FAIL: upper half != 2 — kext would log @0x656 and stop
+
+=== done ===

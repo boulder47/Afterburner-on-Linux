@@ -1,0 +1,157 @@
+=== 1. remaining strings ===
+  0x1a4c: 'AppleAfterburner Info: %s[%p]::%s: changing pointer to live...\n'
+  0x17f5: 'AppleAfterburner Info: %s[%p]::%s: reconfiguring to live...\n'
+  0x1656: 'AppleAfterburner Error: %s[%p]::%s: giving up on flash update. max attempts = %u\n'
+  0x0190: ''
+  0x10dd: 'AppleAfterburner Error: %s[%p]::%s: flash update in progress. deferring power state ack\n'
+  0x1136: 'AppleAfterburner Error: %s[%p]::%s: flash update in progress\n'
+  0x1174: 'AppleAfterburner Error: %s[%p]::%s: lost decoder configuration. driver support for PR has been deprecated\n'
+  0x127f: 'AppleAfterburner Error: %s[%p]::%s: Unexpected requested power state %lu'
+  0x122f: 'AppleAfterburner Info: %s[%p]::%s: Resetting thermal distress condition 0x%08x\n'
+  0x1389: 'AppleAfterburner Info: %s[%p]::%s: begin erasing flash\n'
+  0x13c1: 'spierase'
+  0x1be6: 'AppleAfterburner Info: %s[%p]::%s: requesting resource data from %s\n'
+  0x1c2b: 'loadBitfile'
+  0x1c37: 'AppleAfterburner Error: %s[%p]::%s: OSKextRequestResource failed: %d\n'
+  0x14d0: 'AppleAfterburner Info: %s[%p]::%s: completed writing at 0x%08x\n'
+  0x1510: 'AppleAfterburner Info: %s[%p]::%s: @0x%08x : wrfifo_full... waiting for space in the FIFO\n'
+  0x156b: 'AppleAfterburner Info: %s[%p]::%s: @0x%08x : wrfifo is not empty... waiting for the FIFO to empty\n'
+  0x15ce: 'AppleAfterburner Info: %s[%p]::%s: done programming flash-%u\n'
+
+=== 2. PLT[0xe83c] (first stub) ===
+PLT[0xe83c]: GOT=0x14000; idx=0 => {'lib': 254, 'weak': 0, 'name': '_IODelay'}
+
+=== 3. fn@0x8580 full (pointer switcher): 0x8580..0x8628 ===
+  0x8580: pacibsp	
+  0x8584: stp	x20, x19, [sp, #-0x20]!
+  0x8588: stp	x29, x30, [sp, #0x10]
+  0x858c: add	x29, sp, #0x10
+  0x8590: mov	x19, x1
+  0x8594: mov	x20, x0
+  0x8598: mov	w8, #0xff40
+  0x859c: movk	w8, #0x13f, lsl #16
+  0x85a0: sub	w1, w8, #0xf40
+  0x85a4: bl	#0x809c
+  0x85a8: adrp	x8, #0
+  0x85ac: add	x8, x8, #0x670
+  0x85b0: adrp	x9, #0
+  0x85b4: add	x9, x9, #0x5f0
+  0x85b8: cmp	w19, #1
+  0x85bc: csel	x3, x9, x8, eq
+  0x85c0: adrp	x8, #0
+  0x85c4: add	x8, x8, #0x6b0
+  0x85c8: adrp	x9, #0
+  0x85cc: add	x9, x9, #0x630
+  0x85d0: csel	x19, x9, x8, eq
+  0x85d4: mov	x0, x20
+  0x85d8: mov	w1, #0
+  0x85dc: mov	w2, #0xff40
+  0x85e0: movk	w2, #0x13f, lsl #16
+  0x85e4: mov	w4, #0x40
+  0x85e8: mov	w5, #0
+  0x85ec: bl	#0x821c
+  0x85f0: mov	x0, x20
+  0x85f4: mov	w1, #1
+  0x85f8: mov	w2, #0xff40
+  0x85fc: movk	w2, #0x13f, lsl #16
+  0x8600: mov	x3, x19
+  0x8604: mov	w4, #0x40
+  0x8608: mov	w5, #0
+  0x860c: ldp	x29, x30, [sp, #0x10]
+  0x8610: ldp	x20, x19, [sp], #0x20
+  0x8614: autibsp	
+  0x8618: eor	x9, x30, x30, lsl #1
+  0x861c: tbz	x9, #0x3e, #0x8624
+  0x8620: brk	#0xc471
+  0x8624: b	#0x821c
+
+=== 4. fn@0x821c prologue: 0x821c..0x82e8 ===
+  0x821c: pacibsp	
+  0x8220: sub	sp, sp, #0x90
+  0x8224: stp	x28, x27, [sp, #0x30]
+  0x8228: stp	x26, x25, [sp, #0x40]
+  0x822c: stp	x24, x23, [sp, #0x50]
+  0x8230: stp	x22, x21, [sp, #0x60]
+  0x8234: stp	x20, x19, [sp, #0x70]
+  0x8238: stp	x29, x30, [sp, #0x80]
+  0x823c: add	x29, sp, #0x80
+  0x8240: mov	x22, x5
+  0x8244: mov	x21, x4
+  0x8248: mov	x23, x3
+  0x824c: mov	x24, x2
+  0x8250: mov	x20, x1
+  0x8254: mov	x19, x0
+  0x8258: ldr	x16, [x0]
+  0x825c: mov	x25, x0
+  0x8260: movk	x25, #0xcda1, lsl #48
+  0x8264: mov	x17, x0
+  0x8268: movk	x17, #0xcda1, lsl #48
+  0x826c: autda	x16, x17
+  0x8270: mov	x17, x16
+  0x8274: xpacd	x17
+  0x8278: cmp	x16, x17
+  0x827c: b.eq	#0x8284
+  0x8280: brk	#0xc472
+  0x8284: add	x8, x16, #0x3a8
+  0x8288: ldr	x9, [x16, #0x3a8]
+  0x828c: movk	x8, #0xc9c, lsl #48
+  0x8290: mov	x1, #0
+  0x8294: blraa	x9, x8
+  0x8298: adrp	x26, #0x1000
+  0x829c: add	x26, x26, #0x492
+  0x82a0: stp	x26, x20, [sp, #0x10]
+  0x82a4: stp	x0, x19, [sp]
+  0x82a8: adrp	x0, #0x1000
+  0x82ac: add	x0, x0, #0x453
+  0x82b0: bl	#0xe884
+  0x82b4: mov	w8, #0xaaaa
+  0x82b8: ldr	x9, [x19, #0x150]
+  0x82bc: bfi	w8, w20, #0x10, #0x10
+  0x82c0: str	w24, [x9, #0x40]
+  0x82c4: str	w8, [x9, #0x48]
+  0x82c8: cmp	w21, #4
+  0x82cc: str	x20, [sp, #0x20]
+  0x82d0: b.lo	#0x8570
+  0x82d4: mov	w28, #0
+  0x82d8: adrp	x24, #0x1000
+  0x82dc: add	x24, x24, #0x49d
+  0x82e0: mov	x27, x21
+  0x82e4: ldr	w8, [x23]
+
+=== 5. vtable_slots_main.json: slot 259 + neighbors ===
+  type=list, len=250
+
+=== 6. grep IOService headers for setPowerState / slot context ===
+--- rework/static_re/IOService_sonoma.h:
+  1751: *   @discussion Removes the driver from the power plane and stop its power management. This method is synchronous against any power management method invocations (e.g. <code>setPowerState</code> or <code>setAggressiveness</code>), so when this method returns it is guaranteed those power management methods will not be entered. Driver should not call any power management methods after this call.
+  1766: *   @discussion A driver defines its array of supported power states with power management in its power management initialization (its <code>start</code> routine). If successful, power management will call the driver to instruct it to change its power state through @link setPowerState setPowerState@/link.
+  1810:/*! @function acknowledgeSetPowerState
+  1811:*   @abstract Acknowledges the belated completion of a driver's <code>setPowerState</code> power state change.
+  1812:*   @discussion After power management instructs a driver to change its state via @link setPowerState setPowerState@/link, that driver must acknowledge the change when its device has completed its transition. The acknowledgement may be immediate, via a return code from <code>setPowerState</code>, or delayed, via this call to <code>acknowledgeSetPowerState</code>.
+  1813:*   Any driver that does not return <code>kIOPMAckImplied</code> from its <code>setPowerState</code> implementation must later call <code>acknowledgeSetPowerState</code>.
+  1817:	IOReturn acknowledgeSetPowerState( void );
+  2007:/*! @function setPowerState
+  2009: *   @discussion A power managed driver must override <code>setPowerState</code> to take part in system power management. After a driver is registered with power management, the system uses <code>setPowerState</code> to power the device off and on for system sleep and wake.
+  2010: *   Calls to @link PMinit PMinit@/link and @link registerPowerDriver registerPowerDriver@/link enable power management to change a device's power state using <code>setPowerState</code>. <code>setPowerState</code> is called in a clean and separate thread context.
+  2013: *   @result The driver must return <code>IOPMAckImplied</code> if it has complied with the request when it returns. Otherwise if it has started the process of changing power state but not finished it, the driver should return a number of microseconds which is an upper limit of the time it will need to finish. Then, when it has completed the power switch, it should call @link acknowledgeSetPowerState acknowledgeSetPowerState@/link. */
+  2015:	virtual IOReturn setPowerState(
+--- rework/static_re/IOService_seq.h:
+  1590:	 *   @abstract Register a handler for ANE exclave's setPowerState upcall
+  1844: *   @discussion Removes the driver from the power plane and stop its power management. This method is synchronous against any power management method invocations (e.g. <code>setPowerState</code> or <code>setAggressiveness</code>), so when this method returns it is guaranteed those power management methods will not be entered. Driver should not call any power management methods after this call.
+  1859: *   @discussion A driver defines its array of supported power states with power management in its power management initialization (its <code>start</code> routine). If successful, power management will call the driver to instruct it to change its power state through @link setPowerState setPowerState@/link.
+  1903:/*! @function acknowledgeSetPowerState
+  1904:*   @abstract Acknowledges the belated completion of a driver's <code>setPowerState</code> power state change.
+  1905:*   @discussion After power management instructs a driver to change its state via @link setPowerState setPowerState@/link, that driver must acknowledge the change when its device has completed its transition. The acknowledgement may be immediate, via a return code from <code>setPowerState</code>, or delayed, via this call to <code>acknowledgeSetPowerState</code>.
+  1906:*   Any driver that does not return <code>kIOPMAckImplied</code> from its <code>setPowerState</code> implementation must later call <code>acknowledgeSetPowerState</code>.
+  1910:	IOReturn acknowledgeSetPowerState( void );
+  2107:/*! @function setPowerState
+  2109: *   @discussion A power managed driver must override <code>setPowerState</code> to take part in system power management. After a driver is registered with power management, the system uses <code>setPowerState</code> to power the device off and on for system sleep and wake.
+  2110: *   Calls to @link PMinit PMinit@/link and @link registerPowerDriver registerPowerDriver@/link enable power management to change a device's power state using <code>setPowerState</code>. <code>setPowerState</code> is called in a clean and separate thread context.
+  2113: *   @result The driver must return <code>IOPMAckImplied</code> if it has complied with the request when it returns. Otherwise if it has started the process of changing power state but not finished it, the driver should return a number of microseconds which is an upper limit of the time it will need to finish. Then, when it has completed the power switch, it should call @link acknowledgeSetPowerState acknowledgeSetPowerState@/link. */
+  2115:	virtual IOReturn setPowerState(
+
+=== 7. ab_vtable_true.txt: slot 259 area ===
+  (no match)
+
+=== 8. local_syms.json: any entry near 0x7c60 / 0x7508 / 0x6b94 ===
+  type=list, len=142

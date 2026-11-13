@@ -1,0 +1,82 @@
+00711c: ldr      x8, [x19, #0x138]
+007120: ldr      w8, [x8, #0xc]
+007124: stp      x21, x8, [sp, #0x10]
+007128: stp      x0, x19, [sp]
+00712c: adrp     x0, #0x1000
+007130: add      x0, x0, #0x6a8
+007134: bl       #0xe884
+007138: ldr      x8, [x19, #0x138]
+00713c: ldr      w8, [x8, #0xc]
+007140: ubfx     w20, w8, #0x10, #8
+007144: cmp      w20, #2
+007148: b.hs     #0x7394
+00714c: and      w8, w8, #3
+007150: ldr      x9, [x19, #0x1198]
+007154: cbz      x9, #0x73dc
+007158: ldr      x9, [x19, #0x11a0]
+00715c: cbz      x9, #0x7414
+007160: ldr      w8, [x19, #0x16c]
+007164: add      w8, w8, #1
+007168: str      w8, [x19, #0x16c]
+00716c: ldr      x16, [x19]
+007170: autda    x16, x22
+007174: mov      x17, x16
+007178: xpacd    x17
+00717c: cmp      x16, x17
+007180: b.eq     #0x7188
+007184: brk      #0xc472
+007188: add      x8, x16, #0x3a8
+00718c: ldr      x9, [x16, #0x3a8]
+007190: movk     x8, #0xc9c, lsl #48
+007194: mov      x0, x19
+007198: mov      x1, #0
+00719c: blraa    x9, x8
+0071a0: stp      x19, x21, [sp, #8]
+0071a4: str      x0, [sp]
+0071a8: adrp     x0, #0x1000
+0071ac: add      x0, x0, #0x7b3
+0071b0: bl       #0xe884
+0071b4: mov      x0, x19
+0071b8: mov      w1, #0
+0071bc: bl       #0x8580
+0071c0: mov      w0, #0x3e8
+0071c4: bl       #0xe89c
+0071c8: mov      x0, x19
+0071cc: mov      w1, #0x1400000
+0071d0: bl       #0x809c
+0071d4: ldr      x0, [x19, #0x1198]
+0071d8: ldr      x16, [x0]
+0071dc: mov      x17, x0
+0071e0: movk     x17, #0xcda1, lsl #48
+0071e4: autda    x16, x17
+0071e8: mov      x17, x16
+0071ec: xpacd    x17
+0071f0: cmp      x16, x17
+0071f4: b.eq     #0x71fc
+0071f8: brk      #0xc472
+0071fc: add      x8, x16, #0x308
+007200: ldr      x9, [x16, #0x308]
+007204: movk     x8, #0xf4f4, lsl #48
+007208: blraa    x9, x8
+00720c: mov      x20, x0
+007210: ldr      x0, [x19, #0x1198]
+007214: ldr      x16, [x0]
+007218: mov      x17, x0
+00721c: movk     x17, #0xcda1, lsl #48
+007220: autda    x16, x17
+007224: mov      x17, x16
+007228: xpacd    x17
+00722c: cmp      x16, x17
+007230: b.eq     #0x7238
+007234: brk      #0xc472
+007238: add      x8, x16, #0x300
+00723c: ldr      x9, [x16, #0x300]
+007240: movk     x8, #0x98e1, lsl #48
+007244: blraa    x9, x8
+007248: mov      x4, x0
+00724c: mov      w23, #1
+007250: mov      x0, x19
+007254: mov      w1, #0
+007258: mov      w2, #0x1400000
+00725c: mov      x3, x20
+007260: mov      w5, #1

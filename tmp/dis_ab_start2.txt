@@ -1,0 +1,384 @@
+5000: mov	x17, x16
+5004: xpacd	x17
+5008: cmp	x16, x17
+500c: b.eq	#0x5014
+5010: brk	#0xc472
+5014: add	x8, x16, #0x160
+5018: ldr	x9, [x16, #0x160]
+501c: movk	x8, #0x11e8, lsl #48
+5020: blraa	x9, x8
+5024: ldr	x0, [x19, #0x1180]
+5028: ldr	x16, [x0]
+502c: mov	x17, x0
+5030: movk	x17, #0xcda1, lsl #48
+5034: autda	x16, x17
+5038: mov	x17, x16
+503c: xpacd	x17
+5040: cmp	x16, x17
+5044: b.eq	#0x504c
+5048: brk	#0xc472
+504c: add	x8, x16, #0x170
+5050: ldr	x9, [x16, #0x170]
+5054: movk	x8, #0x9b16, lsl #48
+5058: blraa	x9, x8
+505c: adrp	x16, #0x7000
+5060: add	x16, x16, #0x4c4
+5064: mov	x17, #0x73d8
+5068: pacia	x16, x17
+506c: mov	x1, x16
+5070: mov	x0, x19
+5074: bl	#0xe944   ; ZN18IOTimerEventSource16timerEventSourceEP8OSObjectPFvS1_PS_E
+5078: mov	x1, x0
+507c: str	x0, [x19, #0x1178]
+5080: cbz	x0, #0x54c8
+5084: ldr	x0, [x19, #0x98]
+5088: ldr	x16, [x0]
+508c: mov	x17, x0
+5090: movk	x17, #0xcda1, lsl #48
+5094: autda	x16, x17
+5098: mov	x17, x16
+509c: xpacd	x17
+50a0: cmp	x16, x17
+50a4: b.eq	#0x50ac
+50a8: brk	#0xc472
+50ac: add	x8, x16, #0x160
+50b0: ldr	x9, [x16, #0x160]
+50b4: movk	x8, #0x11e8, lsl #48
+50b8: blraa	x9, x8
+50bc: ldr	x0, [x19, #0x1178]
+50c0: ldr	x16, [x0]
+50c4: mov	x17, x0
+50c8: movk	x17, #0xcda1, lsl #48
+50cc: autda	x16, x17
+50d0: mov	x17, x16
+50d4: xpacd	x17
+50d8: cmp	x16, x17
+50dc: b.eq	#0x50e4
+50e0: brk	#0xc472
+50e4: add	x8, x16, #0x170
+50e8: ldr	x9, [x16, #0x170]
+50ec: movk	x8, #0x9b16, lsl #48
+50f0: blraa	x9, x8
+50f4: adrp	x16, #0x7000
+50f8: add	x16, x16, #0x508
+50fc: mov	x17, #0x12f7
+5100: pacia	x16, x17
+5104: mov	x1, x16
+5108: mov	x0, x19
+510c: mov	x2, #0
+5110: mov	w3, #0
+5114: bl	#0xe950   ; ZN22IOInterruptEventSource20interruptEventSourceEP8OSObjectPFvS1_PS_iEP9IOServicei
+5118: mov	x1, x0
+511c: str	x0, [x19, #0x1190]
+5120: cbz	x0, #0x550c
+5124: ldr	x0, [x19, #0x98]
+5128: ldr	x16, [x0]
+512c: mov	x17, x0
+5130: movk	x17, #0xcda1, lsl #48
+5134: autda	x16, x17
+5138: mov	x17, x16
+513c: xpacd	x17
+5140: cmp	x16, x17
+5144: b.eq	#0x514c
+5148: brk	#0xc472
+514c: add	x8, x16, #0x160
+5150: ldr	x9, [x16, #0x160]
+5154: movk	x8, #0x11e8, lsl #48
+5158: blraa	x9, x8
+515c: ldr	x0, [x19, #0x1190]
+5160: ldr	x16, [x0]
+5164: mov	x17, x0
+5168: movk	x17, #0xcda1, lsl #48
+516c: autda	x16, x17
+5170: mov	x17, x16
+5174: xpacd	x17
+5178: cmp	x16, x17
+517c: b.eq	#0x5184
+5180: brk	#0xc472
+5184: add	x8, x16, #0x170
+5188: ldr	x9, [x16, #0x170]
+518c: movk	x8, #0x9b16, lsl #48
+5190: blraa	x9, x8
+5194: adrp	x16, #0x7000
+5198: add	x16, x16, #0xc1c
+519c: mov	x17, #0x73d8
+51a0: pacia	x16, x17
+51a4: mov	x1, x16
+51a8: mov	x0, x19
+51ac: bl	#0xe944   ; ZN18IOTimerEventSource16timerEventSourceEP8OSObjectPFvS1_PS_E
+51b0: mov	x1, x0
+51b4: str	x0, [x19, #0x1188]
+51b8: cbz	x0, #0x5550
+51bc: ldr	x0, [x19, #0x98]
+51c0: ldr	x16, [x0]
+51c4: mov	x17, x0
+51c8: movk	x17, #0xcda1, lsl #48
+51cc: autda	x16, x17
+51d0: mov	x17, x16
+51d4: xpacd	x17
+51d8: cmp	x16, x17
+51dc: b.eq	#0x51e4
+51e0: brk	#0xc472
+51e4: add	x8, x16, #0x160
+51e8: ldr	x9, [x16, #0x160]
+51ec: movk	x8, #0x11e8, lsl #48
+51f0: blraa	x9, x8
+51f4: ldr	x0, [x19, #0x1188]
+51f8: ldr	x16, [x0]
+51fc: mov	x17, x0
+5200: movk	x17, #0xcda1, lsl #48
+5204: autda	x16, x17
+5208: mov	x17, x16
+520c: xpacd	x17
+5210: cmp	x16, x17
+5214: b.eq	#0x521c
+5218: brk	#0xc472
+521c: add	x8, x16, #0x170
+5220: ldr	x9, [x16, #0x170]
+5224: movk	x8, #0x9b16, lsl #48
+5228: blraa	x9, x8
+522c: cbz	w26, #0x5274
+5230: mov	w8, #1
+5234: strb	w8, [x19, #0x169]
+5238: ldr	x0, [x19, #0x1178]
+523c: ldr	x16, [x0]
+5240: mov	x17, x0
+5244: movk	x17, #0xcda1, lsl #48
+5248: autda	x16, x17
+524c: mov	x17, x16
+5250: xpacd	x17
+5254: cmp	x16, x17
+5258: b.eq	#0x5260
+525c: brk	#0xc472
+5260: add	x8, x16, #0x1f0
+5264: ldr	x9, [x16, #0x1f0]
+5268: movk	x8, #0x246e, lsl #48
+526c: mov	w1, #0x7d0
+5270: blraa	x9, x8
+5274: stp	xzr, xzr, [x19, #0xe0]
+5278: add	x0, x19, #0xf8
+527c: bl	#0xea10   ; microtime
+5280: str	wzr, [x19, #0x12e0]
+5284: ldr	x0, [x19, #0x98]
+5288: ldr	x16, [x0]
+528c: mov	x17, x0
+5290: movk	x17, #0xcda1, lsl #48
+5294: autda	x16, x17
+5298: mov	x17, x16
+529c: xpacd	x17
+52a0: cmp	x16, x17
+52a4: b.eq	#0x52ac
+52a8: brk	#0xc472
+52ac: add	x8, x16, #0x180
+52b0: ldr	x9, [x16, #0x180]
+52b4: movk	x8, #0x8bec, lsl #48
+52b8: blraa	x9, x8
+52bc: mov	x21, #0
+52c0: add	x22, x19, #0x174
+52c4: ldr	x0, [x19, #0x88]
+52c8: mov	x1, x21
+52cc: bl	#0xe8c0   ; ZN11IOPCIDevice20extendedConfigRead32Ey
+52d0: str	w0, [x22, x21]
+52d4: add	x21, x21, #4
+52d8: cmp	x21, #1, lsl #12
+52dc: b.ne	#0x52c4
+52e0: bl	#0xe854   ; IOLockAlloc
+52e4: str	x0, [x19, #0x12b8]
+52e8: bl	#0xe854   ; IOLockAlloc
+52ec: str	x0, [x19, #0x12c0]
+52f0: mov	w8, #0x200000
+52f4: str	w8, [x19, #0x11e0]
+52f8: mov	w0, #0x200000
+52fc: bl	#0xe890   ; IOMalloc
+5300: str	x0, [x19, #0x11d8]
+5304: ldr	x16, [x19]
+5308: autda	x16, x25
+530c: mov	x17, x16
+5310: xpacd	x17
+5314: cmp	x16, x17
+5318: b.eq	#0x5320
+531c: brk	#0xc472
+5320: add	x8, x16, #0x7c0
+5324: ldr	x9, [x16, #0x7c0]
+5328: movk	x8, #0xe8de, lsl #48
+532c: mov	x0, x19
+5330: blraa	x9, x8
+5334: ldr	x16, [x20]
+5338: mov	x17, x20
+533c: movk	x17, #0xcda1, lsl #48
+5340: autda	x16, x17
+5344: mov	x17, x16
+5348: xpacd	x17
+534c: cmp	x16, x17
+5350: b.eq	#0x5358
+5354: brk	#0xc472
+5358: add	x8, x16, #0x7d0
+535c: ldr	x9, [x16, #0x7d0]
+5360: movk	x8, #0x4bc0, lsl #48
+5364: mov	x0, x20
+5368: mov	x1, x19
+536c: blraa	x9, x8
+5370: ldr	x16, [x19]
+5374: autda	x16, x25
+5378: mov	x17, x16
+537c: xpacd	x17
+5380: cmp	x16, x17
+5384: b.eq	#0x538c
+5388: brk	#0xc472
+538c: add	x8, x16, #0x7d8
+5390: ldr	x9, [x16, #0x7d8]
+5394: movk	x8, #0xf8a6, lsl #48
+5398: adrp	x2, #0x10000
+539c: add	x2, x2, #0xc8
+53a0: mov	x0, x19
+53a4: mov	x1, x19
+53a8: mov	w3, #2
+53ac: blraa	x9, x8
+53b0: ldr	x16, [x19]
+53b4: autda	x16, x25
+53b8: mov	x17, x16
+53bc: xpacd	x17
+53c0: cmp	x16, x17
+53c4: b.eq	#0x53cc
+53c8: brk	#0xc472
+53cc: add	x8, x16, #0x5e0
+53d0: ldr	x9, [x16, #0x5e0]
+53d4: movk	x8, #0x7d59, lsl #48
+53d8: mov	x0, x19
+53dc: mov	w1, #0
+53e0: blraa	x9, x8
+53e4: add	x8, x23, #0x118
+53e8: adrp	x9, #0
+53ec: ldr	q0, [x9, #0x5e0]
+53f0: str	q0, [x8]
+53f4: mov	w0, #1
+53f8: b	#0x4a54
+53fc: ldr	x16, [x19]
+5400: autda	x16, x25
+5404: mov	x17, x16
+5408: xpacd	x17
+540c: cmp	x16, x17
+5410: b.eq	#0x5418
+5414: brk	#0xc472
+5418: add	x8, x16, #0x3a8
+541c: ldr	x9, [x16, #0x3a8]
+5420: movk	x8, #0xc9c, lsl #48
+5424: mov	x0, x19
+5428: blraa	x9, x8
+542c: stp	x19, x24, [sp, #8]
+5430: str	x0, [sp]
+5434: adrp	x0, #0
+5438: add	x0, x0, #0xe98
+543c: b	#0x4a4c
+5440: ldr	x16, [x19]
+5444: autda	x16, x25
+5448: mov	x17, x16
+544c: xpacd	x17
+5450: cmp	x16, x17
+5454: b.eq	#0x545c
+5458: brk	#0xc472
+545c: add	x8, x16, #0x3a8
+5460: ldr	x9, [x16, #0x3a8]
+5464: movk	x8, #0xc9c, lsl #48
+5468: mov	x0, x19
+546c: blraa	x9, x8
+5470: stp	x19, x24, [sp, #8]
+5474: str	x0, [sp]
+5478: adrp	x0, #0
+547c: add	x0, x0, #0xee5
+5480: b	#0x4a4c
+5484: ldr	x16, [x19]
+5488: autda	x16, x25
+548c: mov	x17, x16
+5490: xpacd	x17
+5494: cmp	x16, x17
+5498: b.eq	#0x54a0
+549c: brk	#0xc472
+54a0: add	x8, x16, #0x3a8
+54a4: ldr	x9, [x16, #0x3a8]
+54a8: movk	x8, #0xc9c, lsl #48
+54ac: mov	x0, x19
+54b0: blraa	x9, x8
+54b4: stp	x19, x24, [sp, #8]
+54b8: str	x0, [sp]
+54bc: adrp	x0, #0
+54c0: add	x0, x0, #0xf26
+54c4: b	#0x4a4c
+54c8: ldr	x16, [x19]
+54cc: autda	x16, x25
+54d0: mov	x17, x16
+54d4: xpacd	x17
+54d8: cmp	x16, x17
+54dc: b.eq	#0x54e4
+54e0: brk	#0xc472
+54e4: add	x8, x16, #0x3a8
+54e8: ldr	x9, [x16, #0x3a8]
+54ec: movk	x8, #0xc9c, lsl #48
+54f0: mov	x0, x19
+54f4: blraa	x9, x8
+54f8: stp	x19, x24, [sp, #8]
+54fc: str	x0, [sp]
+5500: adrp	x0, #0
+5504: add	x0, x0, #0xf7f
+5508: b	#0x4a4c
+550c: ldr	x16, [x19]
+5510: autda	x16, x25
+5514: mov	x17, x16
+5518: xpacd	x17
+551c: cmp	x16, x17
+5520: b.eq	#0x5528
+5524: brk	#0xc472
+5528: add	x8, x16, #0x3a8
+552c: ldr	x9, [x16, #0x3a8]
+5530: movk	x8, #0xc9c, lsl #48
+5534: mov	x0, x19
+5538: blraa	x9, x8
+553c: stp	x19, x24, [sp, #8]
+5540: str	x0, [sp]
+5544: adrp	x0, #0
+5548: add	x0, x0, #0xfd4
+554c: b	#0x4a4c
+5550: ldr	x16, [x19]
+5554: autda	x16, x25
+5558: mov	x17, x16
+555c: xpacd	x17
+5560: cmp	x16, x17
+5564: b.eq	#0x556c
+5568: brk	#0xc472
+556c: add	x8, x16, #0x3a8
+5570: ldr	x9, [x16, #0x3a8]
+5574: movk	x8, #0xc9c, lsl #48
+5578: mov	x0, x19
+557c: blraa	x9, x8
+5580: stp	x19, x24, [sp, #8]
+5584: str	x0, [sp]
+5588: adrp	x0, #0x1000
+558c: add	x0, x0, #0x34
+5590: b	#0x4a4c
+5594: udf	#0xc
+5598: udf	#0x30
+559c: udf	#0x18
+55a0: udf	#0x20
+55a4: udf	#0x38
+55a8: udf	#0x38
+55ac: udf	#0x28
+55b0: udf	#0xc
+55b4: udf	#0x350
+55b8: udf	#0x39c
+55bc: udf	#0x460
+55c0: ldr	x8, [x0, #0x128]
+55c4: ldr	w0, [x8, w1, uxtw]
+55c8: ret	
+55cc: ldr	x8, [x0, #0x138]
+55d0: ldr	w0, [x8, w1, uxtw]
+55d4: ret	
+55d8: pacibsp	
+55dc: sub	sp, sp, #0x90
+55e0: stp	x22, x21, [sp, #0x60]
+55e4: stp	x20, x19, [sp, #0x70]
+55e8: stp	x29, x30, [sp, #0x80]
+55ec: add	x29, sp, #0x80
+55f0: mov	x19, x0
+55f4: adrp	x8, #0x14000
+55f8: ldr	x8, [x8, #0x160]
+55fc: ldr	x8, [x8]

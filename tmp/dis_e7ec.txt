@@ -1,0 +1,31 @@
+00e7c0: adrp     x0, #0x10000
+00e7c4: add      x0, x0, #0x1c0
+00e7c8: b        #0xe8e4
+00e7cc: adrp     x8, #0x10000
+00e7d0: add      x8, x8, #0x188
+00e7d4: ldr      x2, [x8]
+00e7d8: cbz      x2, #0xe7e4
+00e7dc: mov      w3, #0xe4fe
+00e7e0: braa     x2, x3
+00e7e4: mov      w0, #0
+00e7e8: ret      
+00e7ec: adrp     x8, #0x10000
+00e7f0: add      x8, x8, #0
+00e7f4: add      x0, x8, #0x10
+00e7f8: ret      
+00e7fc: adrp     x8, #0x10000
+00e800: add      x8, x8, #0
+00e804: add      x0, x8, #0x50
+00e808: ret      
+00e80c: adrp     x8, #0x10000
+00e810: add      x8, x8, #0
+00e814: ldr      w0, [x8, #0xc]
+00e818: ret      
+00e81c: adrp     x8, #0x10000
+00e820: add      x8, x8, #0x190
+00e824: ldr      x2, [x8]
+00e828: cbz      x2, #0xe834
+00e82c: mov      w3, #0xe4fe
+00e830: braa     x2, x3
+00e834: mov      w0, #0
+00e838: ret      

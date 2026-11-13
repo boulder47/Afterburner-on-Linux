@@ -1,0 +1,72 @@
+007c60: pacibsp  
+007c64: sub      sp, sp, #0x60
+007c68: stp      x24, x23, [sp, #0x20]
+007c6c: stp      x22, x21, [sp, #0x30]
+007c70: stp      x20, x19, [sp, #0x40]
+007c74: stp      x29, x30, [sp, #0x50]
+007c78: add      x29, sp, #0x50
+007c7c: mov      x20, x1
+007c80: mov      x19, x0
+007c84: mov      w8, #0x11d0
+007c88: add      x21, x0, x8
+007c8c: ldr      x16, [x0]
+007c90: mov      x23, x0
+007c94: movk     x23, #0xcda1, lsl #48
+007c98: mov      x17, x0
+007c9c: movk     x17, #0xcda1, lsl #48
+007ca0: autda    x16, x17
+007ca4: mov      x17, x16
+007ca8: xpacd    x17
+007cac: cmp      x16, x17
+007cb0: b.eq     #0x7cb8
+007cb4: brk      #0xc472
+007cb8: add      x8, x16, #0x3a8
+007cbc: ldr      x9, [x16, #0x3a8]
+007cc0: movk     x8, #0xc9c, lsl #48
+007cc4: mov      x1, #0
+007cc8: blraa    x9, x8
+007ccc: adrp     x22, #0x1000
+007cd0: add      x22, x22, #0xcf
+007cd4: stp      x22, x20, [sp, #0x10]
+007cd8: stp      x0, x19, [sp]
+007cdc: adrp     x0, #0x1000
+007ce0: add      x0, x0, #0x90
+007ce4: bl       #0xe884
+007ce8: cmp      x20, #1
+007cec: b.eq     #0x7d58
+007cf0: cbnz     x20, #0x7dd0
+007cf4: ldrb     w8, [x19, #0x169]
+007cf8: cbz      w8, #0x7e20
+007cfc: ldr      x16, [x19]
+007d00: autda    x16, x23
+007d04: mov      x17, x16
+007d08: xpacd    x17
+007d0c: cmp      x16, x17
+007d10: b.eq     #0x7d18
+007d14: brk      #0xc472
+007d18: add      x8, x16, #0x3a8
+007d1c: ldr      x9, [x16, #0x3a8]
+007d20: movk     x8, #0xc9c, lsl #48
+007d24: mov      x0, x19
+007d28: mov      x1, #0
+007d2c: blraa    x9, x8
+007d30: stp      x19, x22, [sp, #8]
+007d34: str      x0, [sp]
+007d38: adrp     x0, #0x1000
+007d3c: add      x0, x0, #0xdd
+007d40: bl       #0xe884
+007d44: mov      w8, #1
+007d48: strb     w8, [x19, #0x16a]
+007d4c: mov      w0, #0xa300
+007d50: movk     w0, #0x11e1, lsl #16
+007d54: b        #0x7ffc
+007d58: ldr      x8, [x19, #0x158]
+007d5c: cbz      x8, #0x7e70
+007d60: ldr      w9, [x8]
+007d64: ldrb     w10, [x19, #0x169]
+007d68: cbnz     w10, #0x7e78
+007d6c: and      w9, w9, #0xff
+007d70: cmp      w9, #1
+007d74: b.ne     #0x7ec0
+007d78: str      w9, [x8, #4]
+007d7c: ldr      x16, [x19]

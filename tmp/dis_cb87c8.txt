@@ -1,0 +1,49 @@
+0087c8: pacibsp  
+0087cc: sub      sp, sp, #0x70
+0087d0: stp      x24, x23, [sp, #0x30]
+0087d4: stp      x22, x21, [sp, #0x40]
+0087d8: stp      x20, x19, [sp, #0x50]
+0087dc: stp      x29, x30, [sp, #0x60]
+0087e0: add      x29, sp, #0x60
+0087e4: mov      x19, x3
+0087e8: mov      x20, x2
+0087ec: mov      x23, x1
+0087f0: mov      x21, x0
+0087f4: adrp     x1, #0x10000
+0087f8: add      x1, x1, #0x198
+0087fc: mov      x0, x4
+008800: bl       #0xe92c
+008804: cbz      x0, #0x885c
+008808: mov      x22, x0
+00880c: stp      x20, x19, [sp, #0x18]
+008810: stp      x21, x23, [sp, #8]
+008814: str      x0, [sp]
+008818: adrp     x0, #0x1000
+00881c: add      x0, x0, #0xcbc
+008820: bl       #0xe884
+008824: mov      x0, x22
+008828: mov      x1, x21
+00882c: mov      x3, x20
+008830: mov      x4, x19
+008834: ldp      x29, x30, [sp, #0x60]
+008838: ldp      x20, x19, [sp, #0x50]
+00883c: ldp      x22, x21, [sp, #0x40]
+008840: ldp      x24, x23, [sp, #0x30]
+008844: add      sp, sp, #0x70
+008848: autibsp  
+00884c: eor      x9, x30, x30, lsl #1
+008850: tbz      x9, #0x3e, #0x8858
+008854: brk      #0xc471
+008858: b        #0x888c
+00885c: adrp     x0, #0x1000
+008860: add      x0, x0, #0xd20
+008864: ldp      x29, x30, [sp, #0x60]
+008868: ldp      x20, x19, [sp, #0x50]
+00886c: ldp      x22, x21, [sp, #0x40]
+008870: ldp      x24, x23, [sp, #0x30]
+008874: add      sp, sp, #0x70
+008878: autibsp  
+00887c: eor      x9, x30, x30, lsl #1
+008880: tbz      x9, #0x3e, #0x8888
+008884: brk      #0xc471
+008888: b        #0xe884

@@ -1,0 +1,36 @@
+0000a0f0: add   x12, x21, x9
+0000a0f4: sub   w13, w8, #1
+0000a0f8: cmp   w8, #0
+0000a0fc: csel  w8, w13, wzr, gt
+0000a100: ldr   x13, [x26, #8]
+0000a104: add   x14, x11, x9
+0000a108: str   x14, [x12, #0x18]
+0000a10c: orr   w14, w24, w8, lsl #8
+0000a110: stp   w14, w13, [x12]
+0000a114: ldr   x13, [x26]
+0000a118: add   x14, x12, #0x10
+0000a11c: add   x15, x12, #8
+0000a120: cmp   w25, #0
+0000a124: csel  x14, x15, x14, eq
+0000a128: str   x13, [x14]
+0000a12c: cmp   x9, #0xfe0
+0000a130: csel  x23, x12, x23, eq
+0000a134: subs  w27, w27, #1
+0000a138: b.ne  #0xa154
+0000a13c: lsl   w13, w8, #8
+0000a140: add   w14, w24, #0x13
+0000a144: orr   w13, w13, w14
+0000a148: str   w13, [x12]
+0000a14c: str   xzr, [x12, #0x18]
+0000a150: str   x12, [x20]
+0000a154: add   x26, x26, #0x10
+0000a158: add   x9, x9, #0x20
+0000a15c: cmp   x10, x9
+0000a160: b.ne  #0xa0f0
+0000a164: add   x21, x21, x9
+0000a168: ldur  x22, [x29, #-0x58]
+0000a16c: ldr   x16, [x28]
+0000a170: ldr   x8, [sp, #0x40]
+0000a174: autda x16, x8
+0000a178: mov   x17, x16
+0000a17c: xpacd x17

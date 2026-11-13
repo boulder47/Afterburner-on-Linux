@@ -1,0 +1,217 @@
+00821c: pacibsp  
+008220: sub      sp, sp, #0x90
+008224: stp      x28, x27, [sp, #0x30]
+008228: stp      x26, x25, [sp, #0x40]
+00822c: stp      x24, x23, [sp, #0x50]
+008230: stp      x22, x21, [sp, #0x60]
+008234: stp      x20, x19, [sp, #0x70]
+008238: stp      x29, x30, [sp, #0x80]
+00823c: add      x29, sp, #0x80
+008240: mov      x22, x5
+008244: mov      x21, x4
+008248: mov      x23, x3
+00824c: mov      x24, x2
+008250: mov      x20, x1
+008254: mov      x19, x0
+008258: ldr      x16, [x0]
+00825c: mov      x25, x0
+008260: movk     x25, #0xcda1, lsl #48
+008264: mov      x17, x0
+008268: movk     x17, #0xcda1, lsl #48
+00826c: autda    x16, x17
+008270: mov      x17, x16
+008274: xpacd    x17
+008278: cmp      x16, x17
+00827c: b.eq     #0x8284
+008280: brk      #0xc472
+008284: add      x8, x16, #0x3a8
+008288: ldr      x9, [x16, #0x3a8]
+00828c: movk     x8, #0xc9c, lsl #48
+008290: mov      x1, #0
+008294: blraa    x9, x8
+008298: adrp     x26, #0x1000
+00829c: add      x26, x26, #0x492
+0082a0: stp      x26, x20, [sp, #0x10]
+0082a4: stp      x0, x19, [sp]
+0082a8: adrp     x0, #0x1000
+0082ac: add      x0, x0, #0x453
+0082b0: bl       #0xe884
+0082b4: mov      w8, #0xaaaa
+0082b8: ldr      x9, [x19, #0x150]
+0082bc: bfi      w8, w20, #0x10, #0x10
+0082c0: str      w24, [x9, #0x40]
+0082c4: str      w8, [x9, #0x48]
+0082c8: cmp      w21, #4
+0082cc: str      x20, [sp, #0x20]
+0082d0: b.lo     #0x8570
+0082d4: mov      w28, #0
+0082d8: adrp     x24, #0x1000
+0082dc: add      x24, x24, #0x49d
+0082e0: mov      x27, x21
+0082e4: ldr      w8, [x23]
+0082e8: rev      w9, w8
+0082ec: cmp      w22, #0
+0082f0: csel     w20, w9, w8, ne
+0082f4: ldr      x8, [x19, #0x150]
+0082f8: ldr      w9, [x8, #0x10]
+0082fc: tbz      w9, #1, #0x830c
+008300: mov      w0, #0x64
+008304: bl       #0xe83c
+008308: b        #0x82f4
+00830c: str      w20, [x8, #0x4c]
+008310: sub      w27, w27, #4
+008314: add      w20, w28, #4
+008318: and      w8, w20, #0xffffc
+00831c: cmp      w8, #0xfc
+008320: b.ne     #0x836c
+008324: ldr      x16, [x19]
+008328: autda    x16, x25
+00832c: mov      x17, x16
+008330: xpacd    x17
+008334: cmp      x16, x17
+008338: b.eq     #0x8340
+00833c: brk      #0xc472
+008340: add      x8, x16, #0x3a8
+008344: ldr      x9, [x16, #0x3a8]
+008348: movk     x8, #0xc9c, lsl #48
+00834c: mov      x0, x19
+008350: mov      x1, #0
+008354: blraa    x9, x8
+008358: add      w8, w28, #8
+00835c: stp      x26, x8, [sp, #0x10]
+008360: stp      x0, x19, [sp]
+008364: mov      x0, x24
+008368: bl       #0xe884
+00836c: add      x23, x23, #4
+008370: mov      x28, x20
+008374: cmp      w27, #3
+008378: b.hi     #0x82e4
+00837c: cbz      w27, #0x83b8
+008380: mov      w8, #-1
+008384: str      w8, [sp, #0x2c]
+008388: mov      w2, w27
+00838c: add      x0, sp, #0x2c
+008390: mov      x1, x23
+008394: mov      w3, #4
+008398: bl       #0xe9e0
+00839c: ldr      w8, [sp, #0x2c]
+0083a0: rev      w9, w8
+0083a4: cmp      w22, #0
+0083a8: csel     w8, w9, w8, ne
+0083ac: ldr      x9, [x19, #0x150]
+0083b0: str      w8, [x9, #0x4c]
+0083b4: add      w20, w20, #4
+0083b8: ldr      x16, [x19]
+0083bc: autda    x16, x25
+0083c0: mov      x17, x16
+0083c4: xpacd    x17
+0083c8: cmp      x16, x17
+0083cc: b.eq     #0x83d4
+0083d0: brk      #0xc472
+0083d4: add      x8, x16, #0x3a8
+0083d8: ldr      x9, [x16, #0x3a8]
+0083dc: movk     x8, #0xc9c, lsl #48
+0083e0: mov      x0, x19
+0083e4: mov      x1, #0
+0083e8: blraa    x9, x8
+0083ec: add      w8, w20, #4
+0083f0: stp      x26, x8, [sp, #0x10]
+0083f4: stp      x0, x19, [sp]
+0083f8: adrp     x0, #0x1000
+0083fc: add      x0, x0, #0x4d0
+008400: bl       #0xe884
+008404: ldr      x8, [x19, #0x150]
+008408: ldr      w9, [x8, #0x10]
+00840c: tbz      w9, #1, #0x8474
+008410: sub      w20, w21, w27
+008414: adrp     x22, #0x1000
+008418: add      x22, x22, #0x510
+00841c: ldr      x16, [x19]
+008420: autda    x16, x25
+008424: mov      x17, x16
+008428: xpacd    x17
+00842c: cmp      x16, x17
+008430: b.eq     #0x8438
+008434: brk      #0xc472
+008438: add      x8, x16, #0x3a8
+00843c: ldr      x9, [x16, #0x3a8]
+008440: movk     x8, #0xc9c, lsl #48
+008444: mov      x0, x19
+008448: mov      x1, #0
+00844c: blraa    x9, x8
+008450: stp      x26, x20, [sp, #0x10]
+008454: stp      x0, x19, [sp]
+008458: mov      x0, x22
+00845c: bl       #0xe884
+008460: mov      w0, #0x64
+008464: bl       #0xe83c
+008468: ldr      x8, [x19, #0x150]
+00846c: ldr      w9, [x8, #0x10]
+008470: tbnz     w9, #1, #0x841c
+008474: mov      w9, #-1
+008478: str      w9, [x8, #0x4c]
+00847c: ldr      w8, [x8, #0x10]
+008480: tbnz     w8, #2, #0x84e8
+008484: sub      w20, w21, w27
+008488: adrp     x21, #0x1000
+00848c: add      x21, x21, #0x56b
+008490: ldr      x16, [x19]
+008494: autda    x16, x25
+008498: mov      x17, x16
+00849c: xpacd    x17
+0084a0: cmp      x16, x17
+0084a4: b.eq     #0x84ac
+0084a8: brk      #0xc472
+0084ac: add      x8, x16, #0x3a8
+0084b0: ldr      x9, [x16, #0x3a8]
+0084b4: movk     x8, #0xc9c, lsl #48
+0084b8: mov      x0, x19
+0084bc: mov      x1, #0
+0084c0: blraa    x9, x8
+0084c4: stp      x26, x20, [sp, #0x10]
+0084c8: stp      x0, x19, [sp]
+0084cc: mov      x0, x21
+0084d0: bl       #0xe884
+0084d4: mov      w0, #0x64
+0084d8: bl       #0xe83c
+0084dc: ldr      x8, [x19, #0x150]
+0084e0: ldr      w8, [x8, #0x10]
+0084e4: tbz      w8, #2, #0x8490
+0084e8: mov      w0, #0xa
+0084ec: bl       #0xe89c
+0084f0: ldr      x8, [x19, #0x150]
+0084f4: str      wzr, [x8, #0x48]
+0084f8: mov      w9, #1
+0084fc: str      w9, [x8, #0x54]
+008500: str      wzr, [x8, #0x54]
+008504: ldr      x16, [x19]
+008508: autda    x16, x25
+00850c: mov      x17, x16
+008510: xpacd    x17
+008514: cmp      x16, x17
+008518: b.eq     #0x8520
+00851c: brk      #0xc472
+008520: add      x8, x16, #0x3a8
+008524: ldr      x9, [x16, #0x3a8]
+008528: movk     x8, #0xc9c, lsl #48
+00852c: mov      x0, x19
+008530: mov      x1, #0
+008534: blraa    x9, x8
+008538: ldr      x8, [sp, #0x20]
+00853c: stp      x26, x8, [sp, #0x10]
+008540: stp      x0, x19, [sp]
+008544: adrp     x0, #0x1000
+008548: add      x0, x0, #0x5ce
+00854c: bl       #0xe884
+008550: ldp      x29, x30, [sp, #0x80]
+008554: ldp      x20, x19, [sp, #0x70]
+008558: ldp      x22, x21, [sp, #0x60]
+00855c: ldp      x24, x23, [sp, #0x50]
+008560: ldp      x26, x25, [sp, #0x40]
+008564: ldp      x28, x27, [sp, #0x30]
+008568: add      sp, sp, #0x90
+00856c: retab    
+008570: mov      w20, #0
+008574: mov      x27, x21
+008578: cbnz     w27, #0x8380
+00857c: b        #0x83b8

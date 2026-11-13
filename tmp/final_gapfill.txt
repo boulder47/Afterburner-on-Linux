@@ -1,0 +1,576 @@
+=== 1. PLT[0xe89c], PLT[0xea1c] resolution ===
+PLT[0xe89c]: GOT=0x14040; idx=8 => {'lib': 254, 'weak': 0, 'name': '_IOSleep'}
+PLT[0xea1c]: GOT=0x14198; idx=51 => {'lib': 254, 'weak': 0, 'name': '_snprintf'}
+
+=== 2. strings @0xa4c, @0x7f5 (fn@0x7508 case0), @0xcf, @0xdd (fn@0x7c60) ===
+  0x0a4c: 'pleAfterburner Error: %s[%p]::%s: device is booted to golden %u.%u. reconfiguration is disabled... bailing out\n'
+  0x07f5: 'terburner Error: %s[%p]::%s: could not find mapper!! \n'
+  0x00cf: ''
+  0x00dd: ''
+
+=== 3. fn@0x821c rest: 0x82e8..0x8580 ===
+  0x82e8: rev	w9, w8
+  0x82ec: cmp	w22, #0
+  0x82f0: csel	w20, w9, w8, ne
+  0x82f4: ldr	x8, [x19, #0x150]
+  0x82f8: ldr	w9, [x8, #0x10]
+  0x82fc: tbz	w9, #1, #0x830c
+  0x8300: mov	w0, #0x64
+  0x8304: bl	#0xe83c
+  0x8308: b	#0x82f4
+  0x830c: str	w20, [x8, #0x4c]
+  0x8310: sub	w27, w27, #4
+  0x8314: add	w20, w28, #4
+  0x8318: and	w8, w20, #0xffffc
+  0x831c: cmp	w8, #0xfc
+  0x8320: b.ne	#0x836c
+  0x8324: ldr	x16, [x19]
+  0x8328: autda	x16, x25
+  0x832c: mov	x17, x16
+  0x8330: xpacd	x17
+  0x8334: cmp	x16, x17
+  0x8338: b.eq	#0x8340
+  0x833c: brk	#0xc472
+  0x8340: add	x8, x16, #0x3a8
+  0x8344: ldr	x9, [x16, #0x3a8]
+  0x8348: movk	x8, #0xc9c, lsl #48
+  0x834c: mov	x0, x19
+  0x8350: mov	x1, #0
+  0x8354: blraa	x9, x8
+  0x8358: add	w8, w28, #8
+  0x835c: stp	x26, x8, [sp, #0x10]
+  0x8360: stp	x0, x19, [sp]
+  0x8364: mov	x0, x24
+  0x8368: bl	#0xe884
+  0x836c: add	x23, x23, #4
+  0x8370: mov	x28, x20
+  0x8374: cmp	w27, #3
+  0x8378: b.hi	#0x82e4
+  0x837c: cbz	w27, #0x83b8
+  0x8380: mov	w8, #-1
+  0x8384: str	w8, [sp, #0x2c]
+  0x8388: mov	w2, w27
+  0x838c: add	x0, sp, #0x2c
+  0x8390: mov	x1, x23
+  0x8394: mov	w3, #4
+  0x8398: bl	#0xe9e0
+  0x839c: ldr	w8, [sp, #0x2c]
+  0x83a0: rev	w9, w8
+  0x83a4: cmp	w22, #0
+  0x83a8: csel	w8, w9, w8, ne
+  0x83ac: ldr	x9, [x19, #0x150]
+  0x83b0: str	w8, [x9, #0x4c]
+  0x83b4: add	w20, w20, #4
+  0x83b8: ldr	x16, [x19]
+  0x83bc: autda	x16, x25
+  0x83c0: mov	x17, x16
+  0x83c4: xpacd	x17
+  0x83c8: cmp	x16, x17
+  0x83cc: b.eq	#0x83d4
+  0x83d0: brk	#0xc472
+  0x83d4: add	x8, x16, #0x3a8
+  0x83d8: ldr	x9, [x16, #0x3a8]
+  0x83dc: movk	x8, #0xc9c, lsl #48
+  0x83e0: mov	x0, x19
+  0x83e4: mov	x1, #0
+  0x83e8: blraa	x9, x8
+  0x83ec: add	w8, w20, #4
+  0x83f0: stp	x26, x8, [sp, #0x10]
+  0x83f4: stp	x0, x19, [sp]
+  0x83f8: adrp	x0, #0x1000
+  0x83fc: add	x0, x0, #0x4d0
+  0x8400: bl	#0xe884
+  0x8404: ldr	x8, [x19, #0x150]
+  0x8408: ldr	w9, [x8, #0x10]
+  0x840c: tbz	w9, #1, #0x8474
+  0x8410: sub	w20, w21, w27
+  0x8414: adrp	x22, #0x1000
+  0x8418: add	x22, x22, #0x510
+  0x841c: ldr	x16, [x19]
+  0x8420: autda	x16, x25
+  0x8424: mov	x17, x16
+  0x8428: xpacd	x17
+  0x842c: cmp	x16, x17
+  0x8430: b.eq	#0x8438
+  0x8434: brk	#0xc472
+  0x8438: add	x8, x16, #0x3a8
+  0x843c: ldr	x9, [x16, #0x3a8]
+  0x8440: movk	x8, #0xc9c, lsl #48
+  0x8444: mov	x0, x19
+  0x8448: mov	x1, #0
+  0x844c: blraa	x9, x8
+  0x8450: stp	x26, x20, [sp, #0x10]
+  0x8454: stp	x0, x19, [sp]
+  0x8458: mov	x0, x22
+  0x845c: bl	#0xe884
+  0x8460: mov	w0, #0x64
+  0x8464: bl	#0xe83c
+  0x8468: ldr	x8, [x19, #0x150]
+  0x846c: ldr	w9, [x8, #0x10]
+  0x8470: tbnz	w9, #1, #0x841c
+  0x8474: mov	w9, #-1
+  0x8478: str	w9, [x8, #0x4c]
+  0x847c: ldr	w8, [x8, #0x10]
+  0x8480: tbnz	w8, #2, #0x84e8
+  0x8484: sub	w20, w21, w27
+  0x8488: adrp	x21, #0x1000
+  0x848c: add	x21, x21, #0x56b
+  0x8490: ldr	x16, [x19]
+  0x8494: autda	x16, x25
+  0x8498: mov	x17, x16
+  0x849c: xpacd	x17
+  0x84a0: cmp	x16, x17
+  0x84a4: b.eq	#0x84ac
+  0x84a8: brk	#0xc472
+  0x84ac: add	x8, x16, #0x3a8
+  0x84b0: ldr	x9, [x16, #0x3a8]
+  0x84b4: movk	x8, #0xc9c, lsl #48
+  0x84b8: mov	x0, x19
+  0x84bc: mov	x1, #0
+  0x84c0: blraa	x9, x8
+  0x84c4: stp	x26, x20, [sp, #0x10]
+  0x84c8: stp	x0, x19, [sp]
+  0x84cc: mov	x0, x21
+  0x84d0: bl	#0xe884
+  0x84d4: mov	w0, #0x64
+  0x84d8: bl	#0xe83c
+  0x84dc: ldr	x8, [x19, #0x150]
+  0x84e0: ldr	w8, [x8, #0x10]
+  0x84e4: tbz	w8, #2, #0x8490
+  0x84e8: mov	w0, #0xa
+  0x84ec: bl	#0xe89c
+  0x84f0: ldr	x8, [x19, #0x150]
+  0x84f4: str	wzr, [x8, #0x48]
+  0x84f8: mov	w9, #1
+  0x84fc: str	w9, [x8, #0x54]
+  0x8500: str	wzr, [x8, #0x54]
+  0x8504: ldr	x16, [x19]
+  0x8508: autda	x16, x25
+  0x850c: mov	x17, x16
+  0x8510: xpacd	x17
+  0x8514: cmp	x16, x17
+  0x8518: b.eq	#0x8520
+  0x851c: brk	#0xc472
+  0x8520: add	x8, x16, #0x3a8
+  0x8524: ldr	x9, [x16, #0x3a8]
+  0x8528: movk	x8, #0xc9c, lsl #48
+  0x852c: mov	x0, x19
+  0x8530: mov	x1, #0
+  0x8534: blraa	x9, x8
+  0x8538: ldr	x8, [sp, #0x20]
+  0x853c: stp	x26, x8, [sp, #0x10]
+  0x8540: stp	x0, x19, [sp]
+  0x8544: adrp	x0, #0x1000
+  0x8548: add	x0, x0, #0x5ce
+  0x854c: bl	#0xe884
+  0x8550: ldp	x29, x30, [sp, #0x80]
+  0x8554: ldp	x20, x19, [sp, #0x70]
+  0x8558: ldp	x22, x21, [sp, #0x60]
+  0x855c: ldp	x24, x23, [sp, #0x50]
+  0x8560: ldp	x26, x25, [sp, #0x40]
+  0x8564: ldp	x28, x27, [sp, #0x30]
+  0x8568: add	sp, sp, #0x90
+  0x856c: retab	
+
+=== 4. fn@0x809c (leaf accessor called by 0x8580) ===
+  0x809c: pacibsp	
+  0x80a0: sub	sp, sp, #0x60
+  0x80a4: stp	x24, x23, [sp, #0x20]
+  0x80a8: stp	x22, x21, [sp, #0x30]
+  0x80ac: stp	x20, x19, [sp, #0x40]
+  0x80b0: stp	x29, x30, [sp, #0x50]
+  0x80b4: add	x29, sp, #0x50
+  0x80b8: mov	x20, x1
+  0x80bc: mov	x19, x0
+  0x80c0: ldr	x16, [x0]
+  0x80c4: mov	x21, x0
+  0x80c8: movk	x21, #0xcda1, lsl #48
+  0x80cc: mov	x17, x0
+  0x80d0: movk	x17, #0xcda1, lsl #48
+  0x80d4: autda	x16, x17
+  0x80d8: mov	x17, x16
+  0x80dc: xpacd	x17
+  0x80e0: cmp	x16, x17
+  0x80e4: b.eq	#0x80ec
+  0x80e8: brk	#0xc472
+  0x80ec: add	x8, x16, #0x3a8
+  0x80f0: ldr	x9, [x16, #0x3a8]
+  0x80f4: movk	x8, #0xc9c, lsl #48
+  0x80f8: mov	x1, #0
+  0x80fc: blraa	x9, x8
+  0x8100: adrp	x22, #0x1000
+  0x8104: add	x22, x22, #0x3c1
+  0x8108: stp	x19, x22, [sp, #8]
+  0x810c: str	x0, [sp]
+  0x8110: adrp	x0, #0x1000
+  0x8114: add	x0, x0, #0x389
+  0x8118: bl	#0xe884
+  0x811c: ldr	x16, [x19]
+
+=== 5. fn@0x7c60 rest: 0x7d58..0x8100 (until retab) ===
+  0x7d58: ldr	x8, [x19, #0x158]
+  0x7d5c: cbz	x8, #0x7e70
+  0x7d60: ldr	w9, [x8]
+  0x7d64: ldrb	w10, [x19, #0x169]
+  0x7d68: cbnz	w10, #0x7e78
+  0x7d6c: and	w9, w9, #0xff
+  0x7d70: cmp	w9, #1
+  0x7d74: b.ne	#0x7ec0
+  0x7d78: str	w9, [x8, #4]
+  0x7d7c: ldr	x16, [x19]
+  0x7d80: autda	x16, x23
+  0x7d84: mov	x17, x16
+  0x7d88: xpacd	x17
+  0x7d8c: cmp	x16, x17
+  0x7d90: b.eq	#0x7d98
+  0x7d94: brk	#0xc472
+  0x7d98: add	x8, x16, #0x3a8
+  0x7d9c: ldr	x9, [x16, #0x3a8]
+  0x7da0: movk	x8, #0xc9c, lsl #48
+  0x7da4: mov	x0, x19
+  0x7da8: mov	x1, #0
+  0x7dac: blraa	x9, x8
+  0x7db0: ldr	x8, [x19, #0x158]
+  0x7db4: cbz	x8, #0x7dbc
+  0x7db8: ldr	w8, [x8, #4]
+  0x7dbc: stp	x22, x8, [sp, #0x10]
+  0x7dc0: stp	x0, x19, [sp]
+  0x7dc4: adrp	x0, #0x1000
+  0x7dc8: add	x0, x0, #0x1df
+  0x7dcc: b	#0x7f0c
+  0x7dd0: ldr	x16, [x19]
+  0x7dd4: autda	x16, x23
+  0x7dd8: mov	x17, x16
+  0x7ddc: xpacd	x17
+  0x7de0: cmp	x16, x17
+  0x7de4: b.eq	#0x7dec
+  0x7de8: brk	#0xc472
+  0x7dec: add	x8, x16, #0x3a8
+  0x7df0: ldr	x9, [x16, #0x3a8]
+  0x7df4: movk	x8, #0xc9c, lsl #48
+  0x7df8: mov	x0, x19
+  0x7dfc: mov	x1, #0
+  0x7e00: blraa	x9, x8
+  0x7e04: stp	x22, x20, [sp, #0x10]
+  0x7e08: stp	x0, x19, [sp]
+  0x7e0c: adrp	x0, #0x1000
+  0x7e10: add	x0, x0, #0x27f
+  0x7e14: bl	#0xe884
+  0x7e18: mov	w0, #5
+  0x7e1c: b	#0x7ffc
+  0x7e20: mov	w8, #1
+  0x7e24: strb	w8, [x21, #0x128]
+  0x7e28: ldr	x0, [x19, #0x1300]
+  0x7e2c: ldr	x16, [x0]
+  0x7e30: mov	x17, x0
+  0x7e34: movk	x17, #0xcda1, lsl #48
+  0x7e38: autda	x16, x17
+  0x7e3c: mov	x17, x16
+  0x7e40: xpacd	x17
+  0x7e44: cmp	x16, x17
+  0x7e48: b.eq	#0x7e50
+  0x7e4c: brk	#0xc472
+  0x7e50: add	x8, x16, #0x1f0
+  0x7e54: ldr	x9, [x16, #0x1f0]
+  0x7e58: movk	x8, #0x246e, lsl #48
+  0x7e5c: mov	w1, #0x3e8
+  0x7e60: blraa	x9, x8
+  0x7e64: mov	w0, #0x4b40
+  0x7e68: movk	w0, #0x4c, lsl #16
+  0x7e6c: b	#0x7ffc
+  0x7e70: ldrb	w8, [x19, #0x169]
+  0x7e74: cbz	w8, #0x7ec0
+  0x7e78: ldr	x16, [x19]
+  0x7e7c: autda	x16, x23
+  0x7e80: mov	x17, x16
+  0x7e84: xpacd	x17
+  0x7e88: cmp	x16, x17
+  0x7e8c: b.eq	#0x7e94
+  0x7e90: brk	#0xc472
+  0x7e94: add	x8, x16, #0x3a8
+  0x7e98: ldr	x9, [x16, #0x3a8]
+  0x7e9c: movk	x8, #0xc9c, lsl #48
+  0x7ea0: mov	x0, x19
+  0x7ea4: mov	x1, #0
+  0x7ea8: blraa	x9, x8
+  0x7eac: stp	x19, x22, [sp, #8]
+  0x7eb0: str	x0, [sp]
+  0x7eb4: adrp	x0, #0x1000
+  0x7eb8: add	x0, x0, #0x136
+  0x7ebc: b	#0x7f0c
+  0x7ec0: strb	wzr, [x21]
+  0x7ec4: str	xzr, [x19, #0x158]
+  0x7ec8: ldr	x16, [x19]
+  0x7ecc: autda	x16, x23
+  0x7ed0: mov	x17, x16
+  0x7ed4: xpacd	x17
+  0x7ed8: cmp	x16, x17
+  0x7edc: b.eq	#0x7ee4
+  0x7ee0: brk	#0xc472
+  0x7ee4: add	x8, x16, #0x3a8
+  0x7ee8: ldr	x9, [x16, #0x3a8]
+  0x7eec: movk	x8, #0xc9c, lsl #48
+  0x7ef0: mov	x0, x19
+  0x7ef4: mov	x1, #0
+  0x7ef8: blraa	x9, x8
+  0x7efc: stp	x19, x22, [sp, #8]
+  0x7f00: str	x0, [sp]
+  0x7f04: adrp	x0, #0x1000
+  0x7f08: add	x0, x0, #0x174
+  0x7f0c: bl	#0xe884
+  0x7f10: ldr	w8, [x19, #0x160]
+  0x7f14: cbz	w8, #0x7f64
+  0x7f18: ldr	x16, [x19]
+  0x7f1c: autda	x16, x23
+  0x7f20: mov	x17, x16
+  0x7f24: xpacd	x17
+  0x7f28: cmp	x16, x17
+  0x7f2c: b.eq	#0x7f34
+  0x7f30: brk	#0xc472
+  0x7f34: add	x8, x16, #0x3a8
+  0x7f38: ldr	x9, [x16, #0x3a8]
+  0x7f3c: movk	x8, #0xc9c, lsl #48
+  0x7f40: mov	x0, x19
+  0x7f44: mov	x1, #0
+  0x7f48: blraa	x9, x8
+  0x7f4c: ldr	w8, [x19, #0x160]
+  0x7f50: stp	x22, x8, [sp, #0x10]
+  0x7f54: stp	x0, x19, [sp]
+  0x7f58: adrp	x0, #0x1000
+  0x7f5c: add	x0, x0, #0x22f
+  0x7f60: bl	#0xe884
+  0x7f64: str	wzr, [x19, #0x160]
+  0x7f68: mov	x0, x19
+  0x7f6c: bl	#0x5a3c
+  0x7f70: strb	wzr, [x19, #0x16a]
+  0x7f74: ldr	x0, [x19, #0x98]
+  0x7f78: ldr	x16, [x0]
+  0x7f7c: mov	x17, x0
+  0x7f80: movk	x17, #0xcda1, lsl #48
+  0x7f84: autda	x16, x17
+  0x7f88: mov	x17, x16
+  0x7f8c: xpacd	x17
+  0x7f90: cmp	x16, x17
+  0x7f94: b.eq	#0x7f9c
+  0x7f98: brk	#0xc472
+  0x7f9c: add	x8, x16, #0x180
+  0x7fa0: ldr	x9, [x16, #0x180]
+  0x7fa4: movk	x8, #0x8bec, lsl #48
+  0x7fa8: blraa	x9, x8
+  0x7fac: ldrb	w8, [x21, #0x128]
+  0x7fb0: cbz	w8, #0x7ff8
+  0x7fb4: add	x1, x21, #0x128
+  0x7fb8: strb	wzr, [x1]
+  0x7fbc: ldr	x0, [x19, #0x90]
+  0x7fc0: ldr	x16, [x0]
+  0x7fc4: mov	x17, x0
+  0x7fc8: movk	x17, #0xcda1, lsl #48
+  0x7fcc: autda	x16, x17
+  0x7fd0: mov	x17, x16
+  0x7fd4: xpacd	x17
+  0x7fd8: cmp	x16, x17
+  0x7fdc: b.eq	#0x7fe4
+  0x7fe0: brk	#0xc472
+  0x7fe4: add	x8, x16, #0x208
+  0x7fe8: ldr	x9, [x16, #0x208]
+  0x7fec: movk	x8, #0xf36c, lsl #48
+  0x7ff0: mov	w2, #0
+  0x7ff4: blraa	x9, x8
+  0x7ff8: mov	w0, #0
+  0x7ffc: ldp	x29, x30, [sp, #0x50]
+  0x8000: ldp	x20, x19, [sp, #0x40]
+  0x8004: ldp	x22, x21, [sp, #0x30]
+  0x8008: ldp	x24, x23, [sp, #0x20]
+  0x800c: add	sp, sp, #0x60
+  0x8010: retab	
+
+=== 6. fn@0x8628 prologue + structure: 0x8628..0x8890 ===
+  0x8628: pacibsp	
+  0x862c: sub	sp, sp, #0x70
+  0x8630: stp	x24, x23, [sp, #0x30]
+  0x8634: stp	x22, x21, [sp, #0x40]
+  0x8638: stp	x20, x19, [sp, #0x50]
+  0x863c: stp	x29, x30, [sp, #0x60]
+  0x8640: add	x29, sp, #0x60
+  0x8644: mov	x20, x2
+  0x8648: mov	x21, x1
+  0x864c: mov	x19, x0
+  0x8650: str	wzr, [sp, #0x2c]
+  0x8654: ldr	x16, [x0]
+  0x8658: mov	x23, x0
+  0x865c: movk	x23, #0xcda1, lsl #48
+  0x8660: mov	x17, x0
+  0x8664: movk	x17, #0xcda1, lsl #48
+  0x8668: autda	x16, x17
+  0x866c: mov	x17, x16
+  0x8670: xpacd	x17
+  0x8674: cmp	x16, x17
+  0x8678: b.eq	#0x8680
+  0x867c: brk	#0xc472
+  0x8680: add	x8, x16, #0x3a8
+  0x8684: ldr	x9, [x16, #0x3a8]
+  0x8688: movk	x8, #0xc9c, lsl #48
+  0x868c: mov	x1, #0
+  0x8690: blraa	x9, x8
+  0x8694: adrp	x22, #0x1000
+  0x8698: add	x22, x22, #0xc2b
+  0x869c: stp	x22, x21, [sp, #0x10]
+  0x86a0: stp	x0, x19, [sp]
+  0x86a4: adrp	x0, #0x1000
+  0x86a8: add	x0, x0, #0xbe6
+  0x86ac: bl	#0xe884
+  0x86b0: bl	#0xe7ec
+  0x86b4: adrp	x16, #0x8000
+  0x86b8: add	x16, x16, #0x7c8
+  0x86bc: mov	x17, #0x5e7e
+  0x86c0: pacia	x16, x17
+  0x86c4: mov	x2, x16
+  0x86c8: add	x4, sp, #0x2c
+  0x86cc: mov	x1, x21
+  0x86d0: mov	x3, x19
+  0x86d4: bl	#0xe8a8
+  0x86d8: mov	x21, x0
+  0x86dc: cbz	w0, #0x8744
+  0x86e0: ldr	x16, [x19]
+  0x86e4: autda	x16, x23
+  0x86e8: mov	x17, x16
+  0x86ec: xpacd	x17
+  0x86f0: cmp	x16, x17
+  0x86f4: b.eq	#0x86fc
+  0x86f8: brk	#0xc472
+  0x86fc: add	x8, x16, #0x3a8
+  0x8700: ldr	x9, [x16, #0x3a8]
+  0x8704: movk	x8, #0xc9c, lsl #48
+  0x8708: mov	x0, x19
+  0x870c: mov	x1, #0
+  0x8710: blraa	x9, x8
+  0x8714: stp	x22, x21, [sp, #0x10]
+  0x8718: stp	x0, x19, [sp]
+  0x871c: adrp	x0, #0x1000
+  0x8720: add	x0, x0, #0xc37
+  0x8724: bl	#0xe884
+  0x8728: mov	x0, x21
+  0x872c: ldp	x29, x30, [sp, #0x60]
+  0x8730: ldp	x20, x19, [sp, #0x50]
+  0x8734: ldp	x22, x21, [sp, #0x40]
+  0x8738: ldp	x24, x23, [sp, #0x30]
+  0x873c: add	sp, sp, #0x70
+  0x8740: retab	
+
+=== 7. strings @0x731, @0x754, @0x770, @0x795 (fuse path fmts) ===
+  0x0731: 'not obtain workloop \n'
+  0x0754: 'terburner Error: %s[%p]::%s: (%p): could not obtain DMA command pool \n'
+  0x0770: ' (%p): could not obtain DMA command pool \n'
+  0x0795: 'ool \n'
+
+=== 8. embedded pointer tables: hexdump __cstring @0x5f0..0x6f0 ===
+  @0x5f0: 00 00 56 a9 01 02 00 00 01 02 ff 00 00 00 00 20 ...
+        u32s: ['0xa9560000', '0x201', '0xff0201', '0x20000000', '0x101ccf5', '0x1010000', '0x10003', '0x10009', '0x0', '0x0', '0x0', '0x0', '0x1', '0x0', '0x0', '0xffffffff']
+  @0x630: 00 20 56 a9 20 30 00 20 00 30 ff 40 00 20 00 08 ...
+        u32s: ['0xa9562000', '0x20003020', '0x40ff3000', '0x8002000', '0x3020343e', '0x30c00400', '0x30800001', '0x30800000', '0x20002000', '0x20002000', '0x20002000', '0x20002000', '0x20003080', '0x2000', '0x20002000', '0xffffffff']
+  @0x670: 00 00 56 a9 01 02 00 00 01 02 ff 00 00 00 00 00 ...
+        u32s: ['0xa9560000', '0x201', '0xff0201', '0x0', '0x101ccf5', '0x1010000', '0x10003', '0x10009', '0x0', '0x0', '0x0', '0x0', '0x1', '0xf0000', '0x0', '0xffffffff']
+  @0x6b0: 00 20 56 a9 20 30 00 20 00 30 ff 40 00 20 10 00 ...
+        u32s: ['0xa9562000', '0x20003020', '0x40ff3000', '0x102000', '0x3020343e', '0x30c00400', '0x30800001', '0x30800000', '0x20002000', '0x20002000', '0x20002000', '0x20002000', '0x20003080', '0x2000', '0x20002000', '0xffffffff']
+
+=== 9. fn@0x7c60: what is [self+0x150]? and check AB slot names file ===
+  IOBufferMemoryDescriptor.h
+  IOCommand.h
+  IOCommandGate.h
+  IOCommandPool.cpp
+  IOCommandPool.h
+  IOCommandPool_0f3703ac1d.h
+  IOCommandPool_3789.h
+  IOCommandPool_6153.h
+  IOCommandPool_7195.h
+  IOCommandPool_e13b1fa576.h
+  IODMACommand.cpp
+  IODMACommand_xnu.cpp
+  IODMACommand_xnu.h
+  IOEventSource.h
+  IOInterruptEventSource.h
+  IOMemDesc_88cc0b975a.h
+  IOMemDesc_a5e7219620.h
+  IOMemoryDescriptor.h
+  IOMemoryDescriptor_xnu.h
+  IORegistryEntry.cpp
+  IORegistryEntry.h
+  IORegistryEntry_newsrc.txt
+  IORegistryEntry_seq.h
+  IORegistryEntry_sonoma.h
+  IOService.h
+  IOService_main.h
+  IOService_newsrc.txt
+  IOService_seq.h
+  IOService_sonoma.h
+  IOTimerEventSource.h
+  IOUserClient_main.h
+  IOWorkLoop.h
+  OSMetaClass.cpp
+  OSMetaClass.h
+  OSMetaClass_sonoma.h
+  OSObject.cpp
+  OSObject.h
+  OSObject_newsrc.txt
+  OSObject_seq.h
+  OSObject_sonoma.h
+  ab_vtable_full.txt
+  ab_vtable_true.txt
+  ab_vtable_true2.txt
+  adrp_table.json
+  arm64e_orig.bin
+  bmd_test.c
+  build_plt.py
+  build_stubs.py
+  chain_main_recount.json
+  check_cbz.py
+  check_vt.py
+  count_vt.py
+  demangle.py
+  disasm.py
+  dma_test.c
+  dump_base.py
+  dump_vtable.py
+  find_stores.py
+  find_vtables.py
+  getDescriptorList.txt
+  getResourceDescriptorList.txt
+  imports_map.json
+  iocmd_test.c
+  ioreg_test.c
+  iouc_slots.json
+  lc_dump.py
+  loader_xnu.h
+  local_syms.json
+  md_test.c
+  oscb_chunk.c
+  oscb_test.c
+  osobj_test.c
+  osobj_test2.c
+  pool_commits.json
+  pool_test.c
+  pp_IOBufferMemoryDescriptor.c
+  pp_IOBufferMemoryDescriptor.h.txt
+  pp_IOBufferMemoryDescriptor_out.txt
+  pp_IOMemoryDescriptor.c
+  pp_IOMemoryDescriptor.h.txt
+  pp_IOMemoryDescriptor_out.txt
+  pp_err.txt
+  strtab_1862c.json
+  stub_map.json
+  stubs.json
+  stubs_raw.txt
+  syms_16.json
+  syms_x86.json
+  uc_vtable_full.txt
+  vcall_scan.py
+  vcall_sites.json
+  vcount.py
+  vt_decode.py
+  vt_impl.py
+  vt_test.c
+  vt_test2.c
+  vtable_named.txt
+  vtable_slots_main.json
+  x86_64_orig.bin
+  xnu_tree.json
