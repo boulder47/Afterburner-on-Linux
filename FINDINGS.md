@@ -3542,3 +3542,92 @@ treat its chroma sections as invalid — luma/sentinel/run-length checks remain 
 Healthy: no AER in dmesg across ~10 submits (incl. 4× 1080p + 4× 360p multi-frame); clean
 stop sequence (`BAR0+0x8004=0`, ready=0) after each default-stop decode; decoder quiesced at end
 of session. V-matrix unaffected (V1–V5 ✅, V6 still LAST).
+
+---
+
+## 39. Phase B hardening complete (plan2): kext-parity ioctls, error paths, RECOVER soak
+
+### 39.1 B3 — getPercent v2 + checkForSpace v2
+
+**getPercent model** (kext fn@0x7c60; UC_METHODS §11) — decode duty cycle over the
+window since the previous call:
+
+- `acc_e8` = intervals ending at a completion, i.e. [submit → completion] (decode time);
+  `acc_e0` = everything else (idle). Kext field names: AB+0xE8 / AB+0x12E0.
+- `idle_flag` is 1 between submit and completion (kext's "waiting" flag — the name is
+  inherited from the kext, it means *in-flight* here).
+- GET_PERCENT banks [last_sample → now] into e8 if in-flight else e0, returns
+  `100·e8/(e0+e8)`, then resets both accumulators and last_sample := now.
+
+v1 bug: banking was gated on the completion word's count field (`count == 1`); fixed to
+gate ONLY on bit0 (valid), matching the kext RE exactly (tst #0x1f + tbz #0,
+tmp/full_arm64e.txt 0x63f8–0x6478 — updateActiveTime is called for every valid event).
+
+Live validation: fresh load + idle → **0 %**; in-flight sample → **10 %** (≈5 ms
+in-flight against ≈45 ms gap since baseline — internally consistent); post-burst idle →
+**0 %**. v1's "always 100 %" failure mode is gone.
+
+**checkForSpace v2**: reports `in_flight`, `max_in_flight` (AB_MAX_IN_FLIGHT), plus the
+v2 additions `used_bytes`/`cap_bytes`. Submit path returns the kext's no-space error
+(0xE000_02D8 mapping) when in-flight is at capacity.
+
+### 39.2 B1 — async pair validated
+
+SUBMIT_ASYNC / WAIT_COMPL (the kext's IRQ-driven model in ioctl form): `async_test.c`
+4/4 frames with correct decoded output; a second ring while the first is unreaped →
+**-EBUSY** (kext submitDataGated semantics).
+
+### 39.3 B2 — error-path audit + AB_IOC_RESET (FLR escape hatch)
+
+- `AB_IOC_RESET` wired: pci reset + full re-bring-up, serialized via dm->lock; userland
+  must re-bind regions afterwards. **This card has no FLR capability** (absent from PCI
+  config space; live call → -EOPNOTSUPP/errno 95) — documented hardware limitation; the
+  ioctl is correct for cards that do expose it.
+- Audit fixes: `ab_frame_reset` now refreshes the ready state after the disable/enable
+  cycle; BIND_FRAME rolls back partial region allocation on failure.
+
+### 39.4 B4 — RECOVER soak + two-stage completion discovery
+
+`tests/recover_soak.py`: 5 cycles of wedge (`ab_test_hang_ms=3000`, V5 hook) → submit with
+1 s poll window (guaranteed -ETIMEDOUT; the engine completes decode in ms but we ignore it
+for 3 s) → recovery submit. **All 5 cycles PASS**: timeout clean, recovery status=0x1
+data=6 every cycle, final regression decode OK.
+
+- **ack-register drift: none.** New read-only sysfs `ack0`/`ack1` (BAR1 +0x2018/+0x2014)
+  stable at 0x3 across all snapshots — the §3n engine-owned value, no drift over 5 cycles.
+- **Zero AER** in dmesg over the whole run (651 → 703 lines; only afterburner's own logs).
+
+**New finding — two-stage completion (corrects earlier "one event per frame" readings):**
+
+Every chain submission produces exactly **two** completion events: both word=0x3
+(valid + count=1 → batch channel, data at +0x1044); the second is only visible *after*
+the dual-ack of the first (single status register — the engine re-posts on ack). The
+second event's `completion:` dev_info line has identical text to the first and is
+**printk-rate-limited away**, which made every earlier dmesg-based reading look
+single-event. Confirmed on a clean no-hook decode: ring → handle#1 at +3.8 ms →
+`submit: 2 completion(s)` (ncomp only increments inside ab_handle_completion, so two
+calls = two real engine events).
+
+Consequence for getPercent: `ab_time_complete` runs twice per frame; the second bank adds
+only the ~ms inter-stage interval to acc_e8. This is exact kext parity — the kext's IRQ
+handler sees both events too and updateActiveTime is gated on bit0 only (the "cannot
+double-count" reasoning in the old comment was wrong, but banking on every valid event
+was always the right call).
+
+**ab_frame_reset clears un-acked completion state:** B4 stale snapshots after
+timeout+reset show +0x2044=0x0 — the decoder disable/enable cycle clears the pending
+event and discards its stage-B follow-up (no ghost events across all 5 cycles). Reset is
+a safe recovery primitive; the pre-submit stale-completion flush remains as a
+belt-and-suspenders guard (not triggered in this run because reset already cleared).
+
+### 39.5 Tooling fixes
+
+- `tests/getpct.py`: _IOR direction bit was `(1<<30)` instead of `(2<<30)` — it generated
+  0x40044106 (write direction) and got a spurious ENOTTY; fixed, with an assert pinning
+  the encoding to 0x80044106.
+- New sysfs attributes `ack0`/`ack1` for engine-owned ack-register drift checks.
+
+### 39.6 Card state after Phase B
+
+Healthy: no AER across soak + regression decodes; module loaded without the hang hook;
+decoder quiesced at end of session. V-matrix unaffected (V1–V5 ✅, V6 still LAST).

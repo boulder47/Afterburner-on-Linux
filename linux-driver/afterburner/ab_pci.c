@@ -26,6 +26,9 @@ static int ab_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		return -ENOMEM;
 	ab->pdev = pdev;
 	mutex_init(&ab->dma.lock);
+	raw_spin_lock_init(&ab->dma.time_lock);
+	ab->dma.last_sample = ktime_get_ns(); /* getPercent v2 epoch */
+	ab->dma.space_cap = AB_SPACE_CAP;     /* bindFrame reserve budget (UC_METHODS §6) */
 
 	ret = pci_enable_device(pdev);
 	if (ret) {

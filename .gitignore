@@ -13,3 +13,6 @@ tmp/__pycache__/
 Module.symvers
 modules.order
 .*.cmd
+
+# Compiled test clients (regenerable; sources stay tracked)
+linux-driver/afterburner/tests/async_test

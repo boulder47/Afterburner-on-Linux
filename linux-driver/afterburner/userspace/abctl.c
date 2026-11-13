@@ -42,7 +42,9 @@ struct ioc_submit {
 struct ioc_query  { __u32 status, data_word; };
 struct ioc_bind   { __u32 in_size, out_size; };
 struct ioc_status { __u32 fw_version, ready, dec_enable, engine_ctrl; };
-struct ioc_space  { __u32 in_flight, max_in_flight; };
+struct ioc_space  { __u32 in_flight, max_in_flight;
+                    __u64 used_bytes, cap_bytes; }; /* v2: kext reserve model */
+struct ioc_async  { __u32 in_off, in_len, out_len; };
 
 #define IOC_SUBMIT_FRAME _IOWR('A', 0, struct ioc_submit)
 #define IOC_QUERY_COMPL  _IOR ('A', 1, struct ioc_query)
@@ -53,6 +55,9 @@ struct ioc_space  { __u32 in_flight, max_in_flight; };
 #define IOC_GET_PERCENT  _IOR ('A', 6, __u32)
 #define IOC_STOP         _IO  ('A', 7)
 #define IOC_START        _IO  ('A', 8)
+#define IOC_SUBMIT_ASYNC _IOWR('A', 9, struct ioc_async)
+#define IOC_WAIT_COMPL   _IOR ('A',10, struct ioc_query)
+#define IOC_RESET        _IO  ('A',11)
 
 static const char *dev_path = "/dev/afterburner0";
 
@@ -73,14 +78,27 @@ static int cmd_status(void)
 	if (fd < 0)
 		die("open /dev/afterburner0");
 	ret = ioctl(fd, IOC_CARD_STATUS, &st);
-	close(fd);
-	if (ret)
+	if (ret) {
+		close(fd);
 		die("cardStatus");
+	}
 
 	printf("fw_version   : %u.%u (raw 0x%08x)\n",
 	       (st.fw_version >> 16) & 0xFFFF, st.fw_version & 0xFFFF, st.fw_version);
 	printf("decoder      : ready=%u enable=0x%x\n", st.ready, st.dec_enable);
 	printf("engine_ctrl  : 0x%08x   completion: see sysfs 'completion'\n", st.engine_ctrl);
+
+	/* space pool (kext bindFrame reserve model, UC_METHODS §6) */
+	struct ioc_space sp;
+	if (!ioctl(fd, IOC_CHECK_SPACE, &sp)) {
+		printf("space        : in_flight=%u/%u  used=%.1f MiB / %.0f MiB\n",
+		       sp.in_flight, sp.max_in_flight,
+		       (double)sp.used_bytes / (1 << 20),
+		       (double)sp.cap_bytes / (1 << 20));
+	} else {
+		printf("space        : CHECK_SPACE failed (%m)\n");
+	}
+	close(fd);
 
 	/* thermal snapshot from the sysfs surface (Phase A) */
 	const char *base = "/sys/class/afterburner/afterburner0";

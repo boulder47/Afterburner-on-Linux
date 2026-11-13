@@ -99,6 +99,18 @@ static ssize_t completion_show(struct device *dev, struct device_attribute *da, 
 	return ab_show_u32hex(dev, buf, AB_B1_COMPLETION, AB_BAR1);
 }
 
+/* dual-ack registers — engine-owned (§3n: host writes don't stick; the engine
+ * rewrites them on ack). Exposed for drift checks in the B4 RECOVER soak. */
+static ssize_t ack0_show(struct device *dev, struct device_attribute *da, char *buf)
+{
+	return ab_show_u32hex(dev, buf, AB_B1_ACK_0, AB_BAR1);
+}
+
+static ssize_t ack1_show(struct device *dev, struct device_attribute *da, char *buf)
+{
+	return ab_show_u32hex(dev, buf, AB_B1_ACK_1, AB_BAR1);
+}
+
 static ssize_t thermal_status_show(struct device *dev, struct device_attribute *da, char *buf)
 {
 	return ab_show_u32hex(dev, buf, AB_B0_THERM_STATUS, AB_BAR0);
@@ -146,6 +158,8 @@ static struct device_attribute ab_attrs[] = {
 	__ATTR_RO(decoder_enable),
 	__ATTR_RO(engine_ctrl),
 	__ATTR_RO(completion),
+	__ATTR_RO(ack0),
+	__ATTR_RO(ack1),
 	__ATTR_RO(thermal_status),
 	__ATTR_RO(temp_backcard_c),
 	__ATTR_RO(temp_fpga_die_c),

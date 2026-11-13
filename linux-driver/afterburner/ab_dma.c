@@ -32,7 +32,9 @@
 
 #include <linux/delay.h>
 #include <linux/dma-mapping.h>
+#include <linux/ktime.h>
 #include <linux/slab.h>
+#include <linux/spinlock.h>
 
 #include "include/ab.h"
 #include "include/ab_regs.h"
@@ -124,12 +126,91 @@ static void ab_ring(struct ab_device *ab, dma_addr_t head_pa, u32 bank_off,
 	ab_write(ab, AB_BAR1, db_off, ring_val);			/* RING */
 }
 
+/* ------------------------------------------------------------------ *
+ * getPercent time accounting — byte-exact port of the kext trio
+ * (UC_METHODS §11; disassembly: tmp/dis_ab_updateIdleTime.txt @0x9be0,
+ *  tmp/dis_ab_cardStatus_getPercent.txt @0xbda0/@0xbe64).
+ *
+ *   updateIdleTime  @0x9be0 — called from submitDataGated @0x9b18 (step 6,
+ *       BEFORE the doorbell ring): acc_e0 += now-last; idle_flag=1; last=now.
+ *   updateActiveTime@0xbe64 — called from handleInterrupt @0x64c8/@0x68a0:
+ *       acc_e8 += now-last; idle_flag=0; last=now.
+ *   getPercent      @0xbda0 — remaining = now-last goes to acc_e8 if the flag
+ *       is set else acc_e0; pct = total ? acc_e8*100/total : 0; both
+ *       accumulators reset, last := now.
+ *
+ * NOTE: the kext's "idle" flag is inverted vs physical state — it is set during
+ * [submit -> completion], i.e. while the FPGA decodes. We port the formula as-is,
+ * so getPercent returns the DECODE DUTY CYCLE over the window since the previous
+ * call (high % = card busy decoding; low % = starved/waiting). See FINDINGS §39.
+ * ------------------------------------------------------------------ */
+
+static void ab_time_submit(struct ab_dma_state *dm)
+{
+	unsigned long flags;
+	ktime_t now = ktime_get_ns();
+
+	raw_spin_lock_irqsave(&dm->time_lock, flags);
+	dm->acc_e0 += ktime_sub(now, dm->last_sample);
+	dm->idle_flag = true;
+	dm->last_sample = now;
+	raw_spin_unlock_irqrestore(&dm->time_lock, flags);
+}
+
+static void ab_time_complete(struct ab_dma_state *dm)
+{
+	unsigned long flags;
+	ktime_t now = ktime_get_ns();
+
+	raw_spin_lock_irqsave(&dm->time_lock, flags);
+	dm->acc_e8 += ktime_sub(now, dm->last_sample);
+	dm->idle_flag = false;
+	dm->last_sample = now;
+	raw_spin_unlock_irqrestore(&dm->time_lock, flags);
+}
+
+u32 ab_get_percent(struct ab_device *ab)
+{
+	struct ab_dma_state *dm = &ab->dma;
+	unsigned long flags;
+	ktime_t now = ktime_get_ns();
+	u64 el, total, pct;
+
+	raw_spin_lock_irqsave(&dm->time_lock, flags);
+	el = ktime_sub(now, dm->last_sample);
+	if (dm->idle_flag)
+		dm->acc_e8 += el;
+	else
+		dm->acc_e0 += el;
+	total = dm->acc_e0 + dm->acc_e8;
+	pct = total ? dm->acc_e8 * 100 / total : 0;
+	dm->acc_e0 = 0;
+	dm->acc_e8 = 0;
+	dm->last_sample = now;
+	raw_spin_unlock_irqrestore(&dm->time_lock, flags);
+	return (u32)pct;
+}
+
 /* kext fn@0x5aec — one completion event for a non-zero status word.
  * Returns the data word (+0x44 or +0x1044). */
 static u32 ab_handle_completion(struct ab_device *ab, u32 s)
 {
 	u32 count = s >> 1;
 	u32 data = 0;
+
+	/* updateActiveTime (@0xbe64): bank the [submit -> completion] interval at
+	 * event observation — kext parity: the UC-side completion notification
+	 * calls it gated ONLY on bit0 (valid) of the status word (tst #0x1f +
+	 * tbz #0, tmp/full_arm64e.txt 0x63f8-0x6478). Live evidence (Phase B,
+	 * no-hook decode): chain submissions produce TWO completion events per
+	 * frame — both word=0x3 (count=1, batch channel); the second is only
+	 * visible after the dual-ack of the first, and its "completion:" log line
+	 * is printk-rate-limited away (identical text), which made earlier runs
+	 * look single-event. The kext's IRQ handler sees both events too, so
+	 * banking on every handled valid event is exact parity; the second bank
+	 * adds only the ~ms inter-stage interval to acc_e8. */
+	if (s & 1)
+		ab_time_complete(&ab->dma);
 
 	ab_write(ab, AB_BAR1, AB_B1_ACK_0, s);	/* ack#1 (@0x63ac), before data */
 	if (!count) {			/* send-channel completion (status=0x1) */
@@ -264,16 +345,23 @@ static void ab_frame_reset(struct ab_device *ab)
 	 * IOSleep(100ms) and re-writes enable each pass; cap at ~5 s here. */
 	{
 		int i, tries = 0;
+		u32 st;
 
 		for (i = 0; i < 50; i++) {
 			ab_write(ab, AB_BAR0, ab->hdr_off + AB_DEC_ENABLE, 1);
-			if (ab_read(ab, AB_BAR0, ab->hdr_off + AB_DEC_READY) & 1)
+			st = ab_read(ab, AB_BAR0, ab->hdr_off + AB_DEC_READY);
+			if (st & 1)
 				break;
 			msleep(100);
 			tries++;
 		}
+		st = ab_read(ab, AB_BAR0, ab->hdr_off + AB_DEC_READY);
 		dev_info(&ab->pdev->dev, "reset: decoder status=0x%08x after %d ms\n",
-			 ab_read(ab, AB_BAR0, ab->hdr_off + AB_DEC_READY), tries * 100);
+			 st, tries * 100);
+		/* B2 audit fix: reflect the real end state — a failed re-enable
+		 * must not leave ab->ready stale-true (submits would then ring
+		 * doorbells at a non-ready decoder). */
+		ab->ready = !!(st & 1);
 	}
 
 	/* 5. reset completion tracking (kext: stampBase = frameNum) */
@@ -281,27 +369,17 @@ static void ab_frame_reset(struct ab_device *ab)
 	dm->in_flight = 0;
 }
 
-int ab_submit_frame(struct ab_device *ab,
-		    const dma_addr_t *in_pas, const size_t *in_lens, int n_in,
-		    const dma_addr_t *out_pas, const size_t *out_lens, int n_out,
-		    u32 in_len, u32 out_len, u32 poll_ms,
-		    u32 *out_status, u32 *out_data)
+/* Shared prepare+ring core for sync and async submit (kext fn@0x985c steps 4-6:
+ * request build, updateIdleTime, stage A ring, seq++, stage B ring). Caller
+ * holds dm->lock. Returns 0 once both doorbells are rung; -ENOMEM if a chain
+ * build fails (nothing was rung, in_flight untouched). */
+static int ab_ring_frame(struct ab_device *ab,
+			 const dma_addr_t *in_pas, const size_t *in_lens, int n_in,
+			 const dma_addr_t *out_pas, const size_t *out_lens, int n_out,
+			 u32 in_len, u32 out_len)
 {
 	struct ab_dma_state *dm = &ab->dma;
-	u32 last = 0, final_status = 0, data_word = 0, ncomp = 0;
 	bool fresh_in = false, fresh_out = false;
-	unsigned long deadline;
-
-	if (!ab->ready)
-		return -ENODEV;
-	if (!in_len || !out_len || n_in < 1 || n_out < 1)
-		return -EINVAL;
-
-	mutex_lock(&dm->lock);
-	if (dm->in_flight >= AB_MAX_IN_FLIGHT) { /* kext 0xE000_02D8 "no space" */
-		mutex_unlock(&dm->lock);
-		return -ENOSPC;
-	}
 
 	/* Persistent chains (kext parity): build once per segment list, reuse
 	 * for every submit. Per-submit alloc/free broke decoding from frame #2
@@ -313,7 +391,7 @@ int ab_submit_frame(struct ab_device *ab,
 		ab_chain_free(ab, &dm->in_ch);
 		if (!ab_build_chain(ab, &dm->in_ch, in_pas, in_lens, n_in,
 				    ab_pick_seg(in_len), AB_DESC_PA_IN))
-			goto err_nomem;
+			return -ENOMEM;
 		dm->ch_in_pa = in_pas[0];
 		dm->ch_in_len = in_len;
 		dm->ch_in_nseg = n_in;
@@ -324,7 +402,7 @@ int ab_submit_frame(struct ab_device *ab,
 		ab_chain_free(ab, &dm->out_ch);
 		if (!ab_build_chain(ab, &dm->out_ch, out_pas, out_lens, n_out,
 				    ab_pick_seg(out_len), AB_DESC_PA_OUT))
-			goto err_nomem;
+			return -ENOMEM;
 		dm->ch_out_pa = out_pas[0];
 		dm->ch_out_len = out_len;
 		dm->ch_out_nseg = n_out;
@@ -371,11 +449,45 @@ int ab_submit_frame(struct ab_device *ab,
 		 ((dm->seq - dm->done_seq) << 16) & 0xffff0000u); /* @0x9a14 */
 
 	dm->in_flight++;
+	/* kext submitDataGated step 6: updateIdleTime BEFORE the doorbell. */
+	ab_time_submit(dm);
 	ab_ring(ab, dm->in_ch.pa, AB_B1_STAGE_SEND, AB_B1_DOORBELL_SEND, 0xFFE7F);
 
 	/* ---- Stage B (BATCH) — receive bank with fresh out chain ---- */
 	dm->seq++;	/* batch consumes a seq (@0xa988-0xa9a0) */
 	ab_ring(ab, dm->out_ch.pa, AB_B1_STAGE_BATCH, AB_B1_DOORBELL_BATCH, 0x80FFE7F);
+
+	return 0;
+}
+
+int ab_submit_frame(struct ab_device *ab,
+		    const dma_addr_t *in_pas, const size_t *in_lens, int n_in,
+		    const dma_addr_t *out_pas, const size_t *out_lens, int n_out,
+		    u32 in_len, u32 out_len, u32 poll_ms,
+		    u32 *out_status, u32 *out_data)
+{
+	struct ab_dma_state *dm = &ab->dma;
+	u32 last = 0, final_status = 0, data_word = 0, ncomp = 0;
+	unsigned long deadline;
+	int ret;
+
+	if (!ab->ready)
+		return -ENODEV;
+	if (!in_len || !out_len || n_in < 1 || n_out < 1)
+		return -EINVAL;
+
+	mutex_lock(&dm->lock);
+	if (dm->in_flight >= AB_MAX_IN_FLIGHT) { /* kext 0xE000_02D8 "no space" */
+		mutex_unlock(&dm->lock);
+		return -ENOSPC;
+	}
+
+	ret = ab_ring_frame(ab, in_pas, in_lens, n_in, out_pas, out_lens, n_out,
+			    in_len, out_len);
+	if (ret) {
+		mutex_unlock(&dm->lock);
+		return ret;
+	}
 
 	/* ---- Completion poll (kext fn@0x5aec semantics: any non-zero status).
 	 * After a handled event the dual-ack clears +0x2044 to 0 (mode 9), so
@@ -444,20 +556,125 @@ int ab_submit_frame(struct ab_device *ab,
 	ab_frame_reset(ab);
 	mutex_unlock(&dm->lock);
 	return 0;
+}
 
-err_nomem:
+/* B1 async pair — the kext's IRQ-driven model in ioctl form. SUBMIT_ASYNC rings
+ * both doorbells and returns immediately (kext submitDataGated: no wait for the
+ * completion, which arrives via handleInterrupt). WAIT_COMPLETION blocks until
+ * the next completion word, then does c2h settle + per-frame reset — i.e. it is
+ * the kext query stub's blocking equivalent. Depth stays 1 unreaped frame: a
+ * second ring while +0x2044 holds stale status is ignored by the engine
+ * (mode-10 run 1), and the fw-side coalesce/queue protocol that would allow
+ * deeper pipelines needs the init-handshake RE (B1-deferred). */
+int ab_submit_async(struct ab_device *ab,
+		    const dma_addr_t *in_pas, const size_t *in_lens, int n_in,
+		    const dma_addr_t *out_pas, const size_t *out_lens, int n_out,
+		    u32 in_len, u32 out_len)
+{
+	struct ab_dma_state *dm = &ab->dma;
+	int ret;
+
+	if (!ab->ready)
+		return -ENODEV;
+	if (!in_len || !out_len || n_in < 1 || n_out < 1)
+		return -EINVAL;
+
+	mutex_lock(&dm->lock);
+	if (dm->in_flight > 0) { /* an unreaped async frame is pending */
+		mutex_unlock(&dm->lock);
+		return -EBUSY;
+	}
+	ret = ab_ring_frame(ab, in_pas, in_lens, n_in, out_pas, out_lens, n_out,
+			    in_len, out_len);
 	mutex_unlock(&dm->lock);
-	return -ENOMEM;
+	if (!ret)
+		dev_info(&ab->pdev->dev, "async: frame rung (in_flight=%u)\n",
+			 dm->in_flight);
+	return ret;
+}
+
+int ab_wait_completion(struct ab_device *ab, u32 timeout_ms,
+		       u32 *out_status, u32 *out_data)
+{
+	struct ab_dma_state *dm = &ab->dma;
+	u32 last = 0, final_status = 0, data_word = 0;
+	unsigned long deadline;
+
+	if (!timeout_ms)
+		timeout_ms = 2000;
+
+	mutex_lock(&dm->lock);
+
+	/* Nothing in flight: drain any stray pending event (the kext would
+	 * process it on IRQ) and report "nothing to reap". */
+	if (!dm->in_flight) {
+		u32 s = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
+
+		while (s) {
+			dev_info(&ab->pdev->dev,
+				 "wait: draining stray completion 0x%08x\n", s);
+			ab_handle_completion(ab, s);
+			s = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
+		}
+		mutex_unlock(&dm->lock);
+		return -EAGAIN;
+	}
+
+	/* Break on the FIRST completion: chain submits produce exactly one
+	 * event per frame (Phase 3o — the send channel does not complete for
+	 * chains), unlike the sync path which waits out the full window. */
+	deadline = jiffies + msecs_to_jiffies(timeout_ms);
+	while (time_before(jiffies, deadline)) {
+		u32 s = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
+
+		if (s && s != last) {
+			last = s;
+			final_status = s;
+			data_word = ab_handle_completion(ab, s);
+			break;
+		} else if (!s) {
+			last = 0; /* cleared — ready for next event */
+		}
+		usleep_range(2000, 4000);
+	}
+
+	if (!final_status) {
+		/* kext queryCompletionGated timeout semantics: NO state change.
+		 * The frame may still complete; userland retries WAIT_COMPLETION
+		 * (a pending event is reaped on entry) or escalates to RECOVER /
+		 * RESET, which clear the stuck in_flight counter. */
+		dev_err(&ab->pdev->dev,
+			"wait: no completion in %u ms (frame still pending)\n",
+			timeout_ms);
+		mutex_unlock(&dm->lock);
+		return -ETIMEDOUT;
+	}
+
+	/* c2h DMA can lag the completion signal by ~1 s on large frames (§26.1) */
+	msleep(1000);
+
+	if (out_status)
+		*out_status = final_status;
+	if (out_data)
+		*out_data = data_word;
+	dm->in_flight--;
+	dm->last_done = true;
+	dev_info(&ab->pdev->dev, "wait: status=0x%08x data=0x%08x\n",
+		 final_status, data_word);
+
+	/* Per-frame teardown (kext query stub -> AB::reset) */
+	ab_frame_reset(ab);
+	mutex_unlock(&dm->lock);
+	return 0;
 }
 
 /* Free persistent chains (and optionally the bound data regions) — called on
- * re-bind, unbindAll, and module remove. Caller holds no lock; submit is
- * serialized by dm->lock so this must not race an in-flight frame. */
-void ab_dma_release(struct ab_device *ab, bool free_bufs)
+ * re-bind, unbindAll, and module remove. __-variant: caller holds dm->lock;
+ * submit is serialized by the same lock so this cannot race an in-flight frame. */
+void __ab_dma_release(struct ab_device *ab, bool free_bufs)
 {
 	struct ab_dma_state *dm = &ab->dma;
 
-	mutex_lock(&dm->lock);
 	ab_chain_free(ab, &dm->in_ch);
 	ab_chain_free(ab, &dm->out_ch);
 	dm->ch_in_pa = dm->ch_out_pa = 0;
@@ -485,7 +702,19 @@ void ab_dma_release(struct ab_device *ab, bool free_bufs)
 	dm->done_seq = 0;
 	dm->in_flight = 0;
 	dm->last_done = false;
-	mutex_unlock(&dm->lock);
+	/* kext unbindAll releases the used pool (per-desc saturating subtract,
+	 * UC_METHODS §4.6). The cap field is NEVER written by any kext code path
+	 * — full __text scan: exactly two loads at AB+0x12F0, zero stores
+	 * (FINDINGS §39) — so it stays the device-lifetime constant set in probe;
+	 * only `used` goes back to 0 here. */
+	dm->space_used = 0;
+}
+
+void ab_dma_release(struct ab_device *ab, bool free_bufs)
+{
+	mutex_lock(&ab->dma.lock);
+	__ab_dma_release(ab, free_bufs);
+	mutex_unlock(&ab->dma.lock);
 }
 
 /* Non-blocking peek at +0x2044 (queryCompletion): if a completion is pending,

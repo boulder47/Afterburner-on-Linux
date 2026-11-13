@@ -179,3 +179,51 @@ bool ab_recover(struct ab_device *ab)
 	ab->ready = ab_poll_ready(ab);
 	return ab->ready;
 }
+
+/* FLR hard reset — rung B of the recovery ladder (plan2 Phase B item 4).
+ * pci_reset_function() performs a Function Level Reset when the device
+ * advertises it in DEVCAP and refuses otherwise (-EOPNOTSUPP) — we never fall
+ * back to a secondary-bus reset: this card shares its bus with nothing today,
+ * but a link reset would also kill any future co-tenant. FLR wipes engine +
+ * decoder state (and restores config space via pci_restore_state inside), so
+ * the full bring-up sequence re-runs afterwards; BAR windows stay mapped and
+ * host DMA memory survives — userland must re-bind regions after RESET. */
+int ab_hard_reset(struct ab_device *ab)
+{
+	struct ab_dma_state *dm = &ab->dma;
+	u32 devcap;
+	int ret;
+
+	if (!pci_pcie_cap(ab->pdev)) {
+		dev_err(&ab->pdev->dev, "hard reset: not a PCIe device — no FLR\n");
+		return -EOPNOTSUPP;
+	}
+	pci_read_config_dword(ab->pdev, pci_pcie_cap(ab->pdev) + PCI_EXP_DEVCAP, &devcap);
+	if (!(devcap & PCI_EXP_DEVCAP_FLR)) {
+		dev_err(&ab->pdev->dev, "hard reset: no FLR capability (DEVCAP=0x%08x)\n", devcap);
+		return -EOPNOTSUPP;
+	}
+
+	mutex_lock(&dm->lock);
+	if (dm->in_flight) {
+		mutex_unlock(&dm->lock);
+		return -EBUSY; /* don't FLR under a live frame */
+	}
+	/* drop bindings + chains before the wipe (caller-holds-lock variant) */
+	__ab_dma_release(ab, true);
+	mutex_unlock(&dm->lock);
+
+	dev_info(&ab->pdev->dev, "hard reset: issuing FLR\n");
+	ret = pci_reset_function(ab->pdev);
+	if (ret) {
+		dev_err(&ab->pdev->dev, "hard reset: FLR failed (%d)\n", ret);
+		return ret;
+	}
+
+	ret = ab_bringup(ab);
+	if (ret)
+		dev_err(&ab->pdev->dev, "hard reset: bring-up after FLR failed (%d)\n", ret);
+	else
+		dev_info(&ab->pdev->dev, "hard reset: OK — re-bind regions and resubmit\n");
+	return ret;
+}

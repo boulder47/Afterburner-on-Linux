@@ -47,17 +47,31 @@ struct ab_ioc_status {
 	__u32 dec_enable;  /* BAR0[hdr+4] */
 	__u32 engine_ctrl; /* BAR1+0x2010 */
 };
-struct ab_ioc_space { __u32 in_flight; __u32 max_in_flight; };
+struct ab_ioc_space {
+	__u32 in_flight;     /* frames submitted but not yet reaped */
+	__u32 max_in_flight; /* AB_MAX_IN_FLIGHT (sync) / 1 (async depth) */
+	/* v2 (Phase B): kext space pool — bytes of bound DMA regions, under the
+	 * same reserve/rollback model as bindFrame (UC_METHODS §6). CHECK_SPACE
+	 * is a read-only report here; BIND_FRAME performs the mutating reserve. */
+	__u64 used_bytes;
+	__u64 cap_bytes;
+};
+
+struct ab_ioc_async { __u32 in_off; __u32 in_len; __u32 out_len; }; /* submitFrame (ring only) */
 
 #define AB_IOC_SUBMIT_FRAME _IOWR('A', 0, struct ab_ioc_submit) /* submitFrame   */
 #define AB_IOC_QUERY_COMPL  _IOR ('A', 1, struct ab_ioc_query)  /* queryCompletion */
 #define AB_IOC_BIND_FRAME   _IOWR('A', 2, struct ab_ioc_bind)   /* bindFrame     */
 #define AB_IOC_CARD_STATUS  _IOR ('A', 3, struct ab_ioc_status) /* cardStatus    */
-#define AB_IOC_CHECK_SPACE  _IOR ('A', 4, struct ab_ioc_space)  /* checkForSpace */
+#define AB_IOC_CHECK_SPACE  _IOR ('A', 4, struct ab_ioc_space)  /* checkForSpace (v2: +used/cap) */
 #define AB_IOC_UNBIND_ALL   _IO  ('A', 5)                       /* unbindAll     */
 #define AB_IOC_GET_PERCENT  _IOR ('A', 6, __u32)                /* getPercent    */
 #define AB_IOC_STOP         _IO  ('A', 7)                       /* stop (kext fn@0xc0a4) */
 #define AB_IOC_START        _IO  ('A', 8)                       /* re-bring-up after STOP */
+/* Phase B additions: */
+#define AB_IOC_SUBMIT_ASYNC _IOWR('A', 9, struct ab_ioc_async)  /* submitFrame (no wait) */
+#define AB_IOC_WAIT_COMPL   _IOR ('A', 10, struct ab_ioc_query) /* blocking reap + settle + reset */
+#define AB_IOC_RESET        _IO  ('A', 11)                      /* FLR hard reset (rung B) */
 
 /* ------------------------------------------------------------------ *
  * Region allocation — single coherent block first; on no-IOMMU hosts a
@@ -231,6 +245,43 @@ static int ab_mmap(struct file *filp, struct vm_area_struct *vma)
  * ioctls
  * ------------------------------------------------------------------ */
 
+/* Slice bound regions into chain segments for [in_off,in_len) / [0,out_len).
+ * Returns 0 and fills both counts, or -EINVAL (unbound / out of bounds /
+ * segment truncation). Shared by SUBMIT_FRAME and SUBMIT_ASYNC. */
+static int ab_prepare_segments(struct ab_device *ab, u32 in_off, u32 in_len,
+			       u32 out_len, dma_addr_t *in_pas, size_t *in_lens,
+			       dma_addr_t *out_pas, size_t *out_lens,
+			       int *n_in, int *n_out)
+{
+	struct ab_dma_state *dm = &ab->dma;
+
+	if (!dm->in.virt || !dm->out.virt)
+		return -EINVAL; /* bindFrame first */
+	if ((u64)in_off + in_len > dm->in.size || out_len > dm->out.size)
+		return -EINVAL;
+
+	*n_in = ab_slice_segments(&dm->in, in_off, in_len, in_pas, in_lens, AB_MAX_SEGS);
+	*n_out = ab_slice_segments(&dm->out, 0, out_len, out_pas, out_lens, AB_MAX_SEGS);
+	if (!*n_in || !*n_out)
+		return -EINVAL;
+
+	{ /* truncation guard: sliced bytes must cover the request */
+		u64 sum = 0;
+		int k;
+
+		for (k = 0; k < *n_in; k++)
+			sum += in_lens[k];
+		if (sum != in_len)
+			return -EINVAL;
+		sum = 0;
+		for (k = 0; k < *n_out; k++)
+			sum += out_lens[k];
+		if (sum != out_len)
+			return -EINVAL;
+	}
+	return 0;
+}
+
 static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	struct ab_device *ab = filp->private_data;
@@ -241,43 +292,20 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		struct ab_ioc_submit s;
 		dma_addr_t in_pas[AB_MAX_SEGS], out_pas[AB_MAX_SEGS];
 		size_t in_lens[AB_MAX_SEGS], out_lens[AB_MAX_SEGS];
-		int n_in, n_out;
-		u32 status = 0, data_word = 0;
-		int ret;
+		int n_in, n_out, ret;
 
 		if (copy_from_user(&s, (void __user *)arg, sizeof(s)))
 			return -EFAULT;
-		if (!dm->in.virt || !dm->out.virt)
-			return -EINVAL;	/* bindFrame first */
-		if ((u64)s.in_off + s.in_len > dm->in.size || s.out_len > dm->out.size)
-			return -EINVAL;
-
-		n_in = ab_slice_segments(&dm->in, s.in_off, s.in_len, in_pas, in_lens, AB_MAX_SEGS);
-		n_out = ab_slice_segments(&dm->out, 0, s.out_len, out_pas, out_lens, AB_MAX_SEGS);
-		if (!n_in || !n_out)
-			return -EINVAL;
-
-		{ /* truncation guard: sliced bytes must cover the request */
-			u64 sum = 0;
-			int k;
-
-			for (k = 0; k < n_in; k++)
-				sum += in_lens[k];
-			if (sum != s.in_len)
-				return -EINVAL;
-			sum = 0;
-			for (k = 0; k < n_out; k++)
-				sum += out_lens[k];
-			if (sum != s.out_len)
-				return -EINVAL;
-		}
+		ret = ab_prepare_segments(ab, s.in_off, s.in_len, s.out_len,
+					  in_pas, in_lens, out_pas, out_lens,
+					  &n_in, &n_out);
+		if (ret)
+			return ret;
 
 		ret = ab_submit_frame(ab, in_pas, in_lens, n_in,
 				      out_pas, out_lens, n_out,
 				      s.in_len, s.out_len, s.poll_ms,
-				      &status, &data_word);
-		s.status = status;
-		s.data_word = data_word;
+				      &s.status, &s.data_word);
 		if (copy_to_user((void __user *)arg, &s, sizeof(s)))
 			return -EFAULT;
 		return ret;
@@ -298,13 +326,30 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	case AB_IOC_BIND_FRAME: {
 		struct ab_ioc_bind b;
+		u64 reserve;
 		int ret = 0;
 
 		if (copy_from_user(&b, (void __user *)arg, sizeof(b)))
 			return -EFAULT;
-		/* drop previous binding — chains + data regions (takes lock) */
-		ab_dma_release(ab, true);
+
 		mutex_lock(&dm->lock);
+		/* kext AB::bindFrame (@0xbec) ordering: commit used += len FIRST,
+		 * then check cap — over-cap leaves the pool over-committed and UC
+		 * rolls back via freeSpace. We do the same rollback inline. */
+		reserve = (u64)b.in_size + b.out_size;
+		dm->space_used += reserve;
+		if (dm->space_used > dm->space_cap) {
+			dm->space_used -= reserve; /* freeSpace rollback */
+			mutex_unlock(&dm->lock);
+			return -ENOSPC; /* kext 0xE000_02EC */
+		}
+
+		/* drop previous binding — chains + data regions (caller holds
+		 * lock; also resets the space pool, so re-commit below) */
+		__ab_dma_release(ab, true);
+		dm->space_used = reserve;
+		dm->space_cap = AB_SPACE_CAP;
+
 		if (b.in_size) {
 			size_t sz = (size_t)b.in_size + PAGE_SIZE - 1;
 
@@ -317,8 +362,15 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			sz &= ~(PAGE_SIZE - 1);
 			ret = ab_alloc_region(ab, &dm->out, sz);
 		}
+		if (ret) {
+			/* B2 audit: alloc failure after reserve must roll the pool
+			 * back — otherwise a failed bind leaks capacity forever. */
+			dm->space_used -= reserve;
+			mutex_unlock(&dm->lock);
+			return ret;
+		}
 		mutex_unlock(&dm->lock);
-		return ret;
+		return 0;
 	}
 
 	case AB_IOC_CARD_STATUS: {
@@ -334,8 +386,14 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 
 	case AB_IOC_CHECK_SPACE: {
-		struct ab_ioc_space sp = { dm->in_flight, AB_MAX_IN_FLIGHT };
+		struct ab_ioc_space sp;
 
+		mutex_lock(&dm->lock);
+		sp.in_flight = dm->in_flight;
+		sp.max_in_flight = AB_MAX_IN_FLIGHT;
+		sp.used_bytes = dm->space_used;
+		sp.cap_bytes = dm->space_cap;
+		mutex_unlock(&dm->lock);
 		if (copy_to_user((void __user *)arg, &sp, sizeof(sp)))
 			return -EFAULT;
 		return 0;
@@ -361,7 +419,7 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 
 	case AB_IOC_GET_PERCENT: {
-		u32 p = dm->last_done ? 100 : 0; /* v1 stub — no mid-frame progress signal */
+		u32 p = ab_get_percent(ab); /* kext-exact duty cycle (UC_METHODS §11) */
 
 		if (copy_to_user((void __user *)arg, &p, sizeof(p)))
 			return -EFAULT;
@@ -398,7 +456,46 @@ static long ab_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		mutex_unlock(&dm->lock);
 		return ok ? 0 : -ETIMEDOUT;
 	}
-}
+
+	case AB_IOC_SUBMIT_ASYNC: {
+		struct ab_ioc_async a;
+		dma_addr_t in_pas[AB_MAX_SEGS], out_pas[AB_MAX_SEGS];
+		size_t in_lens[AB_MAX_SEGS], out_lens[AB_MAX_SEGS];
+		int n_in, n_out, ret;
+
+		if (copy_from_user(&a, (void __user *)arg, sizeof(a)))
+			return -EFAULT;
+		ret = ab_prepare_segments(ab, a.in_off, a.in_len, a.out_len,
+					  in_pas, in_lens, out_pas, out_lens,
+					  &n_in, &n_out);
+		if (ret)
+			return ret;
+
+		/* ring both doorbells and return — reap via WAIT_COMPL. Depth-1:
+		 * -EBUSY while a frame is unreaped (kext submitDataGated parity). */
+		return ab_submit_async(ab, in_pas, in_lens, n_in,
+				       out_pas, out_lens, n_out,
+				       a.in_len, a.out_len);
+	}
+
+	case AB_IOC_WAIT_COMPL: {
+		struct ab_ioc_query q = { 0 };
+		int ret = ab_wait_completion(ab, 2000, &q.status, &q.data_word);
+
+		if (ret == -EAGAIN)
+			ret = 0; /* nothing to reap — not an error */
+		else if (ret < 0)
+			return ret;
+		if (copy_to_user((void __user *)arg, &q, sizeof(q)))
+			return -EFAULT;
+		return 0;
+	}
+
+	case AB_IOC_RESET:
+		/* FLR + full re-bring-up (rung B). Serializes internally via
+		 * dm->lock; userland must re-bind regions afterwards. */
+		return ab_hard_reset(ab);
+	}
 	return -ENOTTY;
 }
 
