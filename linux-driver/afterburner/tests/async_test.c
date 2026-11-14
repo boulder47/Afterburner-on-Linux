@@ -5,10 +5,14 @@
  *
  * Per frame: SUBMIT_ASYNC returns immediately; we sample GET_PERCENT while
  * the frame is in flight (getPercent takes only time_lock, so it works
- * concurrently), then WAIT_COMPLETION blocks until the decode completion +
- * 1 s c2h settle.  The stale send-channel event left at BAR1+0x2044 is
- * drained kext-exact by ab_drain() inside the next submit (verified in
- * dmesg: "pre-submit drain" lines). */
+ * concurrently), then WAIT_COMPLETION blocks until the batch-channel decode
+ * completion (fires after c2h has landed).  A stale send-channel event left
+ * at BAR1+0x2044 by a previous frame is drained kext-exact by ab_drain()
+ * inside the next submit (verified in dmesg: "pre-submit drain" lines).
+ *
+ * NOTE: in_len must be the EXACT packet size, never page-aligned — the
+ * firmware stalls on an over-declared input length and posts no completion
+ * at all (kext parity: segment list carries real {PA,len} pairs). */
 
 #include <errno.h>
 #include <fcntl.h>
@@ -57,6 +61,7 @@ int main(int argc, char **argv)
 	struct ioc_status st;
 	uint16_t fw, fh;
 	int stride, rows, out_len, fd, rc = 0;
+	long psz;
 
 	if (argc < 2) {
 		fprintf(stderr, "usage: async_test <frame.bin> [out.yuv] [N]\n");
@@ -86,8 +91,8 @@ int main(int argc, char **argv)
 	stride = ((fw * 2 + 63) / 64) * 64;
 	rows = ((fh + 15) / 16) * 16;
 	out_len = stride * rows;
-	fsz = (fsz + 4095) & ~4095L; /* page-align the bind size */
-	frame = realloc(frame, fsz);
+	psz = (fsz + 4095) & ~4095L; /* page-align the bind/mmap size only */
+	frame = realloc(frame, psz);
 	if (!frame) { perror("realloc"); return 1; }
 
 	fd = open("/dev/afterburner0", O_RDWR);
@@ -121,7 +126,7 @@ int main(int argc, char **argv)
 	}
 	printf("[percent] baseline (idle window): %u%%\n", pct);
 
-	struct ioc_bind b = { (uint32_t)fsz, (uint32_t)out_len };
+	struct ioc_bind b = { (uint32_t)psz, (uint32_t)out_len };
 
 	if (ioctl(fd, IOC_BIND_FRAME, &b)) {
 		perror("bindFrame");
@@ -136,16 +141,16 @@ int main(int argc, char **argv)
 	       sp.in_flight, sp.max_in_flight,
 	       (double)sp.used_bytes / 1048576.0,
 	       (double)sp.cap_bytes / 1048576.0,
-	       ((double)fsz + out_len) / 1048576.0);
+	       ((double)psz + out_len) / 1048576.0);
 
-	inmap = mmap(NULL, (size_t)fsz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	inmap = mmap(NULL, (size_t)psz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	outmap = mmap(NULL, (size_t)out_len, PROT_READ | PROT_WRITE, MAP_SHARED,
 		      fd, (off_t)1 * 4096);
 	if (inmap == MAP_FAILED || outmap == MAP_FAILED) {
 		perror("mmap");
 		return 1;
 	}
-	memcpy(inmap, frame, (size_t)fsz);
+	memcpy(inmap, frame, (size_t)fsz); /* exact packet bytes */
 	memset(outmap, 0x5A, (size_t)out_len); /* sentinel: untouched = partial */
 
 	double t_start = now_ms();

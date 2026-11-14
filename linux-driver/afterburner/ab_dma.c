@@ -276,6 +276,13 @@ static int ab_test_hang_ms;
 module_param(ab_test_hang_ms, int, 0644);
 MODULE_PARM_DESC(ab_test_hang_ms, "V5 test hook: ignore completions for N ms after doorbell (0=off)");
 
+/* Diagnostic: completion poll interval in microseconds (default 2000).
+ * Lower values (e.g. 100) capture the full per-frame event stream at high
+ * resolution — used to characterize the s=0x1-only wedge on frame 728. */
+static int ab_poll_us = 2000;
+module_param(ab_poll_us, int, 0644);
+MODULE_PARM_DESC(ab_poll_us, "completion poll interval in microseconds (default 2000)");
+
 static u32 ab_pick_seg(u64 total)
 {
 	u32 seg = ab_out_seg ? ab_out_seg : AB_MIN_SEG;
@@ -287,8 +294,9 @@ static u32 ab_pick_seg(u64 total)
 
 /* Two-stage frame submit — kext fn@0x985c. in_pa/out_pa are coherent DMA PAs of
  * the user's mapped input/output regions. Blocks for up to poll_ms (default 2 s)
- * plus a 1 s c2h settle (§26.1). Returns 0 on completion, -ETIMEDOUT if no
- * completion arrived in the window. */
+ * waiting for completion; the c2h drain gate is the conditional status check in
+ * ab_frame_reset() (§10.3), not a blind sleep. Returns 0 on completion,
+ * -ETIMEDOUT if no completion arrived in the window. */
 /* ------------------------------------------------------------------ *
  * Per-frame teardown — kext AB::reset @0xaea8 (UC_METHODS §10.3).
  *
@@ -342,22 +350,26 @@ static void ab_frame_reset(struct ab_device *ab)
 	}
 
 	/* 4. decoder re-enable until ready bit ([hdr+8] & 1). kext loops with
-	 * IOSleep(100ms) and re-writes enable each pass; cap at ~5 s here. */
+	 * IOSleep(100ms) and re-writes enable each pass; we poll at 2-4 ms
+	 * instead — the 100 ms granularity showed up as ~109 ms per-frame
+	 * latency spikes in realtime playback (abplayer, frames 51/86 of a
+	 * 30 fps run) whenever the ready bit needed one extra pass. The
+	 * re-write-each-pass is kept for kext parity; cap at ~2 s here. */
 	{
 		int i, tries = 0;
 		u32 st;
 
-		for (i = 0; i < 50; i++) {
+		for (i = 0; i < 500; i++) {
 			ab_write(ab, AB_BAR0, ab->hdr_off + AB_DEC_ENABLE, 1);
 			st = ab_read(ab, AB_BAR0, ab->hdr_off + AB_DEC_READY);
 			if (st & 1)
 				break;
-			msleep(100);
+			usleep_range(2000, 4000);
 			tries++;
 		}
 		st = ab_read(ab, AB_BAR0, ab->hdr_off + AB_DEC_READY);
-		dev_info(&ab->pdev->dev, "reset: decoder status=0x%08x after %d ms\n",
-			 st, tries * 100);
+		dev_info(&ab->pdev->dev, "reset: decoder status=0x%08x after %d polls\n",
+			 st, tries);
 		/* B2 audit fix: reflect the real end state — a failed re-enable
 		 * must not leave ab->ready stale-true (submits would then ring
 		 * doorbells at a non-ready decoder). */
@@ -489,7 +501,8 @@ int ab_submit_frame(struct ab_device *ab,
 		return ret;
 	}
 
-	/* ---- Completion poll (kext fn@0x5aec semantics: any non-zero status).
+	/* ---- Completion poll (kext fn@0x5aec semantics: any non-zero status is
+	 * an event; only a batch-channel one (count>=1) completes the frame).
 	 * After a handled event the dual-ack clears +0x2044 to 0 (mode 9), so
 	 * `last` resets on the zero read and a repeat value is re-handled. */
 	if (!poll_ms)
@@ -518,20 +531,28 @@ int ab_submit_frame(struct ab_device *ab,
 			}
 			s = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
 
-			if (s && s != last) {
+			if (!s) {
+				last = 0;	/* cleared — ready for next event */
+			} else if (s != last) {
 				last = s;
 				ncomp++;
-				final_status = s;
 				data_word = ab_handle_completion(ab, s);
-			} else if (!s) {
-				last = 0;	/* cleared — ready for next event */
+				if ((s >> 1) >= 1) { /* batch channel: frame done */
+					final_status = s;
+					break;	/* c2h landed — drain gate is in reset() */
+				}
+				/* send-channel (count=0): acked, keep waiting for the
+				 * batch event. A lone 0x1 is NOT frame completion:
+				 * live run 2026-11-14 showed it arriving right after
+				 * the batch and being reported as the final status,
+				 * masking a decode that never happened. */
 			}
 			usleep_range(2000, 4000);
 		}
 	}
 
-	if (ncomp == 0) {
-		dev_err(&ab->pdev->dev, "submit: no completion in %u ms window\n", poll_ms);
+	if (!final_status) {
+		dev_err(&ab->pdev->dev, "submit: no batch completion in %u ms window (ncomp=%u)\n", poll_ms, ncomp);
 		dm->in_flight--;
 		/* kext sleep_timer path: reset on hang too (§10.2) */
 		ab_frame_reset(ab);
@@ -539,8 +560,13 @@ int ab_submit_frame(struct ab_device *ab,
 		return -ETIMEDOUT;
 	}
 
-	/* c2h DMA can lag the completion signal by ~1 s on large frames (§26.1) */
-	msleep(1000);
+	/* No blind c2h settle here (was msleep(1000)): the kext has no such
+	 * sleep on this path — its only drain gate is the CONDITIONAL check in
+	 * AB::reset() step 2 (§10.3): if c2hStatus/h2cStatus bit0 is still set,
+	 * wait; otherwise proceed immediately. ab_frame_reset() below ports that
+	 * gate exactly (poll up to ~2 s), so small frames pay only the MMIO read.
+	 * The old unconditional 1 s floor capped throughput at ~1 fps and was
+	 * sized for the §26.1 33 MB worst case, not the common path. */
 
 	if (out_status)
 		*out_status = final_status;
@@ -561,8 +587,9 @@ int ab_submit_frame(struct ab_device *ab,
 /* B1 async pair — the kext's IRQ-driven model in ioctl form. SUBMIT_ASYNC rings
  * both doorbells and returns immediately (kext submitDataGated: no wait for the
  * completion, which arrives via handleInterrupt). WAIT_COMPLETION blocks until
- * the next completion word, then does c2h settle + per-frame reset — i.e. it is
- * the kext query stub's blocking equivalent. Depth stays 1 unreaped frame: a
+ * the next completion word, then does per-frame reset — i.e. it is the kext
+ * query stub's blocking equivalent (the c2h drain gate lives in the reset's
+ * conditional status check, §10.3 — no blind settle sleep). Depth stays 1 unreaped frame: a
  * second ring while +0x2044 holds stale status is ignored by the engine
  * (mode-10 run 1), and the fw-side coalesce/queue protocol that would allow
  * deeper pipelines needs the init-handshake RE (B1-deferred). */
@@ -584,6 +611,12 @@ int ab_submit_async(struct ab_device *ab,
 		mutex_unlock(&dm->lock);
 		return -EBUSY;
 	}
+	/* kext parity: handleInterrupt processes every completion as it
+	 * arrives. A stale event at +0x2044 makes the engine ignore a new
+	 * ring (mode-10 run 1) and desyncs WAIT_COMPLETION, which would reap
+	 * the stale word instead of this frame's batch completion — so drain
+	 * before ringing, exactly like the sync path. */
+	ab_drain(ab);
 	ret = ab_ring_frame(ab, in_pas, in_lens, n_in, out_pas, out_lens, n_out,
 			    in_len, out_len);
 	mutex_unlock(&dm->lock);
@@ -620,22 +653,31 @@ int ab_wait_completion(struct ab_device *ab, u32 timeout_ms,
 		return -EAGAIN;
 	}
 
-	/* Break on the FIRST completion: chain submits produce exactly one
-	 * event per frame (Phase 3o — the send channel does not complete for
-	 * chains), unlike the sync path which waits out the full window. */
+	/* Wait for THIS frame's batch-channel completion (count>=1): it fires
+	 * only after decode AND the c2h DMA have landed (probe evidence: an
+	 * immediate dump right after reaping status=0x3 is pixel-perfect).
+	 * Send-channel events (count=0) are acked as they appear but do NOT
+	 * complete the frame — breaking on them ran ab_frame_reset() mid-c2h
+	 * and truncated the output to a partial write (Phase B async garbage:
+	 * 63% sentinel + 37% pixels). */
 	deadline = jiffies + msecs_to_jiffies(timeout_ms);
 	while (time_before(jiffies, deadline)) {
 		u32 s = ab_read(ab, AB_BAR1, AB_B1_COMPLETION);
 
-		if (s && s != last) {
-			last = s;
-			final_status = s;
-			data_word = ab_handle_completion(ab, s);
-			break;
-		} else if (!s) {
+		if (!s) {
 			last = 0; /* cleared — ready for next event */
+		} else if (s != last) {
+			dev_info(&ab->pdev->dev, "wait: observed status=0x%08x\n", s);
+			last = s;
+			data_word = ab_handle_completion(ab, s);
+			if ((s >> 1) >= 1) { /* batch channel: frame done */
+				final_status = s;
+				break;
+			}
+			/* send-channel (count=0): acked above, keep waiting */
 		}
-		usleep_range(2000, 4000);
+		usleep_range(ab_poll_us > 0 ? ab_poll_us : 2000,
+			     ab_poll_us > 0 ? ab_poll_us * 2 : 4000);
 	}
 
 	if (!final_status) {
@@ -650,8 +692,8 @@ int ab_wait_completion(struct ab_device *ab, u32 timeout_ms,
 		return -ETIMEDOUT;
 	}
 
-	/* c2h DMA can lag the completion signal by ~1 s on large frames (§26.1) */
-	msleep(1000);
+	/* No blind c2h settle here either — see ab_submit_frame(): the drain
+	 * gate is the conditional status check in ab_frame_reset() below. */
 
 	if (out_status)
 		*out_status = final_status;
@@ -697,6 +739,19 @@ void __ab_dma_release(struct ab_device *ab, bool free_bufs)
 						  dm->out.chunks[i].pa);
 		memset(&dm->in, 0, sizeof(dm->in));
 		memset(&dm->out, 0, sizeof(dm->out));
+	}
+	if (dm->in_flight > 0) {
+		/* A frame was still pending when the bindings went away — the
+		 * engine may be mid-decode on DMA we are about to free, and it
+		 * will ignore every new ring until a decoder cycle clears its
+		 * state (live: aborted run left the card globally stuck; only an
+		 * AB_IOC_START/START-equivalent recovered it). Quiesce now — this
+		 * is our port of the kext sleep_timer's last-resort reset, which
+		 * fires even when userland never comes back. */
+		dev_warn(&ab->pdev->dev,
+			 "release: %u frame(s) still in flight — quiescing engine\n",
+			 dm->in_flight);
+		ab_frame_reset(ab);
 	}
 	dm->seq = 0;
 	dm->done_seq = 0;

@@ -99,6 +99,19 @@ static ssize_t completion_show(struct device *dev, struct device_attribute *da, 
 	return ab_show_u32hex(dev, buf, AB_B1_COMPLETION, AB_BAR1);
 }
 
+/* channel status words — bit0 = valid (engine-owned; wedge diagnostics:
+ * h2cStatus +0x44 / c2hStatus +0x1044 show whether DMA is mid-flight when a
+ * frame never completes). */
+static ssize_t h2c_status_show(struct device *dev, struct device_attribute *da, char *buf)
+{
+	return ab_show_u32hex(dev, buf, AB_B1_DATA_SEND, AB_BAR1);
+}
+
+static ssize_t c2h_status_show(struct device *dev, struct device_attribute *da, char *buf)
+{
+	return ab_show_u32hex(dev, buf, AB_B1_DATA_BATCH, AB_BAR1);
+}
+
 /* dual-ack registers — engine-owned (§3n: host writes don't stick; the engine
  * rewrites them on ack). Exposed for drift checks in the B4 RECOVER soak. */
 static ssize_t ack0_show(struct device *dev, struct device_attribute *da, char *buf)
@@ -158,6 +171,8 @@ static struct device_attribute ab_attrs[] = {
 	__ATTR_RO(decoder_enable),
 	__ATTR_RO(engine_ctrl),
 	__ATTR_RO(completion),
+	__ATTR_RO(h2c_status),
+	__ATTR_RO(c2h_status),
 	__ATTR_RO(ack0),
 	__ATTR_RO(ack1),
 	__ATTR_RO(thermal_status),
