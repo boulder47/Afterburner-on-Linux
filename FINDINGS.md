@@ -3631,3 +3631,84 @@ belt-and-suspenders guard (not triggered in this run because reset already clear
 
 Healthy: no AER across soak + regression decodes; module loaded without the hang hook;
 decoder quiesced at end of session. V-matrix unaffected (V1–V5 ✅, V6 still LAST).
+
+## 40. Phase C — V6 destructive test (2026-11-13)
+
+### 40.1 Spec and setup
+
+V6 per plan2: full frame, **no stop command** (decoder left enabled after
+completion), ≥75 s idle + AER watch. Marked LAST; plan2 expected the card to die
+("mode-15 control"). Module reloaded with `out_seg=4194304` baked at insmod
+(client's sysfs write is root-only). Client: `AB_NOSTOP=1 abtest_4k
+testdata/prores_3840x2160_frame0.bin /tmp/v6_out.yuv 30000`.
+
+Pre-state (clean): completion=0x0, ack0/ack1=0x3, engine_ctrl=0x3, fw 2.62.
+dmesg baseline line 754.
+
+### 40.2 Run log
+
+- t=1794612691 (epoch) submit: in_len=2552068 out_len=16588800 (auto-sized,
+  stride=7680 rows=2160). Kernel log (uptime 385040.5): alloc as **5 × 4145152 B
+  chunks** (no-IOMMU fallback), chain = out[0..3] len 0x3F4000 + out[4] tail
+  len 0x2000 with final ctrl ad4b0013 — **5 descs, all ≤126 cap**.
+- Completion at uptime 385071.5: status=0x1 valid, data_word=0x6 (two-stage
+  model per §39.4; second event rate-limited out of dmesg).
+- `[skip] AB_NOSTOP set — decoder left enabled` → client exited, unbound all
+  DMA regions, decoder stayed ENABLED with no in-flight work.
+
+### 40.3 Result: CARD SURVIVED — expectation refuted
+
+Formal watch (t+5…t+90 s, 18 samples): zero new AER/malf/uncorrectable lines;
+sysfs fully responsive throughout (completion=0x0, engine_ctrl=0x3, ack0=0x3
+stable). Total decoder-enabled idle from first completion to watch end:
+**~27 min (≈1613 s)** — 3.5× the spec window. Zero AER.
+
+This matches the mode-15 control recorded in tmp/mode15_result.txt, which plan2
+misread as a kill: its verdict line says "MODE-15 VERDICT: card ALIVE after
+75 s idle (decoder ENABLED — control failed to reproduce?)". The run-#2 death
+that motivated V6 was root-caused in §28 to **>126 out-descs** (out_seg=131072
+→ 128 descs → MalfTLP straddling the fw's 126-desc stop), NOT to a missing stop
+command. The current driver hard-errors above 126 descs, so that kill path is
+unreachable through it.
+
+**Conclusion: the post-completion stop command (BAR0[hdr+4]=0) is kext-parity
+hygiene but not required for card survival.** V3's survival was never due to
+the stop; both with-stop and without-stop idle are safe at ≤126 descs. No power
+cycle needed; the "V1 post-revive" contingency ran anyway as a health check.
+
+### 40.4 Pixel verification + tail non-determinism (sharper §34)
+
+Card output vs FFmpeg reference (wrap_prores → ffmpeg -pix_fmt yuv422p,
+compare_card_ref.py):
+
+- rows 0–1817: luma ±1 = **100.00%**, maxdiff=1 — pixel-perfect (both V6 runs)
+- rows 1818–2159 (last 342 rows, ~2.6 MB): luma ±1 ≈ 6%, maxdiff 63–167
+
+Two identical V6 submissions (same frame, out_seg=4MB, auto-sized out_len)
+differ in **2,619,392 bytes — all within tail rows 1818–2159** (first diff at
+0xD52800 = row 1818 start; last at buffer end). No 0x5A sentinel anywhere in
+the tail → the engine *writes* those rows, but with different content each run.
+
+This is the precise form of §34's "p4k partial decode at slice #3418 =
+content-specific fw behavior": for this frame the fw decodes pixel-perfectly
+through row 1817 and then DMAs non-deterministic data into the final 342 rows.
+Not a driver bug (driver only stages descriptors; head is perfect, status
+valid); content/frame-specific firmware quirk. The V3-era dump
+(tmp/ab_out4k.bin) shows the same split — its tail also differs from both V6
+runs, consistent with the same non-deterministic behavior under a different
+chain length (8 descs at out_len=2×S·R pre-auto-sizing).
+
+### 40.5 STOP hygiene + V1 post-revive regression
+
+AB_IOC_STOP (_IO('A',7)=0x4107) issued after the watch: dec_enable → 0x0,
+completion/acks unchanged (engine-owned per §3n). Then V1 regression on the
+320×180 fixture: abctl auto re-bring-up via IOC_START ("decoder not ready —
+issuing IOC_START"), decode status=0x1 valid, post-stop clean; pixels vs FFmpeg
+luma/chroma **±1 = 100%, maxdiff=1** (pixel-perfect). Card healthy.
+
+### 40.6 Card state after Phase C
+
+Healthy: zero AER across the entire V6 window + regression; decoder quiesced
+(STOP issued); module loaded with out_seg=4MB param (harmless — client can
+omit argv[4] when the param is baked). **V-matrix complete: V1–V6 all ✅.**
+Remaining plan2 work: Phase D (flash port) — optional.

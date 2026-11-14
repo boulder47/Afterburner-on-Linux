@@ -40,9 +40,10 @@ states only what is done, what remains, and the constraints that are non-negotia
 | Profile matrix complete; output padding rules pinned live | FINDINGS §35.3, §37 |
 | **Phase A done**: sysfs surface (14 attrs) + `abctl` client validated end-to-end on hardware — single-frame & multi-frame decodes pixel-perfect ±1 vs FFmpeg ref; apcn added to decode matrix; §32 chroma claim refuted | FINDINGS §38 |
 | **Phase B done**: kext-parity ioctls (getPercent v2 duty-cycle model, checkForSpace v2 used/cap), async pair (SUBMIT_ASYNC/WAIT_COMPL, EBUSY on double ring), error-path audit + AB_IOC_RESET (FLR-gated; -EOPNOTSUPP on this card — no FLR cap), RECOVER soak 5/5 cycles zero AER / no ack drift; two-stage completion discovery (§39.4) | FINDINGS §39 |
+| **Phase C done**: V6 destructive — full 4K frame, NO stop cmd, ~27 min decoder-enabled idle: **zero AER, card survived** (expectation refuted — the §28 kill was >126 descs, not missing stop; mode-15 control had already shown ALIVE). Tail-row non-determinism pinned for this frame (§40.4). V1 post-revive regression pixel-perfect | FINDINGS §40 |
 
-**Remaining:** Phase C (V6 destructive, LAST) → D (flash port, optional).
-Card is alive and the module currently loaded clean.
+**Remaining:** Phase D (flash port) — optional only.
+Card is alive and the module currently loaded clean (out_seg=4MB param baked; harmless).
 
 ## Remaining phases
 
@@ -112,13 +113,25 @@ soak (5 cycles) zero AER, no ack-register drift.
 
 **Moved to Phase C:** "long idle soak with decoder enabled" IS the V6 kill scenario (§37:
 decoder-enabled + ≥75 s idle after full frame = MalfTLP death). It stays in Phase C as part of
-V6 — do NOT run it under Phase B.
+V6 — do NOT run it under Phase B. *(Outcome, §40: refuted — no AER at ~27 min; the §28 kill was
+the >126-desc chain, not the missing stop command.)*
 
-### Phase C — V6 destructive validation (LAST)
+### ~~Phase C — V6 destructive validation (LAST)~~ ✅ DONE 2026-11-13 (§40)
 
-Full frame, **no stop command**, ≥75 s idle + AER watch. Expected to die (mode-15 control);
-confirms the stop-command necessity that §28/§33 already imply. Run only after B; card needs a
-power cycle afterward — schedule accordingly and re-run V1 as post-revive regression.
+Full frame, **no stop command**, ≥75 s idle + AER watch. Plan expected the card to die
+("mode-15 control") and used it to confirm "stop-command necessity" — **both refuted**:
+
+- Card survived ~27 min decoder-enabled idle (3.5× spec window), zero AER, sysfs responsive
+  throughout; mode-15's own verdict line already said ALIVE (plan misread it). The run-#2 death
+  was root-caused in §28 to >126 out-descs — unreachable now that the chain builder hard-errors.
+- **Stop command = kext-parity hygiene, not a survival requirement** at ≤126 descs.
+- Side finding (§40.4): this frame's last 342 rows (1818–2159) are decoded non-deterministically
+  by the fw (two identical runs differ in 2.6 MB of tail bytes; head pixel-perfect) — sharper
+  form of §34's content-specific behavior, not a driver bug.
+- V1 post-revive regression: pixel-perfect ±1 after STOP + auto re-bring-up. No power cycle was
+  needed (ran the contingency anyway).
+
+**V-matrix complete: V1–V6 all ✅.**
 
 ### Phase D — Flash / bitfile port (optional, opt-in)
 
@@ -153,7 +166,7 @@ high risk (bricks the card on a bad write) — explicit userspace flag, read-bac
 | V3 | full 4K frame, out_seg=4MB, stop cmd, ≥75 s idle + AER watch | ✅ §33.3 (p4k partial-decode at slice #3418 = content-specific fw behavior, §34) |
 | V4 | multi-frame ×N; count≥1 batch completion (+0x1044 path) both channels | ✅ §36 |
 | V5 | induced stall → watchdog reset/re-bringup | ✅ §36 |
-| V6 | full frame, NO stop, ≥75 s idle + AER watch (destructive, LAST) | ⬜ Phase C |
+| V6 | full frame, NO stop, ≥75 s idle + AER watch (destructive, LAST) | ✅ §40 — survived ~27 min, zero AER; "expected to die" refuted (§28 kill was >126 descs) |
 
 ## Build & layout
 
