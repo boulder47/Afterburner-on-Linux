@@ -43,9 +43,9 @@ states only what is done, what remains, and the constraints that are non-negotia
 | **Phase C done**: V6 destructive — full 4K frame, NO stop cmd, ~27 min decoder-enabled idle: **zero AER, card survived** (expectation refuted — the §28 kill was >126 descs, not missing stop; mode-15 control had already shown ALIVE). Tail-row non-determinism pinned for this frame (§40.4). V1 post-revive regression pixel-perfect | FINDINGS §40 |
 | **Playback P-A done**: full-stream pixel verification — all 870 frames of prorestest.mov captured via `abplayer --dump-dir` and compared vs FFmpeg ref: **870/870 bit-exact (maxdiff=0, all planes)**, incl. the previously-corrupted range 728–780; zero AER | FINDINGS §41 |
 | **Playback P-B done**: abplayer hardening — startup offset self-check (negative test: 1 bad stsz entry → 27-sample cascade caught, exit 2 pre-hardware), STOP-on-exit + auto-start lifecycle (kext parity), per-run stats block; full regression clean | FINDINGS §42 |
+| **Playback P-D done**: sustained 4K realtime — prores422.MOV (HQ apch 3840×2160 @ 30 fps) two consecutive full passes: 568/568 ok, late=0, recoveries=0, zero AER; decode avg 2.75 ms (~10× headroom); wall time = content duration | FINDINGS §43 |
 
-**Remaining:** Playback P-D (4K realtime stream); then Phase D
-(flash port) — optional only.
+**Remaining:** Phase D (flash port) — optional only.
 Card is alive and the module currently loaded clean (out_seg=4MB param baked; harmless).
 
 ## Remaining phases
@@ -163,14 +163,13 @@ All three items live-verified:
   wait-retries, decode-time min/avg/max + histogram. Full 870-frame regression clean
   (0 failed / 0 late / 0 recoveries; avg decode 0.67 ms).
 
-#### P-D — 4K realtime stream (pending)
+#### ~~P-D — 4K realtime stream~~ ✅ DONE 2026-11-14 (§43)
 
-Sustained prores422.MOV (ProRes HQ 3840×2160 @ 30 fps, 568 frames) playback through abplayer
-at real-time pace with AER monitoring. V3 validated single-frame 4K end-to-end; this extends
-it to continuous streaming. Watch items: decode time vs the 33 ms budget at HQ 4K, chain
-rebuild cost on per-sample size changes (input chain key includes in_len), and §40.4's
-content-specific tail-row non-determinism (pixel comparison NOT part of P-D acceptance —
-sustained pace + zero AER is).
+Sustained prores422.MOV (ProRes HQ apch, 3840×2160 @ 30 fps, 568 frames) playback at
+real-time pace: **two consecutive full passes, both 568/568 ok with late=0, recoveries=0,
+zero AER**; decode avg 2.75 ms / max 3.19 ms (~10× headroom vs the 33 ms budget — input
+samples are ≤2.9 MB, not ~13 MB; that was the output size). Wall time 19.02 s for 18.93 s of
+content. Stop-on-exit + auto-start lifecycle exercised under sustained load between passes.
 
 ### Phase D — Flash / bitfile port (optional, opt-in)
 
@@ -207,6 +206,7 @@ high risk (bricks the card on a bad write) — explicit userspace flag, read-bac
 | V5 | induced stall → watchdog reset/re-bringup | ✅ §36 |
 | V6 | full frame, NO stop, ≥75 s idle + AER watch (destructive, LAST) | ✅ §40 — survived ~27 min, zero AER; "expected to die" refuted (§28 kill was >126 descs) |
 | V7 | full-stream pixel verification: all 870 frames of prorestest.mov vs FFmpeg ref (playback path, `abplayer --dump-dir`) | ✅ §41 — 870/870 bit-exact incl. range 728–780; zero AER |
+| V8 | sustained 4K realtime: full prores422.MOV (HQ apch 3840×2160 @ 30 fps, 568 frames) at real-time pace + AER watch | ✅ §43 — two consecutive passes, late=0 / recoveries=0 / zero AER; decode avg 2.75 ms |
 
 ## Build & layout
 

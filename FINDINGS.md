@@ -3805,3 +3805,35 @@ Also fixed while in there: `[card] fw=` printed `st.fw_version >> 8` unmasked �
 now matches abctl's 16.16 split (`(v>>16)&0xFFFF . v&0xFFFF`) → "2.62".
 
 **V-matrix unchanged (P-B is hardening, not a new validation); P-D next.**
+
+## 43. Playback P-D — sustained 4K realtime stream (2026-11-14) [live]
+
+Option D from the 2026-11-14 next-phase list: continuous prores422.MOV playback
+(ProRes **HQ** apch, 3840×2160 @ 30 fps, 568 frames) through abplayer at real-time pace.
+V3 had validated single-frame 4K end-to-end; this extends it to sustained streaming — the
+card's headline use case.
+
+### 43.1 D1 — decode time budget at HQ 4K
+
+Measured (10-frame headless run): **min 0.00 / avg 2.77 / max 3.19 ms** per frame vs the
+33.3 ms realtime budget → ~10× headroom. No pacing work needed — the concern in the options
+table ("4K frames are ~13 MB, chain rebuilds get expensive") was about the *output* size
+(out/frame = 7680×2160 = 16,588,800 B); input samples are only ≤2.9 MB (max sample
+2,905,872 B → in_size 2,908,160 B), and the persistent-chain cache keyed on (first PA, len,
+nseg) absorbs per-sample size changes without rebuilds once a key repeats.
+
+### 43.2 D2 — sustained realtime playback: two consecutive full passes
+
+Both passes: **568/568 frames ok, late=0, recoveries=0, wait-retries=0**; decode
+min 0.00 / avg 2.75 / max 3.19 ms (all in the <5 ms bucket). Wall time 19.019 s and
+19.018 s for 18.93 s of content — pacing accurate to ~80 ms total overhead.
+
+- Zero AER/PCIe errors across both passes (dmesg clean; only normal completion/reset/stop
+  lines). Card quiesced after each pass via the P-B2 stop-on-exit path
+  (`stop: BAR0+0x8004=0`), and the second pass auto-started from that stopped state —
+  the self-contained lifecycle (P-B) exercised under sustained load.
+- Acceptance per plan2 P-D: sustained pace + zero AER (pixel comparison excluded by design —
+  §40.4's content-specific tail-row non-determinism applies to this class).
+
+**V8 added to the validation matrix: sustained 4K realtime stream ✅.** All playback phases
+(P-A, P-B, P-D) complete; remaining plan2 item is Phase D (flash port), optional only.
