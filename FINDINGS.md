@@ -3754,3 +3754,54 @@ Post-run sysfs: completion=0x0, decoder_enable=1, acks stable — card healthy a
 
 **V7 added to the validation matrix: full-stream pixel verification ✅.** The playback path is
 now proven correct end-to-end on content, not just completions.
+
+## 42. Playback P-B — abplayer hardening (2026-11-14) [live]
+
+Option B from the 2026-11-14 next-phase list: make the player safe to run unattended so
+this class of bug fails loudly instead of wedging the card. Three changes, all in
+`userspace/abplayer.c`:
+
+### 42.1 B1 — startup offset self-check (before any hardware access)
+
+After mmap'ing the file and before `card_open()`, every sample is validated:
+`offsets[i] + sizes[i] <= st_size` AND `be32(fdata + offsets[i]) == sizes[i]` (a ProRes
+packet's own declared length is the u32BE at offset 0). Any mismatch → print up to 10
+offending samples, **ABORT with exit 2 without opening /dev/afterburner0**.
+
+- Positive: prorestest.mov → "all 870 samples OK".
+- Negative (constructed): corrupting a single stsz entry (stsz[728] 19600→19700) makes the
+  self-check report **27 bad samples starting at 728** — one bad size/offset entry cascades
+  through every subsequent sample in its chunk until the next boundary, which is exactly the
+  real-world failure mode of the original 728–780 stsc off-by-one bug. Clean abort, zero
+  hardware access (no `[card]` line at all).
+- Note: truncating the file instead does NOT reach this check — prorestest.mov keeps its
+  moov box at EOF, so a tail-truncated file is rejected earlier as "not a MOV/MP4".
+
+### 42.2 B2 — stop-cmd on exit + self-contained lifecycle (kext parity)
+
+On exit the player issues `AB_IOC_STOP` (kext fn@0xc0a4 parity, §40.5): dmesg confirms
+`stop: BAR0+0x8004=0 (rb 0x00000000)` and sysfs dec_enable returns to 0 — the card idles
+with the decoder disabled instead of left enabled. EBUSY (frame in flight after an abort)
+is tolerated; UNBIND_ALL drains it.
+
+Live finding: **STOP also clears ready** (the kext stop() tears down the decode path), so a
+player that only STOPs on exit would refuse its own next launch ("card not ready"). Fix —
+`card_open()` is now self-contained: if `ready==0` at open it issues `AB_IOC_START` itself
+(the same rung-A cycle the recovery ladder uses, proven safe) and re-queries status. Verified
+live: card left stopped by a previous run → next launch auto-starts, decodes, stops again.
+No manual `abctl start` needed between runs.
+
+### 42.3 B3 — per-run statistics (backpressure + recovery accounting)
+
+Every run ends with a stats block: frames submitted/ok/failed, late frames (elapsed > 1.5×
+source budget), recovery-ladder usage (full unbind/START/rebind vs START-only sync path),
+second-WAIT_COMPL retries, and decode-time min/avg/max + histogram (<2/2-5/5-10/10-20/20-50/≥50 ms).
+
+Full 870-frame regression with the hardened binary: **870 ok / 0 failed, late=0,
+recoveries=0, wait-retries=0; decode min 0.00 / avg 0.67 / max 0.79 ms** (all <2 ms — ~50×
+headroom vs the 33 ms realtime budget at this size). Zero AER across all P-B runs.
+
+Also fixed while in there: `[card] fw=` printed `st.fw_version >> 8` unmasked → "512.62";
+now matches abctl's 16.16 split (`(v>>16)&0xFFFF . v&0xFFFF`) → "2.62".
+
+**V-matrix unchanged (P-B is hardening, not a new validation); P-D next.**

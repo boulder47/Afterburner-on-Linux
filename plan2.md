@@ -42,8 +42,9 @@ states only what is done, what remains, and the constraints that are non-negotia
 | **Phase B done**: kext-parity ioctls (getPercent v2 duty-cycle model, checkForSpace v2 used/cap), async pair (SUBMIT_ASYNC/WAIT_COMPL, EBUSY on double ring), error-path audit + AB_IOC_RESET (FLR-gated; -EOPNOTSUPP on this card — no FLR cap), RECOVER soak 5/5 cycles zero AER / no ack drift; two-stage completion discovery (§39.4) | FINDINGS §39 |
 | **Phase C done**: V6 destructive — full 4K frame, NO stop cmd, ~27 min decoder-enabled idle: **zero AER, card survived** (expectation refuted — the §28 kill was >126 descs, not missing stop; mode-15 control had already shown ALIVE). Tail-row non-determinism pinned for this frame (§40.4). V1 post-revive regression pixel-perfect | FINDINGS §40 |
 | **Playback P-A done**: full-stream pixel verification — all 870 frames of prorestest.mov captured via `abplayer --dump-dir` and compared vs FFmpeg ref: **870/870 bit-exact (maxdiff=0, all planes)**, incl. the previously-corrupted range 728–780; zero AER | FINDINGS §41 |
+| **Playback P-B done**: abplayer hardening — startup offset self-check (negative test: 1 bad stsz entry → 27-sample cascade caught, exit 2 pre-hardware), STOP-on-exit + auto-start lifecycle (kext parity), per-run stats block; full regression clean | FINDINGS §42 |
 
-**Remaining:** Playback P-B (abplayer hardening) + P-D (4K realtime stream); then Phase D
+**Remaining:** Playback P-D (4K realtime stream); then Phase D
 (flash port) — optional only.
 Card is alive and the module currently loaded clean (out_seg=4MB param baked; harmless).
 
@@ -148,17 +149,19 @@ All 870 frames of prorestest.mov decoded through the real playback path
 decoded correctly before the stsc off-by-one fix. Zero AER, zero recoveries, ~2 ms/frame.
 Tooling: `abplayer --dump-dir/--no-pace`, `tests/compare_fullstream.py` (numpy).
 
-#### P-B — abplayer hardening (in progress)
+#### ~~P-B — abplayer hardening~~ ✅ DONE 2026-11-14 (§42)
 
-Make the player safe to run unattended; this class of bug fails loudly instead of wedging
-the card:
+All three items live-verified:
 
-- **B1** startup offset self-check: validate `be32(offset)==sample_size` for EVERY sample
-  (plus bounds check) before touching hardware — the exact check that would have caught the
-  728–780 corruption class at launch.
-- **B2** stop-cmd on exit: issue AB_IOC_STOP after the playback loop (kext parity, §40.5).
-- **B3** frame-drop/backpressure stats + recovery-ladder accounting: per-run summary
-  (decode-time distribution, late frames, recoveries by rung) instead of silent behavior.
+- **B1** startup offset self-check (`be32(off)==size` + bounds for every sample, before any
+  hardware access): positive pass on prorestest.mov; negative test (one corrupted stsz entry)
+  caught a 27-sample cascade and aborted with exit 2 without opening the device.
+- **B2** stop-cmd on exit (`AB_IOC_STOP`, kext parity — dmesg `stop: BAR0+0x8004=0`) +
+  self-contained lifecycle: STOP clears ready, so `card_open()` now auto-starts when not
+  ready (rung-A cycle) — no manual `abctl start` between runs.
+- **B3** per-run stats block: frames ok/failed, late count, recovery-ladder usage by rung,
+  wait-retries, decode-time min/avg/max + histogram. Full 870-frame regression clean
+  (0 failed / 0 late / 0 recoveries; avg decode 0.67 ms).
 
 #### P-D — 4K realtime stream (pending)
 

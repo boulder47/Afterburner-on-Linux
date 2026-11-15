@@ -61,8 +61,47 @@ struct ioc_async  { __u32 in_off, in_len, out_len; };
 #define IOC_START        _IO  ('A', 8)
 #define IOC_SUBMIT_ASYNC _IOWR('A', 9, struct ioc_async)
 #define IOC_WAIT_COMPL   _IOR ('A',10, struct ioc_query)
+#define IOC_STOP         _IO  ('A', 7)                       /* stop (kext fn@0xc0a4) */
 
 static const char *DEV = "/dev/afterburner0";
+
+/* ---- run statistics (P-B3) ------------------------------------------------- */
+struct run_stats {
+	uint64_t submitted, completed, failed;
+	uint64_t late;             /* frame elapsed > 1.5x source budget        */
+	uint64_t wait_retries;     /* second WAIT_COMPL window consumed         */
+	uint64_t recovers_full;    /* full unbind/START/rebind ladder (async)   */
+	uint64_t recovers_start;   /* START-only recovery (sync path)           */
+	uint64_t dt_min, dt_max, dt_sum;  /* per-frame decode time, ns          */
+	uint64_t hist[6];          /* <2ms, 2-5, 5-10, 10-20, 20-50, >=50 ms   */
+};
+static struct run_stats rs;
+
+static void stat_decode_ns(uint64_t ns)
+{
+	if (!rs.completed || ns < rs.dt_min) rs.dt_min = ns;
+	if (ns > rs.dt_max) rs.dt_max = ns;
+	rs.dt_sum += ns;
+	uint64_t ms = ns / 1000000;
+	int b = ms < 2 ? 0 : ms < 5 ? 1 : ms < 10 ? 2 : ms < 20 ? 3 : ms < 50 ? 4 : 5;
+	rs.hist[b]++;
+}
+
+static void stat_print(void)
+{
+	printf("== stats: %" PRIu64 " frames (%" PRIu64 " ok / %" PRIu64 " failed), late=%" PRIu64
+	       ", recoveries full=%" PRIu64 " start-only=%" PRIu64 ", wait-retries=%" PRIu64 "\n",
+	       rs.submitted, rs.completed, rs.failed, rs.late,
+	       rs.recovers_full, rs.recovers_start, rs.wait_retries);
+	if (rs.completed) {
+		printf("   decode time: min=%.2f ms avg=%.2f ms max=%.2f ms | "
+		       "<2ms:%" PRIu64 " 2-5:%" PRIu64 " 5-10:%" PRIu64
+		       " 10-20:%" PRIu64 " 20-50:%" PRIu64 " >=50:%" PRIu64 "\n",
+		       rs.dt_min / 1e6, (double)rs.dt_sum / rs.completed / 1e6,
+		       rs.dt_max / 1e6, rs.hist[0], rs.hist[1], rs.hist[2],
+		       rs.hist[3], rs.hist[4], rs.hist[5]);
+	}
+}
 
 /* ---- MOV/MP4 ProRes track parsing (port of tmp/extract_frames.py) ------- */
 struct frame_table {
@@ -287,10 +326,19 @@ static int card_open(struct card *c, size_t in_size, size_t out_len)
 
 	struct ioc_status st;
 	if (ioctl(c->fd, IOC_CARD_STATUS, &st)) { perror("CARD_STATUS"); goto err; }
-	printf("[card] fw=%d.%02d ready=%u dec_enable=0x%x engine_ctrl=0x%x\n",
-	       st.fw_version >> 8, st.fw_version & 0xFF, st.ready, st.dec_enable,
+	printf("[card] fw=%u.%u ready=%u dec_enable=0x%x engine_ctrl=0x%x\n",
+	       (st.fw_version >> 16) & 0xFFFF, st.fw_version & 0xFFFF, st.ready, st.dec_enable,
 	       st.engine_ctrl);
-	if (!st.ready) { fprintf(stderr, "card not ready — run: abctl start\n"); goto err; }
+	if (!st.ready) {
+		/* Self-contained lifecycle (kext parity): bring the decoder up on first
+		 * use instead of requiring a manual `abctl start` — our own STOP-on-exit
+		 * (P-B2) leaves ready=0, and so does any prior client's teardown. START
+		 * is the same rung-A cycle the recovery ladder uses; proven safe. */
+		printf("[card] not ready — auto-starting (AB_IOC_START)\n");
+		if (ioctl(c->fd, IOC_START)) { perror("START"); goto err; }
+		if (ioctl(c->fd, IOC_CARD_STATUS, &st)) { perror("CARD_STATUS"); goto err; }
+	}
+	if (!st.ready) { fprintf(stderr, "card not ready after auto-start — check dmesg\n"); goto err; }
 
 	struct ioc_bind b = { (uint32_t)in_size, (uint32_t)out_len };
 	if (ioctl(c->fd, IOC_BIND_FRAME, &b)) { perror("BIND_FRAME"); goto err; }
@@ -351,10 +399,12 @@ static int card_submit_async(struct card *c, const uint8_t *pkt, size_t pkt_len)
 	rc = ioctl(c->fd, IOC_WAIT_COMPL, &q);
 	if (!rc && (q.status >> 1) >= 1) return 0; /* batch channel: frame done */
 
+	rs.wait_retries++;
 	fprintf(stderr, "[warn] no completion in window — retrying WAIT_COMPL\n");
 	rc = ioctl(c->fd, IOC_WAIT_COMPL, &q);
 	if (!rc && (q.status >> 1) >= 1) return 0;
 
+	rs.recovers_full++;
 	fprintf(stderr, "[warn] engine wedged — full recovery (unbind/START/rebind)\n");
 	if (card_recover(c)) return -1;
 	memcpy(c->inmap, pkt, pkt_len); /* fresh input region after rebind */
@@ -387,6 +437,7 @@ static int card_submit_sync(struct card *c, const uint8_t *pkt, size_t pkt_len)
 	if (!ioctl(c->fd, IOC_SUBMIT_FRAME, &s) && ((s.status >> 1) >= 1))
 		return 0;
 
+	rs.recovers_start++;
 	fprintf(stderr, "[warn] sync submit failed — recovery: AB_IOC_START + resubmit\n");
 	if (ioctl(c->fd, IOC_START)) { perror("START"); return -1; }
 	memset(&s, 0, sizeof(s));
@@ -495,6 +546,33 @@ int main(int argc, char **argv)
 	close(ffd);
 	if (fdata == MAP_FAILED) { perror("mmap file"); return 1; }
 
+	/* P-B1: startup offset self-check — validate EVERY sample before touching
+	 * hardware. The stsc off-by-one class (frames 728-780, ce48cf4) corrupts
+	 * offsets silently mid-stream; a ProRes packet's own declared length is the
+	 * u32BE at offset 0, so be32(offset)==size must hold for all samples. Any
+	 * mismatch means we'd feed a truncated/shifted fragment to the engine and
+	 * wedge it — fail loudly at launch instead (bounds check included). */
+	{
+		uint64_t bad = 0;
+		for (uint64_t i = 0; i < ft.n; i++) {
+			if (ft.offsets[i] + ft.sizes[i] > (uint64_t)fst.st_size ||
+			    be32(fdata + ft.offsets[i]) != ft.sizes[i]) {
+				if (bad < 10)
+					fprintf(stderr, "offset self-check: sample %" PRIu64
+						" bad (off=%" PRIu64 " size=%u)\n",
+						i, ft.offsets[i], ft.sizes[i]);
+				bad++;
+			}
+		}
+		if (bad) {
+			fprintf(stderr, "== ABORT: %" PRIu64
+				" sample(s) failed offset self-check — not touching hardware\n", bad);
+			munmap((void *)fdata, fst.st_size);
+			return 2;
+		}
+		printf("offset self-check: all %" PRIu64 " samples OK (be32(off)==size + bounds)\n", ft.n);
+	}
+
 	struct card c = { .fd = -1 };
 	if (card_open(&c, in_size, out_len)) return 1;
 
@@ -544,19 +622,21 @@ int main(int argc, char **argv)
 			const uint8_t *pkt = fdata + ft.offsets[i];
 			size_t plen = ft.sizes[i];
 
-			if (card_submit(&c, pkt, plen, sync_mode)) { failed_frame = i; running = 0; break; }
+			rs.submitted++;
+			if (card_submit(&c, pkt, plen, sync_mode)) { rs.failed++; failed_frame = i; running = 0; break; }
 			uint64_t t_dec = now_ns() - t0;
+			rs.completed++; stat_decode_ns(t_dec);
 
 			if (dump_dir) { /* capture raw card output before next submit */
 				char dpath[4096];
 				snprintf(dpath, sizeof(dpath), "%s/frame_%" PRIu64 ".yuv", dump_dir, i);
 				int dd = open(dpath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-				if (dd < 0) { perror(dpath); failed_frame = i; running = 0; break; }
+				if (dd < 0) { perror(dpath); rs.failed++; failed_frame = i; running = 0; break; }
 				ssize_t wr = write(dd, c.outmap, out_len);
 				close(dd);
 				if (wr != (ssize_t)out_len) {
 					fprintf(stderr, "dump frame %" PRIu64 ": short write %zd\n", i, wr);
-					failed_frame = i; running = 0; break;
+					rs.failed++; failed_frame = i; running = 0; break;
 				}
 			}
 
@@ -597,6 +677,7 @@ int main(int argc, char **argv)
 						SDL_PumpEvents(); /* stay responsive */
 					}
 				} else if (elapsed > interval_ns * 3 / 2) {
+					rs.late++;
 					fprintf(stderr, "[warn] frame %" PRIu64 " late: %llu ms "
 						"(decode %llu ms) budget %llu ms\n", i,
 						(unsigned long long)(elapsed / 1000000),
@@ -606,12 +687,20 @@ int main(int argc, char **argv)
 			}
 		}
 
+	stat_print();
 	if (failed_frame != UINT64_MAX) {
 		fprintf(stderr, "== ABORTED at frame %" PRIu64 " — submit failed after full recovery\n",
 			failed_frame);
 	} else {
 		printf("== done\n");
 	}
+
+	/* P-B2: stop-cmd on exit — kext parity (§40.5): quiesce the decoder so the
+	 * card idles with it disabled instead of left enabled. EBUSY = a frame is
+	 * still in flight (aborted mid-submit); UNBIND_ALL below drains that. */
+	if (c.fd >= 0 && ioctl(c.fd, IOC_STOP) == -1 && errno != EBUSY)
+		fprintf(stderr, "stop: %s\n", strerror(errno));
+
 	munmap((void *)fdata, fst.st_size);
 	card_close(&c);
 	SDL_DestroyTexture(tex);
