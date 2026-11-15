@@ -1,5 +1,7 @@
 # AppleAfterburner — Reverse-Engineering Findings
 
+> **2026-11-15 reorg:** this file now lives at `dev/FINDINGS.md`. Paths in this log predate the move: `rework/`→`dev/rework/`, `tmp/`→`dev/tmp/`, kext bundles →`dev/kexts/`, test media →`dev/testmedia/`, early probe modules →`dev/linux-probes/`.
+
 Target: `rework/x86_64.bin` (Mach-O, x86_64)
 Toolchain: `/opt/rocm/lib/llvm/bin/llvm-objdump -d --no-show-raw-insn`
 Status: **Phase 2a complete** — live hardware BAR map captured + first safe write-test passed. See §12 (verified layout), §13 (named register map), §14 (Phase 2 write-test + IRQ discovery).

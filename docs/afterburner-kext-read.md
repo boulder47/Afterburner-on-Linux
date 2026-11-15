@@ -2,7 +2,7 @@ I hit the iteration limit while trying to disassemble `reconfig_handler` — tha
 
 ## What got done
 
-**Toolchain setup:** No Mach-O tooling on the box; used `/opt/rocm/lib/llvm/bin/llvm-objdump` from ROCm as the disassembler against `rework/x86_64.bin` (the extracted x86_64 slice of `AppleAfterburner.kext`).
+**Toolchain setup:** No Mach-O tooling on the box; used `/opt/rocm/lib/llvm/bin/llvm-objdump` from ROCm as the disassembler against `dev/rework/x86_64.bin` (the extracted x86_64 slice of `AppleAfterburner.kext`).
 
 **Methods successfully disassembled and analyzed:**
 

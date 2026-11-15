@@ -1,5 +1,7 @@
 # Afterburner Linux Driver — Plan v2 (streamlined, 2026-11-12)
 
+> **2026-11-15 reorg:** this file now lives at `dev/plan2.md` (with `dev/FINDINGS.md`, `dev/UC_METHODS.md`, `dev/plan.md`). Paths below predate the move, e.g. `rework/`→`dev/rework/`.
+
 **Goal (unchanged from plan.md):** a complete production **Linux kernel module + userspace
 interface** that drives the Apple Afterburner ProRes decoder card at PCI `0f:00.0`
 (`[106b:0205]`) — decode-only, per Apple's own docs (no encoder datapath exists to port).

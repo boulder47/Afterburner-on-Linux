@@ -43,7 +43,7 @@ macOS ProRes decode pipeline. Key facts extracted:
   the kext exposes exactly seven user methods (`submitFrame`, `queryCompletion`, `bindFrame`,
   `cardStatus`, `checkForSpace`, `unbindAll`, `getPercent`); full ABI decoded. The plugin itself
   lives in **`/Library/Video/Professional Video Workflow Plug-Ins/`** (per
-  `VTProfessionalVideoWorkflow.h`, MacOSX10.15.sdk — headers now in `rework/vt_sdk_10.15/Headers/`).
+  `VTProfessionalVideoWorkflow.h`, MacOSX10.15.sdk — headers now in `dev/rework/vt_sdk_10.15/Headers/`).
 - The v216/y416/RGhA native formats tell us what pixel layout to expect in the output DMA
   buffer when we finally capture decoded YUV from the card.
 

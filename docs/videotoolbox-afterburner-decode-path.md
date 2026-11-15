@@ -1,7 +1,7 @@
 # VideoToolbox ↔ Afterburner ProRes Decode Path — Consolidated Analysis
 
 **Date:** 2026-11-01 · **Phase:** 3r (static RE + third-party VT reference mining)
-**Sources:** WWDC20-10090 transcript (`docs/wwdc20-10090-transcript.md`), Apple VideoToolbox docs JSON, **MacOSX10.15.sdk VideoToolbox headers (phracker/MacOSX-SDKs → `rework/vt_sdk_10.15/Headers/`)**, FFmpeg `libavcodec/videotoolbox.c`, Streambox sxplayer `decoder_vt.c`, dotnet/macios `VTProfessionalVideoWorkflow.cs`, docs.rs `videotoolbox` crate, and the local kext binary RE artifacts (`rework/arm64e.bin`, `rework/static_re/`).
+**Sources:** WWDC20-10090 transcript (`docs/wwdc20-10090-transcript.md`), Apple VideoToolbox docs JSON, **MacOSX10.15.sdk VideoToolbox headers (phracker/MacOSX-SDKs → `dev/rework/vt_sdk_10.15/Headers/`)**, FFmpeg `libavcodec/videotoolbox.c`, Streambox sxplayer `decoder_vt.c`, dotnet/macios `VTProfessionalVideoWorkflow.cs`, docs.rs `videotoolbox` crate, and the local kext binary RE artifacts (`dev/rework/arm64e.bin`, `dev/rework/static_re/`).
 
 ---
 
@@ -57,7 +57,7 @@ The Afterburner ProRes decode path is a **two-layer system**:
 ### 2.1 Session creation — what every client does (exact signatures, MacOSX10.15.sdk)
 
 Full VideoToolbox headers captured from phracker/MacOSX-SDKs into
-`rework/vt_sdk_10.15/Headers/`. The stock pattern used by FFmpeg and sxplayer:
+`dev/rework/vt_sdk_10.15/Headers/`. The stock pattern used by FFmpeg and sxplayer:
 
 ```c
 // VTDecompressionSession.h (10.15 SDK)
@@ -155,7 +155,7 @@ domain above.
 
 ## 3. Kext UserClient ABI — fully decoded (this session)
 
-All addresses are arm64e `__text`/data offsets in `rework/arm64e.bin` (bin offset == vmaddr).
+All addresses are arm64e `__text`/data offsets in `dev/rework/arm64e.bin` (bin offset == vmaddr).
 
 ### 3.1 Class map and lifecycle symbols
 
@@ -257,7 +257,7 @@ an off-by-two indexing error of the same class as the GOT[52] incident (FINDINGS
 ### 3.5 PLT / import map (all 43 stubs resolved)
 
 PLT block @0xE83C–0xEA3C, 12-byte stubs; each loads a tag-0x4010 GOT entry whose low 32 bits index
-the 368-entry kernel-import list (`rework/static_re/imports_map.json`). Notable entries used by the
+the 368-entry kernel-import list (`dev/rework/static_re/imports_map.json`). Notable entries used by the
 frame path:
 
 | stub | addr | import |

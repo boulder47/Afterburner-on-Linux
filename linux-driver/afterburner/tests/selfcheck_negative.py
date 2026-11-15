@@ -4,7 +4,7 @@ test MOV and verify abplayer's startup offset self-check aborts with exit 2
 BEFORE touching hardware.
 
 Usage: selfcheck_negative.py [MOV] [abplayer-bin] [sample-idx]
-Defaults: prorestest.mov at repo root, abplayer next to this file's parent dir.
+Defaults: dev/testmedia/prorestest.mov at repo root, abplayer next to this file's parent dir.
 
 Expected output: "offset self-check: sample <idx> bad ..." lines (the corruption
 cascades through the rest of the chunk), then "== ABORT ... not touching
@@ -13,7 +13,7 @@ import os, struct, subprocess, sys
 
 here = os.path.dirname(os.path.abspath(__file__))
 mov = sys.argv[1] if len(sys.argv) > 1 else \
-    os.path.join(here, "..", "..", "..", "prorestest.mov")
+    os.path.join(here, "..", "..", "..", "dev", "testmedia", "prorestest.mov")
 player = sys.argv[2] if len(sys.argv) > 2 else \
     os.path.join(here, "..", "userspace", "abplayer")
 idx = int(sys.argv[3]) if len(sys.argv) > 3 else 728
