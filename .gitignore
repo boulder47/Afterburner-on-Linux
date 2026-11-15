@@ -16,3 +16,4 @@ modules.order
 
 # Compiled test clients (regenerable; sources stay tracked)
 linux-driver/afterburner/tests/async_test
+dev/testmedia/prores422.MOV
