@@ -13,9 +13,15 @@
  *    only the first H rows are real (padding rows repeat the last row)
  *  - a wedged engine recovers via AB_IOC_START (decoder disable/enable)
  *
- * Usage: abplayer [file.mov] [--start N] [--count N] [-s]
+ * Usage: abplayer [file.mov] [--start N] [--count N] [-s] [--headless]
+ *                [--no-pace] [--dump-dir DIR]
  *   no file arg -> interactive picker over .mov/.mp4 files in cwd
  *   -s          sync submit path (SUBMIT_FRAME, 30 s poll) instead of async
+ *   --headless  decode without SDL window (still paces to source framerate)
+ *   --no-pace   run as fast as the card allows (verification runs)
+ *   --dump-dir DIR  write each decoded frame's raw card output (stride*rows,
+ *                   interleaved [U,Y0,V,Y1]) to DIR/frame_<absidx>.yuv;
+ *                   implies --headless
  * Keys: q/ESC quit, space pause/resume, f fullscreen toggle.
  */
 #ifndef _GNU_SOURCE
@@ -441,15 +447,19 @@ int main(int argc, char **argv)
 {
 	const char *path = NULL;
 	uint64_t start_frame = 0, count = UINT64_MAX;
-	int sync_mode = 0, headless = 0;
+	int sync_mode = 0, headless = 0, no_pace = 0;
+	const char *dump_dir = NULL;
 
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-s")) sync_mode = 1;
 		else if (!strcmp(argv[i], "--headless")) headless = 1;
+		else if (!strcmp(argv[i], "--no-pace")) no_pace = 1;
+		else if (!strcmp(argv[i], "--dump-dir") && i + 1 < argc) dump_dir = argv[++i];
 		else if (!strcmp(argv[i], "--start") && i + 1 < argc) start_frame = strtoull(argv[++i], NULL, 0);
 		else if (!strcmp(argv[i], "--count") && i + 1 < argc) count = strtoull(argv[++i], NULL, 0);
 		else if (path == NULL) path = argv[i];
 	}
+	if (dump_dir) headless = 1; /* dump mode is a verification run */
 	if (!path) path = pick_file();
 	if (!path) return 1;
 
@@ -537,6 +547,19 @@ int main(int argc, char **argv)
 			if (card_submit(&c, pkt, plen, sync_mode)) { failed_frame = i; running = 0; break; }
 			uint64_t t_dec = now_ns() - t0;
 
+			if (dump_dir) { /* capture raw card output before next submit */
+				char dpath[4096];
+				snprintf(dpath, sizeof(dpath), "%s/frame_%" PRIu64 ".yuv", dump_dir, i);
+				int dd = open(dpath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				if (dd < 0) { perror(dpath); failed_frame = i; running = 0; break; }
+				ssize_t wr = write(dd, c.outmap, out_len);
+				close(dd);
+				if (wr != (ssize_t)out_len) {
+					fprintf(stderr, "dump frame %" PRIu64 ": short write %zd\n", i, wr);
+					failed_frame = i; running = 0; break;
+				}
+			}
+
 			if (!headless) {
 				SDL_Rect dst = { 0, 0, ft.w, ft.h };
 				SDL_UpdateTexture(tex, &dst, c.outmap, (int)stride);
@@ -559,11 +582,11 @@ int main(int argc, char **argv)
 					 last - start_frame, fps_ema, t_dec / 1e6,
 					 paused ? " | PAUSED" : "");
 				SDL_SetWindowTitle(win, title);
-			} else if (i % 30 == 0) {
+			} else if (dump_dir || i % 30 == 0) {
 				printf("[frame %" PRIu64 "] decode %.0f ms\n", i, t_dec / 1e6);
 			}
 
-			if (interval_ns) { /* pace to source framerate */
+			if (interval_ns && !no_pace) { /* pace to source framerate */
 				uint64_t elapsed = now_ns() - t0;
 				if (elapsed < interval_ns) {
 					struct timespec rq = {

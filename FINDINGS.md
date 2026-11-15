@@ -3712,3 +3712,45 @@ Healthy: zero AER across the entire V6 window + regression; decoder quiesced
 (STOP issued); module loaded with out_seg=4MB param (harmless — client can
 omit argv[4] when the param is baked). **V-matrix complete: V1–V6 all ✅.**
 Remaining plan2 work: Phase D (flash port) — optional.
+
+## 41. Playback P-A — full-stream pixel verification, all 870 frames (2026-11-14) [live]
+
+Option A from the 2026-11-14 next-phase list: capture card output for **every** frame of
+prorestest.mov and compare against an FFmpeg reference — closing the last correctness gap on
+the playback path (frames 728–780 had never actually been decoded correctly before the stsc
+off-by-one fix, ce48cf4).
+
+### 41.1 Method
+
+- `abplayer` gained two verification flags: `--dump-dir DIR` (writes each frame's raw card
+  output — full outmap region, stride×rows interleaved [U,Y0,V,Y1] — to `DIR/frame_<absidx>.yuv`;
+  implies headless) and `--no-pace` (skip the source-framerate sleep; run at card speed).
+- Reference: `ffmpeg -i prorestest.mov -map 0:v:0 -pix_fmt yuv422p -f rawvideo ref_870.yuv`
+  → planar [Y: W·H][U: (W/2)·H][V: (W/2)·H], one frame per W·H·2 B; 3,608,064,000 B for the
+  full stream.
+- `tests/compare_fullstream.py` (numpy): per frame, unpacks card rows into luma/chroma planes,
+  diffs vs the ref slice, reports exact/±1/±2/maxdiff per plane. PASS = ±1 ≥ 99.5% AND
+  maxdiff ≤ 2 on all three planes (§38 baseline: warm decoder with real motion is pixel-perfect).
+
+### 41.2 Result — 870/870 BIT-EXACT
+
+Full run (`--no-pace --dump-dir`, async path): **all 870 frames PASS with exact=100% and
+maxdiff=0 on luma, chromaU AND chromaV** — stronger than the ±1 rounding baseline of §38;
+the card's 8-bit output is bit-identical to FFmpeg's yuv422p conversion for this stream.
+
+- Previously-corrupted range **728–780: all 53 frames present, all PASS, bit-exact** — the
+  stsc chunk-walk fix (ce48cf4) is now verified at pixel level across the whole boundary region,
+  not just "completions fire".
+- Zero recovery-ladder invocations, zero late/abort lines in the run log; wall time for all
+  870 frames incl. 3.6 GB of dump writes: **1.8 s** (~2 ms/frame end-to-end at this size).
+- File facts used by the test: apcn (ProRes 422 Standard) 1920×1080 @ 29.97 fps, 870 samples,
+  two sample sizes — 19600 B ×150 and 77776 B ×720; in_size=77824 (page-aligned max),
+  out/frame = 3840×1088 = 4,177,920 B.
+
+### 41.3 Card health
+
+Zero AER/PCIe errors across the run (dmesg clean; only normal completion/reset log lines).
+Post-run sysfs: completion=0x0, decoder_enable=1, acks stable — card healthy and quiesced.
+
+**V7 added to the validation matrix: full-stream pixel verification ✅.** The playback path is
+now proven correct end-to-end on content, not just completions.
