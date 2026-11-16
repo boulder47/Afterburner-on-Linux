@@ -10,7 +10,7 @@ latest public Afterburner bitfile (Sonoma and Sequoia kexts ship byte-identical 
 decodes **ProRes 422** and **ProRes 422 HQ** pixel-perfectly (±1 vs FFmpeg, pure 10→8-bit
 rounding). ProRes 4444 and ProRes RAW are acknowledged by the engine but produce no output.
 
-I have a MacPro 7,1 that I put Limux on and its from this machine I tested the Apple Afterburner Card under Limux.
+I have a MacPro 7,1 that I put Linux on and its from this machine I tested the Apple Afterburner Card under Linux.
 
 
 ## Verified status
