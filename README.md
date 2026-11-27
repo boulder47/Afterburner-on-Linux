@@ -32,6 +32,7 @@ linux-driver/afterburner/   production driver + userspace tools (the deliverable
   Makefile                  Kbuild module build
   userspace/abctl           control client (status / decode / start / stop / unbind)
   userspace/abplayer        realtime SDL2 ProRes player + verification modes
+  userspace/abplayer-gtk/   GTK4/libadwaita desktop player + test tool (Wayland/GNOME)
   tests/                    V-matrix test clients, comparison scripts, soak/negative tests
 docs/                       deliverable documentation (kext read, VideoToolbox path analysis)
 testdata/                   single-frame ProRes fixtures (320×180, 4K, RAW) for abctl decode
@@ -81,6 +82,22 @@ gcc -O2 -o userspace/abplayer userspace/abplayer.c $(pkg-config --cflags --libs 
 Sample clips live in `dev/testmedia/`: `prorestest.mov` (the canonical test clip,
 870 frames), `prores422.MOV` (sustained 4K HQ @30 fps), plus RAW/MXF material used for
 profile-matrix testing.
+
+## Desktop player & test tool (abplayer-gtk)
+
+A native GNOME/Wayland app (GTK4 + libadwaita) on top of the same ioctl path: open or drop a
+ProRes clip, play/pause/scrub/step frame-by-frame, loop, run at card speed, and watch live
+decode/readback timings, recovery-ladder counters, `getPercent` duty cycle, decoder state and
+thermals. Frames can be saved as PNG or as raw card output for `tests/compare_card_ref.py`.
+A clearly-labelled simulated card lets the UI run without hardware.
+
+```sh
+sudo pacman -S --needed base-devel gtk4 libadwaita libepoxy
+cd linux-driver/afterburner/userspace/abplayer-gtk
+make && ./abplayer-gtk clip.mov          # make install → app grid entry under ~/.local
+```
+
+See `linux-driver/afterburner/userspace/abplayer-gtk/README.md`.
 
 ## Single-frame decode & control (abctl)
 

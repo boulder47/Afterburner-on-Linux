@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Afterburner Player
+GenericName=ProRes Player
+Comment=Play ProRes 422 clips decoded by the Apple Afterburner card
+Exec=abplayer-gtk %f
+Icon=io.github.boulder47.AfterburnerPlayer
+Terminal=false
+Categories=AudioVideo;Video;Player;
+MimeType=video/quicktime;video/mp4;
+Keywords=prores;afterburner;video;decoder;test;
+StartupNotify=true
+SingleMainWindow=true
