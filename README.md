@@ -114,6 +114,12 @@ gcc -O2 -o userspace/abctl userspace/abctl.c     # no dependencies beyond libc
 ./userspace/abctl unbind                          # release bound DMA regions
 ```
 
+The driver keeps a single global DMA binding, so a second client's bind/unbind frees the
+buffers the first one has mapped. `abctl decode/start/stop/unbind`, `abplayer` and
+`abplayer-gtk` therefore take an exclusive `flock` on `/dev/afterburner0` and refuse to run
+while another of them holds it. `abctl status` is read-only and works alongside a running
+player. (The test clients in `tests/` do not take the lock — don't run them during playback.)
+
 The ioctl ABI on `/dev/afterburnerN` mirrors the kext's user-client `sMethods` one-to-one:
 `submitFrame`, `queryCompletion`, `bindFrame`, `cardStatus`, `checkForSpace`, `unbindAll`,
 `getPercent`, `stop`, `start`, plus async pair (`SUBMIT_ASYNC`/`WAIT_COMPL`) and a FLR
@@ -121,8 +127,9 @@ escape hatch (`AB_IOC_RESET`). See `ab_chardev.c` for the struct definitions.
 
 ### Decoded output format
 
-The card emits **interleaved 8-bit YUV422** — `[U, Y0, V, Y1]` groups (SDL `YUY2`, so
-`abplayer` blits with zero conversion). Buffer layout is fixed regardless of buffer size:
+The card emits **interleaved 8-bit YUV422** — `[U, Y0, V, Y1]` groups, i.e. **UYVY** (SDL
+`SDL_PIXELFORMAT_UYVY`, so `abplayer` blits with zero conversion; *not* YUY2, which is
+`[Y0, U, Y1, V]`). Buffer layout is fixed regardless of buffer size:
 row stride = `ceil(W*2/64)*64` bytes, rows = `ceil(H/16)*16`; padding rows repeat the last
 real row. Only the first H rows are real content.
 

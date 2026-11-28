@@ -21,6 +21,13 @@
  *   abctl stop                       disable decoder (kext stop() parity)
  *   abctl unbind                     release bound DMA regions (IOC_UNBIND_ALL)
  *
+ * Locking: decode/start/stop/unbind take an exclusive flock on the device
+ * node (the same lock abplayer and Afterburner Player hold for their whole
+ * session) and refuse to run while another client holds it — the driver has
+ * a single global DMA binding, so BIND/UNBIND/STOP under a live player would
+ * free or stop the buffers it is using. `status` is read-only and lock-free,
+ * so it can monitor a running player.
+ *
  * Build: gcc -O2 -o abctl abctl.c
  */
 #include <errno.h>
@@ -29,6 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/file.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -67,6 +75,23 @@ static void die(const char *what)
 	exit(1);
 }
 
+/* exclusive=1 for anything that binds, unbinds, starts or stops (see header) */
+static int open_dev(int exclusive)
+{
+	int fd = open(dev_path, O_RDWR);
+
+	if (fd < 0)
+		die("open /dev/afterburner0");
+	if (exclusive && flock(fd, LOCK_EX | LOCK_NB)) {
+		if (errno != EWOULDBLOCK)
+			die("flock");
+		fprintf(stderr, "%s is in use by another client (abplayer, abctl or Afterburner "
+			"Player) — close it first; `abctl status` works meanwhile\n", dev_path);
+		exit(1);
+	}
+	return fd;
+}
+
 /* ------------------------------------------------------------------ */
 /* status                                                              */
 static int cmd_status(void)
@@ -74,9 +99,7 @@ static int cmd_status(void)
 	struct ioc_status st;
 	int fd, ret;
 
-	fd = open(dev_path, O_RDWR);
-	if (fd < 0)
-		die("open /dev/afterburner0");
+	fd = open_dev(0);
 	ret = ioctl(fd, IOC_CARD_STATUS, &st);
 	if (ret) {
 		close(fd);
@@ -150,9 +173,7 @@ static int cmd_decode(int argc, char **argv)
 		return 1;
 	}
 
-	fd = open(dev_path, O_RDWR);
-	if (fd < 0)
-		die("open /dev/afterburner0");
+	fd = open_dev(1);
 
 	ret = ioctl(fd, IOC_CARD_STATUS, &st);
 	if (ret)
@@ -270,6 +291,10 @@ static int cmd_decode(int argc, char **argv)
 		printf("[skip] decoder left enabled (--nostop)\n");
 	}
 
+	/* unmap BEFORE unbind: UNBIND_ALL frees the coherent pages, and
+	 * remap_pfn_range mappings hold no page references */
+	munmap(inmap, in_size);
+	munmap(outmap, out_len);
 	ioctl(fd, IOC_UNBIND_ALL, NULL);
 	close(fd);
 	return 0;
@@ -278,11 +303,9 @@ static int cmd_decode(int argc, char **argv)
 /* ------------------------------------------------------------------ */
 static int cmd_start(void)
 {
-	int fd = open(dev_path, O_RDWR), ret;
+	int fd = open_dev(1), ret;
 	struct ioc_status st;
 
-	if (fd < 0)
-		die("open /dev/afterburner0");
 	ret = ioctl(fd, IOC_START, NULL);
 	if (ret)
 		die("startFrame");
@@ -294,11 +317,9 @@ static int cmd_start(void)
 
 static int cmd_stop(void)
 {
-	int fd = open(dev_path, O_RDWR), ret;
+	int fd = open_dev(1), ret;
 	struct ioc_status st;
 
-	if (fd < 0)
-		die("open /dev/afterburner0");
 	ret = ioctl(fd, IOC_STOP, NULL);
 	if (ret)
 		die("stopFrame");
@@ -310,10 +331,8 @@ static int cmd_stop(void)
 
 static int cmd_unbind(void)
 {
-	int fd = open(dev_path, O_RDWR), ret;
+	int fd = open_dev(1), ret;
 
-	if (fd < 0)
-		die("open /dev/afterburner0");
 	ret = ioctl(fd, IOC_UNBIND_ALL, NULL);
 	close(fd);
 	if (ret)

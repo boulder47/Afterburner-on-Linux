@@ -1,9 +1,11 @@
 /* abplayer.c — realtime ProRes player through the Afterburner card.
  *
  * Flow: select file -> verify (MOV/MP4 walk + codec/res/fps check) -> Go:
- * continuous async frame submits to /dev/afterburner0, decoded YUYV frames
- * straight into an SDL2 window (card output is interleaved [U,Y,V,Y] =
- * SDL_PIXELFORMAT_YUY2, so the texture update is a zero-conversion blit).
+ * continuous async frame submits to /dev/afterburner0, decoded frames
+ * straight into an SDL2 window. Card output is interleaved [U,Y0,V,Y1]
+ * (FINDINGS §35/§41) = SDL_PIXELFORMAT_UYVY, so the texture update is a
+ * zero-conversion blit. (Not YUY2: that is [Y0,U,Y1,V] and swaps luma and
+ * chroma on screen.)
  *
  * Verified pipeline facts baked in here:
  *  - in_len must be the EXACT packet size (page-aligned stalls firmware)
@@ -39,6 +41,7 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/ioctl.h>
+#include <sys/file.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <time.h>
@@ -119,7 +122,13 @@ static uint32_t be32(const uint8_t *p) {
 }
 static uint64_t be64(const uint8_t *p) { return ((uint64_t)be32(p) << 32) | be32(p + 4); }
 
-/* walk sibling boxes in [start,end); returns count, fills cb */
+/* box header length: 16 when the 32-bit size is 1 (64-bit largesize follows) */
+static uint64_t box_hdr(const uint8_t *d, uint64_t off) { return be32(d + off) == 1 ? 16 : 8; }
+
+/* walk sibling boxes in [start,end); returns count, fills cb.
+ * Sizes stay 64-bit: an mdat over 4 GiB (~45 s of 4K HQ) is written with a
+ * largesize, and truncating it to u32 used to end the top-level walk before
+ * moov ("no moov box") on every long recording. */
 typedef int (*box_cb)(const char *type, uint64_t s, uint64_t e, void *ud);
 static size_t box_walk(const uint8_t *d, uint64_t start, uint64_t end,
 		       box_cb cb, void *ud)
@@ -127,11 +136,15 @@ static size_t box_walk(const uint8_t *d, uint64_t start, uint64_t end,
 	size_t found = 0;
 	uint64_t off = start;
 	while (off + 8 <= end) {
-		uint32_t size = be32(d + off);
+		uint64_t size = be32(d + off);
 		const char *type = (const char *)(d + off + 4);
-		if (size == 1)      size = (uint32_t)be64(d + off + 8);
-		else if (size == 0) size = (uint32_t)(end - off);
-		if (size < 8 || off + (uint64_t)size > end) break;
+		if (size == 1) {
+			if (end - off < 16) break;
+			size = be64(d + off + 8);
+		} else if (size == 0) {
+			size = end - off;
+		}
+		if (size < box_hdr(d, off) || size > end - off) break;
 		if (cb(type, off, off + size, ud)) { found++; break; }
 		off += size;
 	}
@@ -149,7 +162,7 @@ static int find_child(const uint8_t *d, uint64_t s, uint64_t e, const char *t,
 		      uint64_t *cs, uint64_t *ce)
 {
 	struct find_res r = { .type = t };
-	box_walk(d, s + 8, e, find_cb, &r);
+	box_walk(d, s + box_hdr(d, s), e, find_cb, &r);
 	if (!r.hit) return -1;
 	*cs = r.s; *ce = r.e;
 	return 0;
@@ -269,9 +282,12 @@ static int parse_track(const uint8_t *d, uint64_t ts, uint64_t te, struct frame_
 		ft->fps = (ts_ > 0 && dur_ > 0 && ft->n) ? ts_ / (dur_ / ft->n) : 0.0;
 	}
 
+	/* The card decodes the ProRes 422 family only (FINDINGS §36–38). 4444
+	 * (ap4h, ap4x = 4444 XQ) and RAW are acked by the engine but produce no
+	 * output, so they are rejected here like any other non-422 codec. */
 	static const struct { const char *fcc, *name; } profs[] = {
-		{ "apco", "ProRes 422 Proxy" }, { "apcn", "ProRes 422 Standard" },
-		{ "apch", "ProRes 422 HQ" },    { "ap4x", "ProRes 422 LT" },
+		{ "apco", "ProRes 422 Proxy" }, { "apcs", "ProRes 422 LT" },
+		{ "apcn", "ProRes 422 Standard" }, { "apch", "ProRes 422 HQ" },
 	};
 	for (size_t i = 0; i < sizeof(profs)/sizeof(*profs); i++)
 		if (!memcmp(ft->fourcc, profs[i].fcc, 4))
@@ -295,16 +311,24 @@ static int verify_file(const char *path, struct frame_table *ft)
 	box_walk(d, 0, st.st_size, find_cb, &moov);
 	if (!moov.hit) fprintf(stderr, "REJECT: no moov box (not a MOV/MP4)\n");
 	else {
-		uint64_t ts, te;
-		while (!find_child(d, moov.s, moov.e, "trak", &ts, &te)) {
-			int r = parse_track(d, ts, te, ft);
+		/* walk every trak in order: an audio/timecode track ahead of the
+		 * video track must be skipped, not re-parsed forever */
+		uint64_t off = moov.s + box_hdr(d, moov.s);
+		while (off + 8 <= moov.e) {
+			struct find_res tr = { .type = "trak" };
+			box_walk(d, off, moov.e, find_cb, &tr);
+			if (!tr.hit) break;
+			int r = parse_track(d, tr.s, tr.e, ft);
 			if (r == 0) { rc = 0; break; }
 			if (r == -2) { /* unknown codec: report and stop */
-				fprintf(stderr, "REJECT: unsupported codec '%.4s' "
-					"(card decodes apco/apcn/apch/ap4x only)\n", ft->fourcc);
+				fprintf(stderr, "REJECT: unsupported codec '%.4s' (card decodes "
+					"ProRes 422: apco/apcs/apcn/apch; 4444 and RAW produce "
+					"no output on fw 2.62)\n", ft->fourcc);
 				break;
 			}
+			free(ft->sizes); free(ft->offsets);
 			memset(ft, 0, sizeof(*ft)); /* try next trak */
+			off = tr.e;
 		}
 		if (rc) fprintf(stderr, "REJECT: no card-decodable video track\n");
 	}
@@ -323,6 +347,18 @@ static int card_open(struct card *c, size_t in_size, size_t out_len)
 {
 	c->fd = open(DEV, O_RDWR);
 	if (c->fd < 0) { perror(DEV); return -1; }
+	/* The driver keeps ONE global DMA binding: another client's BIND/UNBIND
+	 * frees the pages this process has mapped. Hold an exclusive lock for the
+	 * whole session (same lock as abctl and Afterburner Player) and refuse to
+	 * start rather than rebind under someone else. */
+	if (flock(c->fd, LOCK_EX | LOCK_NB)) {
+		if (errno == EWOULDBLOCK)
+			fprintf(stderr, "%s is in use by another client (abplayer, abctl or "
+				"Afterburner Player) — not touching it\n", DEV);
+		else
+			perror("flock");
+		goto err;
+	}
 
 	struct ioc_status st;
 	if (ioctl(c->fd, IOC_CARD_STATUS, &st)) { perror("CARD_STATUS"); goto err; }
@@ -355,7 +391,16 @@ err:
 
 static void card_close(struct card *c)
 {
-	if (c->fd >= 0) { ioctl(c->fd, IOC_UNBIND_ALL); close(c->fd); c->fd = -1; }
+	if (c->fd >= 0) {
+		/* unmap BEFORE unbind: UNBIND_ALL frees the coherent pages, and
+		 * remap_pfn_range mappings hold no page references */
+		if (c->inmap && c->inmap != MAP_FAILED) munmap(c->inmap, c->in_size);
+		if (c->outmap && c->outmap != MAP_FAILED) munmap(c->outmap, c->out_len);
+		c->inmap = c->outmap = NULL;
+		ioctl(c->fd, IOC_UNBIND_ALL);
+		close(c->fd);
+		c->fd = -1;
+	}
 }
 
 /* Full wedge recovery (driver-documented escalation): UNBIND_ALL clears the
@@ -530,6 +575,9 @@ int main(int argc, char **argv)
 	       ft.profile_name, ft.fourcc, ft.w, ft.h, ft.n, ft.fps);
 	printf("    in=%zu B (max sample %u), out/frame=%zu B (stride %zu x rows %zu)\n",
 	       in_size, max_sample, out_len, stride, rows);
+	if (!memcmp(ft.fourcc, "apcs", 4))
+		printf("note: ProRes 422 LT has not been verified on the card yet "
+		       "(FINDINGS §38.2) — treat this run as a test data point\n");
 
 	uint64_t last = start_frame + count;
 	if (start_frame >= ft.n) { fprintf(stderr, "--start beyond EOF\n"); return 2; }
@@ -576,7 +624,7 @@ int main(int argc, char **argv)
 	struct card c = { .fd = -1 };
 	if (card_open(&c, in_size, out_len)) return 1;
 
-	/* SDL viewer: YUY2 texture pointed at the card's output DMA region */
+	/* SDL viewer: UYVY texture fed from the card's output DMA region */
 	SDL_Window *win = NULL;
 	SDL_Renderer *ren = NULL;
 	SDL_Texture *tex = NULL;
@@ -589,7 +637,9 @@ int main(int argc, char **argv)
 		ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 		if (!ren) ren = SDL_CreateRenderer(win, -1, 0);
 		if (!ren) { fprintf(stderr, "SDL renderer: %s\n", SDL_GetError()); return 1; }
-		tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_YUY2,
+		/* BT.601 for SD, BT.709 for HD (SDL's default is BT.601 for all) */
+		SDL_SetYUVConversionMode(SDL_YUV_CONVERSION_AUTOMATIC);
+		tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_UYVY,
 				     SDL_TEXTUREACCESS_STREAMING, ft.w, ft.h);
 		if (!tex) { fprintf(stderr, "SDL texture: %s\n", SDL_GetError()); return 1; }
 	}

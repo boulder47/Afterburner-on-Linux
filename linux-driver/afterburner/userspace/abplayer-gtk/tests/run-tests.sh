@@ -3,7 +3,8 @@
 #
 #  1. parser + per-frame self-check against ffmpeg-made ProRes clips
 #     (all four 422 profiles, odd width, faststart + colr, interlaced/PAR)
-#  2. rejections: 4444, non-ProRes, truncated file, corrupt sample table
+#     plus a sparse >4 GiB file (64-bit mdat largesize) and audio-track-first
+#  2. rejections: 4444, 4444 XQ, non-ProRes, truncated file, corrupt sample table
 #  3. fuzzing the parser under ASan/UBSan
 #  4. if a Wayland/X display is available and ./abplayer-gtk is built: the
 #     full display pipeline — real ProRes frames decoded by ffmpeg to UYVY are
@@ -51,7 +52,33 @@ gen -f lavfi -i testsrc2=size=1920x1080:rate=24 -frames:v 6 -c:v prores_ks -prof
 	-color_primaries bt709 -color_trc bt709 -colorspace bt709 -movflags +faststart "$OUT/hd_colr.mov"
 gen -f lavfi -i testsrc2=size=1440x1080:rate=30000/1001 -frames:v 4 -c:v prores_ks -profile:v 2 \
 	-flags +ildct+ilme -top 1 -vf setsar=4/3 "$OUT/interlaced_par.mov"
+gen -f lavfi -i testsrc2=size=640x360:rate=30000/1001 -frames:v 3 \
+	-c:v prores_ks -profile:v 5 -pix_fmt yuva444p10le "$OUT/p4444xq.mov"
 gen -f lavfi -i testsrc2=size=640x360:rate=30 -frames:v 5 -c:v mpeg4 "$OUT/mpeg4.mp4"
+gen -i "$OUT/odd_audio.mov" -map 0:a -map 0:v -c copy "$OUT/audio_first.mov"
+# >4 GiB recording layout without writing 4 GiB: rewrite mdat as a 64-bit
+# largesize box padded with a sparse 4.5 GiB hole, moov after it. ffmpeg's
+# 8-byte 'wide' box before mdat makes room for the 16-byte header, so chunk
+# offsets stay valid.
+python3 - "$OUT/p3.mov" "$OUT/largesize_4g.mov" <<'EOF'
+import struct, sys
+src = open(sys.argv[1], 'rb').read()
+boxes, off = [], 0
+while off + 8 <= len(src):
+    sz, = struct.unpack('>I', src[off:off + 4])
+    boxes.append((src[off + 4:off + 8], off, sz))
+    off += sz
+assert [b[0] for b in boxes] == [b'ftyp', b'wide', b'mdat', b'moov'], boxes
+(_, fo, fs), _, (_, mo, ms), (_, vo, vs) = boxes
+hole = 4608 << 20
+payload = src[mo + 8:mo + ms]
+with open(sys.argv[2], 'wb') as f:
+    f.write(src[fo:fo + fs])
+    f.write(struct.pack('>I4sQ', 1, b'mdat', 16 + len(payload) + hole))
+    f.write(payload)
+    f.seek(hole, 1)
+    f.write(src[vo:vo + vs])
+EOF
 head -c 200000 "$OUT/p2.mov" >"$OUT/truncated.mov"
 python3 - "$OUT/p2.mov" "$OUT/bad_stsz.mov" <<'EOF'
 import sys
@@ -71,6 +98,9 @@ run apch      $TM --expect fourcc=apch w=640 h=360 n=20 fps=29.97 "$OUT/p3.mov"
 run odd_width $TM --expect w=322 h=180 n=25 fps=25 "$OUT/odd_audio.mov"
 run faststart_colr $TM --expect fourcc=apch w=1920 h=1080 n=6 fps=24 matrix=1 "$OUT/hd_colr.mov"
 run interlaced_par $TM --expect w=1440 h=1080 n=4 "$OUT/interlaced_par.mov"
+run audio_track_first $TM --expect fourcc=apcn w=322 h=180 n=25 "$OUT/audio_first.mov"
+run largesize_mdat_4g $TM --expect fourcc=apch w=640 h=360 n=20 "$OUT/largesize_4g.mov"
+rm -f "$OUT/largesize_4g.mov" # sparse, but don't leave a 4.5 GiB file behind
 grep -q "par=4:3 il=1" "$OUT/interlaced_par.log" && echo "PASS  par_and_interlace_flags" &&
 	pass=$((pass + 1)) || { echo "FAIL  par_and_interlace_flags"; fail=$((fail + 1)); }
 grep -q "stride=704 rows=192" "$OUT/odd_width.log" && echo "PASS  odd_width_card_layout (FINDINGS §35.3)" &&
@@ -78,6 +108,7 @@ grep -q "stride=704 rows=192" "$OUT/odd_width.log" && echo "PASS  odd_width_card
 
 echo "== rejections"
 run reject_4444      $TM --expect-fail "$OUT/p4444.mov"
+run reject_4444xq    $TM --expect-fail "$OUT/p4444xq.mov"
 run reject_mpeg4     $TM --expect-fail "$OUT/mpeg4.mp4"
 run reject_truncated $TM --expect-fail "$OUT/truncated.mov"
 run reject_bad_stsz  $TM --expect-fail "$OUT/bad_stsz.mov"

@@ -122,7 +122,8 @@ GL: UYVY texture ─(pass 1, 1:1)─▶ RGB FBO + mipmaps ─(pass 2, aspect-fit
   `RESET`. Those ioctls free the coherent pages, and `remap_pfn_range` mappings don't hold
   page references.
 - The driver keeps one global binding, so the app takes an exclusive `flock` on the
-  device node. A second instance reports "in use" instead of rebinding under the first.
+  device node — the same lock `abplayer` and `abctl`'s mutating commands take. Whichever
+  client comes second reports "in use" instead of rebinding under the first.
 - Card output is `[U,Y0,V,Y1]`, i.e. **UYVY**, as pixel-verified in FINDINGS §35/§41. It is
   uploaded unconverted as an RGBA8 texture of ⌈W/2⌉×H texels, using
   `GL_UNPACK_ROW_LENGTH` to handle the padded stride. Pass 1 converts each pixel exactly
@@ -136,7 +137,10 @@ No card is needed. The tests generate ProRes clips with ffmpeg and check:
 - the parser and self-check on all four 422 profiles, an odd width (322×180 → stride 704,
   rows 192, as in FINDINGS §35.3), faststart with a `colr` box, and interlaced with a 4:3
   PAR;
-- that ProRes 4444, MPEG-4, a truncated file and a corrupted `stsz` entry are rejected;
+- a sparse 4.5 GiB file with a 64-bit `mdat` (the layout of any long 4K recording) and a
+  clip whose audio track comes before the video track;
+- that ProRes 4444, 4444 XQ, MPEG-4, a truncated file and a corrupted `stsz` entry are
+  rejected;
 - 6 000 fuzzed parses under ASan/UBSan;
 - with a Wayland or X display, the full display path. Real ProRes frames decoded by ffmpeg
   are replayed through the simulator in the card's padded layout (`AB_SIM_UYVY`), rendered

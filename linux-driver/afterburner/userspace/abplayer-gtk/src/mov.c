@@ -2,14 +2,13 @@
 /*
  * mov.c — MOV/MP4 ProRes video-track parser + per-frame self-check.
  *
- * Differences from userspace/abplayer.c's parser (which was written for
- * known-good test clips):
- *  - every read is bounds-checked against its enclosing box (arbitrary
- *    files can be dropped onto the window);
- *  - 64-bit box sizes are kept 64-bit (abplayer truncates largesize to u32,
- *    so a >4 GiB mdat — ~45 s of 4K HQ — ends the top-level walk early);
- *  - FourCC table: apcs is ProRes 422 LT and ap4x is 4444 XQ (abplayer has
- *    ap4x labelled "422 LT" and does not accept apcs at all);
+ * Compared with userspace/abplayer.c's parser (written for known-good test
+ * clips), this one is meant for arbitrary files dropped onto a window:
+ *  - every read is bounds-checked against its enclosing box;
+ *  - 64-bit box sizes throughout (a >4 GiB mdat — ~45 s of 4K HQ — uses a
+ *    largesize header);
+ *  - FourCC table: apco/apcs/apcn/apch accepted (apcs = 422 LT, untested on
+ *    the card); 4444 (ap4h, ap4x = XQ) and RAW rejected with a reason;
  *  - the self-check also validates the 'icpf' tag, constant dimensions and
  *    4:2:2 chroma, and works through pread() so a huge file is never mapped.
  */

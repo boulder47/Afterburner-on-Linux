@@ -228,10 +228,12 @@ Card *card_open_hw(const char *dev, char *err, size_t errlen)
 		goto fail;
 	}
 	/* the driver keeps ONE global binding: a second client's BIND frees the
-	 * first one's regions under it. Exclude other cooperating players. */
+	 * first one's regions under it. abplayer and abctl's mutating commands
+	 * take the same lock. */
 	if (flock(c->fd, LOCK_EX | LOCK_NB)) {
 		seterr(err, errlen, errno == EWOULDBLOCK
-		       ? "the card is in use by another Afterburner Player instance"
+		       ? "the card is in use by another client (abplayer, abctl or another "
+			 "Afterburner Player window) — close it and try again"
 		       : "flock on %s failed: %s", dev, strerror(errno));
 		goto fail;
 	}
