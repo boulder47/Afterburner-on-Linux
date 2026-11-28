@@ -1,0 +1,5 @@
+# build outputs
+abplayer-gtk
+*.o
+tests/test_mov
+tests/out/

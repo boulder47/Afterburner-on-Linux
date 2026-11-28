@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d3846"/>
+      <stop offset="1" stop-color="#241f31"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#e01b24"/>
+      <stop offset="0.55" stop-color="#ff7800"/>
+      <stop offset="1" stop-color="#f6d32d"/>
+    </linearGradient>
+  </defs>
+  <!-- card body -->
+  <rect x="10" y="22" width="108" height="84" rx="12" fill="url(#body)"/>
+  <rect x="10" y="98" width="108" height="8" rx="4" fill="#1a1625"/>
+  <!-- PCIe edge fingers -->
+  <g fill="#c0bfbc">
+    <rect x="30" y="106" width="6" height="8" rx="1"/>
+    <rect x="40" y="106" width="6" height="8" rx="1"/>
+    <rect x="50" y="106" width="6" height="8" rx="1"/>
+    <rect x="66" y="106" width="6" height="8" rx="1"/>
+    <rect x="76" y="106" width="6" height="8" rx="1"/>
+    <rect x="86" y="106" width="6" height="8" rx="1"/>
+  </g>
+  <!-- flame -->
+  <path d="M64 34c10 12 20 20 20 34 0 12-9 22-20 22s-20-10-20-22c0-9 5-14 9-20 1 7 4 10 7 11-2-9 0-17 4-25z" fill="url(#flame)"/>
+  <!-- play triangle -->
+  <path d="M58 60v20l17-10z" fill="#ffffff"/>
+</svg>

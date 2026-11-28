@@ -32,6 +32,7 @@ linux-driver/afterburner/   production driver + userspace tools (the deliverable
   Makefile                  Kbuild module build
   userspace/abctl           control client (status / decode / start / stop / unbind)
   userspace/abplayer        realtime SDL2 ProRes player + verification modes
+  userspace/abplayer-gtk/   GTK4/libadwaita desktop player + test tool (Wayland/GNOME)
   tests/                    V-matrix test clients, comparison scripts, soak/negative tests
 docs/                       deliverable documentation (kext read, VideoToolbox path analysis)
 testdata/                   single-frame ProRes fixtures (320×180, 4K, RAW) for abctl decode
@@ -82,6 +83,22 @@ Sample clips live in `dev/testmedia/`: `prorestest.mov` (the canonical test clip
 870 frames), `prores422.MOV` (sustained 4K HQ @30 fps), plus RAW/MXF material used for
 profile-matrix testing.
 
+## Desktop player & test tool (abplayer-gtk)
+
+A native GNOME/Wayland app (GTK4 + libadwaita) on top of the same ioctl path: open or drop a
+ProRes clip, play/pause/scrub/step frame-by-frame, loop, run at card speed, and watch live
+decode/readback timings, recovery-ladder counters, `getPercent` duty cycle, decoder state and
+thermals. Frames can be saved as PNG or as raw card output for `tests/compare_card_ref.py`.
+A clearly-labelled simulated card lets the UI run without hardware.
+
+```sh
+sudo pacman -S --needed base-devel gtk4 libadwaita libepoxy
+cd linux-driver/afterburner/userspace/abplayer-gtk
+make && ./abplayer-gtk clip.mov          # make install → app grid entry under ~/.local
+```
+
+See `linux-driver/afterburner/userspace/abplayer-gtk/README.md`.
+
 ## Single-frame decode & control (abctl)
 
 ```sh
@@ -97,6 +114,12 @@ gcc -O2 -o userspace/abctl userspace/abctl.c     # no dependencies beyond libc
 ./userspace/abctl unbind                          # release bound DMA regions
 ```
 
+The driver keeps a single global DMA binding, so a second client's bind/unbind frees the
+buffers the first one has mapped. `abctl decode/start/stop/unbind`, `abplayer` and
+`abplayer-gtk` therefore take an exclusive `flock` on `/dev/afterburner0` and refuse to run
+while another of them holds it. `abctl status` is read-only and works alongside a running
+player. (The test clients in `tests/` do not take the lock — don't run them during playback.)
+
 The ioctl ABI on `/dev/afterburnerN` mirrors the kext's user-client `sMethods` one-to-one:
 `submitFrame`, `queryCompletion`, `bindFrame`, `cardStatus`, `checkForSpace`, `unbindAll`,
 `getPercent`, `stop`, `start`, plus async pair (`SUBMIT_ASYNC`/`WAIT_COMPL`) and a FLR
@@ -104,8 +127,9 @@ escape hatch (`AB_IOC_RESET`). See `ab_chardev.c` for the struct definitions.
 
 ### Decoded output format
 
-The card emits **interleaved 8-bit YUV422** — `[U, Y0, V, Y1]` groups (SDL `YUY2`, so
-`abplayer` blits with zero conversion). Buffer layout is fixed regardless of buffer size:
+The card emits **interleaved 8-bit YUV422** — `[U, Y0, V, Y1]` groups, i.e. **UYVY** (SDL
+`SDL_PIXELFORMAT_UYVY`, so `abplayer` blits with zero conversion; *not* YUY2, which is
+`[Y0, U, Y1, V]`). Buffer layout is fixed regardless of buffer size:
 row stride = `ceil(W*2/64)*64` bytes, rows = `ceil(H/16)*16`; padding rows repeat the last
 real row. Only the first H rows are real content.
 
